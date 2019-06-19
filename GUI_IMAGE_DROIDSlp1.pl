@@ -202,7 +202,7 @@ my $minFrame = $mw->Frame();
 					-textvariable=>\$min_user
 					);
 my $maxFrame = $mw->Frame();
-		my $maxLabel = $maxFrame->Label(-text=>"min value: ");
+		my $maxLabel = $maxFrame->Label(-text=>"max value: ");
 		my $maxEntry = $maxFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$max_user
