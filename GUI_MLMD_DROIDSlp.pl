@@ -426,6 +426,8 @@ system "gedit variant_list.txt\n";
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_ligand_list.txt");
 print MUT "PDB_IDs\n";
+print MUT "$fileIDl\n";
+print MUT "$fileIDl\n";
 close MUT;
 print "opening ligand_list.txt using gedit\n\n";
 print "type PDB ID's for additional ligands under 'PDB_IDs' then save and close\n\n";
@@ -737,7 +739,7 @@ for (my $p = 0; $p < scalar @MUT; $p++){
 	 if ($p == 0){next;}
       my $MUTrow = $MUT[$p];
       my @MUTrow = split (/\s+/, $MUTrow);
-	 $fileIDq = $MUTrow[0];
+	 $fileIDl = $MUTrow[0];
       print "\nrunning antechamber files for $fileIDl.pdb\n";
       sleep(2);
       ########
