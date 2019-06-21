@@ -21,7 +21,9 @@ print "path to teLeap .exe\t"."$teleap_path\n";
 for (my $g = 0; $g < 2; $g++){
 if ($g == 0) {open(MUT, "<"."copy_list.txt");}
 if ($g == 1) {open(MUT, "<"."variant_list.txt");}
+#if ($g == 1) {open(MUT2, "<"."variant_ligand_list.txt");}
 my @MUT = <MUT>;
+#my @MUT2 = <MUT2>;
 #print @MUT;
 for (my $p = 0; $p < scalar @MUT; $p++){
 	 if ($p == 0){next;}
@@ -30,6 +32,11 @@ for (my $p = 0; $p < scalar @MUT; $p++){
       my $MUTrow = $MUT[$p];
       my @MUTrow = split (/\s+/, $MUTrow);
 	 $fileIDq = $MUTrow[0];
+      #if($g == 1){
+      #my $MUT2row = $MUT2[$p];
+      #my @MUT2row = split (/\s+/, $MUT2row);
+	 #$fileIDl = $MUT2row[0];
+      #}
       print "\nmaking teLeap files for $fileIDq.pdb\n";
       sleep(2);
       #############
@@ -141,10 +148,12 @@ open(LEAP_COMPLEX, ">"."$protein_labelQ.bat") or die "could not open LEAP file\n
      print LEAP_COMPLEX "source "."$teleap_path"."$addfield\n";
      print LEAP_COMPLEX "source "."$teleap_path"."leaprc.water.tip3p\n";
 	print LEAP_COMPLEX "loadoff ligand.lib\n";
-     print LEAP_COMPLEX "protein$protein_labelR = loadpdb $protein_labelR.pdb\n";
+     #print LEAP_COMPLEX "protein$protein_labelR = loadpdb $protein_labelR.pdb\n";
+     print LEAP_COMPLEX "protein$protein_label = loadpdb $protein_label.pdb\n";  # replaces line above for teLeap setup of ligand bound sims
      print LEAP_COMPLEX "loadamberparams $ligand_label".".frcmod\n";
      print LEAP_COMPLEX "ligand$ligand_label = loadmol2 $ligand_label.mol2\n";
-     print LEAP_COMPLEX "complex$protein_labelQ = combine{protein$protein_labelR ligand$ligand_label}\n";
+     #print LEAP_COMPLEX "complex$protein_labelQ = combine{protein$protein_labelR ligand$ligand_label}\n";
+     print LEAP_COMPLEX "complex$protein_labelQ = combine{protein$protein_label ligand$ligand_label}\n";  # replaces line above for teLeap setup of ligand bound sims
      print LEAP_COMPLEX "savepdb complex$protein_labelQ complex_$protein_labelQ.pdb\n";
      print LEAP_COMPLEX "saveamberparm complex$protein_labelQ vac_$protein_labelQ.prmtop vac_$protein_labelQ.inpcrd\n";
      print LEAP_COMPLEX "addions complex$protein_labelQ Na+ 0\n"; # only use to charge or neutralize explicit solvent
@@ -187,6 +196,7 @@ sleep(1);
 
 
 close MUT;
+#close MUT2;
 } #end for loop
 } # end outer for loop
 ######################################################################

@@ -182,12 +182,12 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
-	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
-		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
-					-relief => "groove",
-					-textvariable=>\$fileIDq
-					);
+#	my $QfileFrame = $pdbFrame->Frame();
+#		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
+#		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
+#					-relief => "groove",
+#					-textvariable=>\$fileIDq
+#					);
 	my $forceFrame = $pdbFrame->Frame();
 		my $forceLabel = $forceFrame->Label(-text=>"Force Field (from previous runs): ");
 		my $forceEntry = $forceFrame->Entry(-borderwidth => 2,
@@ -316,8 +316,8 @@ $varlistButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
 
-$QfileLabel->pack(-side=>"left");
-$QfileEntry->pack(-side=>"left");
+#$QfileLabel->pack(-side=>"left");
+#$QfileEntry->pack(-side=>"left");
 $forceLabel->pack(-side=>"left");
 $forceEntry->pack(-side=>"left");
 $dforceLabel->pack(-side=>"left");
@@ -337,8 +337,8 @@ $forceFrame->pack(-side=>"top",
 		-anchor=>"e");
 $dforceFrame->pack(-side=>"top",
 		-anchor=>"e");
-$QfileFrame->pack(-side=>"top",
-		-anchor=>"e");
+#$QfileFrame->pack(-side=>"top",
+#		-anchor=>"e");
 $prodFrame->pack(-side=>"top",
 		-anchor=>"e");
 $tempFrame->pack(-side=>"top",
@@ -398,13 +398,13 @@ print MUT "$fileIDq"."_1\n";
 print MUT "$fileIDq"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
-print "type PDB ID's for additional variants under 'PDB_IDs' then save and close\n\n";
+print "type PDB ID's for additional target protein variants under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
 print "1cdw_unbound_F34G\n";
 print "1cdw_unbound_H57D\n";
 print "etc...\n\n\n";
-print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
+print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DNA BINDING VARIANTS\n\n";
 
 system "gedit variant_list.txt\n";
 
@@ -842,6 +842,9 @@ close IN;
 #print "(e.g. enter 1 if starts at MET 1.A) \n\n";
 #my $startN = <STDIN>;
 #chop($startN);
+
+#my $fileIDr = $fileIDq;  # edit for retrieving alignment files for newly deployed simulations
+
 
 sleep(2);
 print "\n\n searching for atom info file = "."cpptraj_atominfo_$fileIDr.txt\n";

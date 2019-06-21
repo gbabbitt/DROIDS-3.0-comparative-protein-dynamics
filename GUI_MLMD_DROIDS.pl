@@ -182,12 +182,12 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
-	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
-		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
-					-relief => "groove",
-					-textvariable=>\$fileIDq
-					);
+#	my $QfileFrame = $pdbFrame->Frame();
+#		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
+#		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
+#					-relief => "groove",
+#					-textvariable=>\$fileIDq
+#					);
 	my $forceFrame = $pdbFrame->Frame();
 		my $forceLabel = $forceFrame->Label(-text=>"Force Field (from previous runs): ");
 		my $forceEntry = $forceFrame->Entry(-borderwidth => 2,
@@ -311,8 +311,8 @@ $varlistButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
 
-$QfileLabel->pack(-side=>"left");
-$QfileEntry->pack(-side=>"left");
+#$QfileLabel->pack(-side=>"left");
+#$QfileEntry->pack(-side=>"left");
 $forceLabel->pack(-side=>"left");
 $forceEntry->pack(-side=>"left");
 $prodLabel->pack(-side=>"left");
@@ -328,8 +328,8 @@ $chainEntry->pack(-side=>"left");
 
 $forceFrame->pack(-side=>"top",
 		-anchor=>"e");
-$QfileFrame->pack(-side=>"top",
-		-anchor=>"e");
+#$QfileFrame->pack(-side=>"top",
+#		-anchor=>"e");
 $prodFrame->pack(-side=>"top",
 		-anchor=>"e");
 $tempFrame->pack(-side=>"top",
@@ -832,6 +832,8 @@ close IN;
 #print "(e.g. enter 1 if starts at MET 1.A) \n\n";
 #my $startN = <STDIN>;
 #chop($startN);
+
+#my $fileIDr = $fileIDq;  # edit for retrieving alignment files for newly deployed simulations
 
 sleep(2);
 print "\n\n searching for atom info file = "."cpptraj_atominfo_$fileIDr.txt\n";

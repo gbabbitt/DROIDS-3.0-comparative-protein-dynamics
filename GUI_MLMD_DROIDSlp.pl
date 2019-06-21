@@ -62,7 +62,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
 	 if ($header eq "Force_Field"){$forceID = $value;}
       if ($header eq "DNA_Field" || $header eq "LIGAND_Field"){$dforceID = $value;}
       if ($header eq "PDB_ID"){$fileIDq = $value; $fileIDq = substr($fileIDq, 0, length ($fileIDq)-7);} # trims 'REDUCED' off end of ref label
-      if ($header eq "LIGAND_ID"){$fileIDl = $value;}
+      if ($header eq "LIGAND_ID"){$fileIDl = $value; }# trims 'REDUCED' off end of ref label
       if ($header eq "Heating_Time"){$cutoffValueHeatFS = $value;}
       if ($header eq "Equilibration_Time"){$cutoffValueEqFS = $value;}
       if ($header eq "Production_Time"){$cutoffValueProdFS = $value;}
@@ -182,18 +182,18 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
-	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
-		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
-					-relief => "groove",
-					-textvariable=>\$fileIDq
-					);
-	my $LfileFrame = $pdbFrame->Frame();
-		my $LfileLabel = $LfileFrame->Label(-text=>"original pdb ID for ligand : ");
-		my $LfileEntry = $LfileFrame->Entry(-borderwidth => 2,
-					-relief => "groove",
-					-textvariable=>\$fileIDl
-					);
+#my $QfileFrame = $pdbFrame->Frame();
+#	my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID query (for deploying learner) : ");
+#	my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
+#				-relief => "groove",
+#				-textvariable=>\$fileIDq
+#				);
+#my $LfileFrame = $pdbFrame->Frame();
+#	my $LfileLabel = $LfileFrame->Label(-text=>"original pdb ID for ligand : ");
+#	my $LfileEntry = $LfileFrame->Entry(-borderwidth => 2,
+#				-relief => "groove",
+#				-textvariable=>\$fileIDl
+#				);
      my $forceFrame = $pdbFrame->Frame();
 		my $forceLabel = $forceFrame->Label(-text=>"protein force field (from previous runs): ");
 		my $forceEntry = $forceFrame->Entry(-borderwidth => 2,
@@ -327,11 +327,11 @@ $controlButton->pack(-side=>"bottom",
 $varlistButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
-
-$QfileLabel->pack(-side=>"left");
-$QfileEntry->pack(-side=>"left");
-$LfileLabel->pack(-side=>"left");
-$LfileEntry->pack(-side=>"left");
+ 
+#$QfileLabel->pack(-side=>"left");
+#$QfileEntry->pack(-side=>"left");
+#$LfileLabel->pack(-side=>"left");
+#$LfileEntry->pack(-side=>"left");
 $forceLabel->pack(-side=>"left");
 $forceEntry->pack(-side=>"left");
 $dforceLabel->pack(-side=>"left");
@@ -351,10 +351,10 @@ $forceFrame->pack(-side=>"top",
 		-anchor=>"e");
 $dforceFrame->pack(-side=>"top",
 		-anchor=>"e");
-$QfileFrame->pack(-side=>"top",
-		-anchor=>"e");
-$LfileFrame->pack(-side=>"top",
-		-anchor=>"e");
+#$QfileFrame->pack(-side=>"top",
+#		-anchor=>"e");
+#$LfileFrame->pack(-side=>"top",
+# 		-anchor=>"e");
 $prodFrame->pack(-side=>"top",
 		-anchor=>"e");
 $tempFrame->pack(-side=>"top",
@@ -413,11 +413,11 @@ print MUT "$fileIDq"."_1\n";
 print MUT "$fileIDq"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
-print "type PDB ID's for additional variants under 'PDB_IDs' then save and close\n\n";
+print "type PDB ID's for additional target proteins of variants under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
-print "3toz_bound_drug1\n";
-print "3t0z_bound_drug2\n";
+print "3toz_unbound_drug1\n";
+print "3t0z_unbound_drug2\n";
 print "etc...\n\n\n";
 print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
 
@@ -457,8 +457,8 @@ my @MUT2 = <MUT2>;
 #print @MUT;
 for (my $p = 0; $p < scalar @MUT; $p++){
 	 if ($p == 0){next;}
-      if ($g == 1 && $p == 1){next;}
-      if ($g == 1 && $p == 2){next;}
+      #if ($g == 1 && $p == 1){next;}
+      #if ($g == 1 && $p == 2){next;}
       my $MUTrow = $MUT[$p];
       my @MUTrow = split (/\s+/, $MUTrow);
 	 $fileIDq = $MUTrow[0];
@@ -629,6 +629,7 @@ print "NOTE: if the chain designations look as if they have been calculated inco
 print "you will need to edit...re-enter lengths manually in MDq_deploy.ctl, DROIDS_deploy.ctl\n\n";
 
 close MUT;
+close MUT2;
 } #end for loop
 } # end outer for loop
 print "\ncontrol files for all variants are made \n\n";
@@ -913,6 +914,8 @@ close IN;
 #print "(e.g. enter 1 if starts at MET 1.A) \n\n";
 #my $startN = <STDIN>;
 #chop($startN);
+
+#my $fileIDr = $fileIDq; # edit for retrieving alignment files for newly deployed simulations
 
 sleep(2);
 print "\n\n searching for atom info file = "."cpptraj_atominfo_$fileIDr.txt\n";
