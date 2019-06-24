@@ -171,8 +171,8 @@ print "  default is simple rigid 3 point model, charge neutralized with Na+\n";
 print "  close .bat when done\n\n";
 sleep(2);
 
-system "gedit $ligand_label.bat\n";
-system "gedit $protein_labelR.bat\n";
+#system "gedit $ligand_label.bat\n";
+#system "gedit $protein_labelR.bat\n";
 system "gedit $protein_labelQ.bat\n";
 
 ######################################################################
