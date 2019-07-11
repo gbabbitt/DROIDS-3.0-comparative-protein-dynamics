@@ -589,6 +589,8 @@ print "note: also be sure to inspect warning messages on the terminal\n\n";
 print "\n============================================================================\n\n";
 sleep(5);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
+print "check scaled quantum mechanical optimizations (close file when done)\n";
+system "gedit sqm.out\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
 system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";

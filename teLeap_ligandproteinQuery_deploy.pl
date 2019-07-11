@@ -156,8 +156,9 @@ open(LEAP_COMPLEX, ">"."$protein_labelQ.bat") or die "could not open LEAP file\n
      print LEAP_COMPLEX "complex$protein_labelQ = combine{protein$protein_label ligand$ligand_label}\n";  # replaces line above for teLeap setup of ligand bound sims
      print LEAP_COMPLEX "savepdb complex$protein_labelQ complex_$protein_labelQ.pdb\n";
      print LEAP_COMPLEX "saveamberparm complex$protein_labelQ vac_$protein_labelQ.prmtop vac_$protein_labelQ.inpcrd\n";
-     print LEAP_COMPLEX "addions complex$protein_labelQ Na+ 0\n"; # only use to charge or neutralize explicit solvent
-	print LEAP_COMPLEX "saveamberparm complex$protein_labelQ ion_$protein_labelQ.prmtop ion_$protein_labelQ.inpcrd\n";
+     print LEAP_COMPLEX "addions complex$protein_labelQ Na+ 0\n"; # to charge or neutralize explicit solvent
+	print LEAP_COMPLEX "addions complex$protein_labelQ Cl- 0\n"; # to charge or neutralize explicit solvent
+     print LEAP_COMPLEX "saveamberparm complex$protein_labelQ ion_$protein_labelQ.prmtop ion_$protein_labelQ.inpcrd\n";
 	print LEAP_COMPLEX "solvateoct complex$protein_labelQ TIP3PBOX 10.0\n";
 	print LEAP_COMPLEX "saveamberparm complex$protein_labelQ wat"."_$protein_labelQ.prmtop wat"."_$protein_labelQ.inpcrd\n";
      print LEAP_COMPLEX "quit\n";
