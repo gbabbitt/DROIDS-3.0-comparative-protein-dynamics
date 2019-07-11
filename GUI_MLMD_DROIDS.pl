@@ -255,9 +255,9 @@ my $teLeapButton = $mw -> Button(-text => "generate topology and coordinate file
 my $reduceButton = $mw -> Button(-text => "dry and reduce structure (run pdb4amber)", 
 				-command => \&reduce
 				); # Creates a pdb4amber button
-my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
-				-command => \&align
-				); # Creates a align button
+#my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
+#				-command => \&align
+#				); # Creates a align button
 my $launchButton = $mw -> Button(-text => "launch MD run", 
 				-command => \&launch,
 				-background => 'gray45',
@@ -298,9 +298,9 @@ $launchButton->pack(-side=>"bottom",
 $teLeapButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
-$alignButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
+#$alignButton->pack(-side=>"bottom",
+#			-anchor=>"s"
+#			);
 $reduceButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);

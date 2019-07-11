@@ -611,7 +611,7 @@ system "perl MD_proteinQuery.pl\n";
 sleep(2);
 system "perl MD_proteinReference.pl\n";
 print "\n\n";
-print "MD SIMULATIONS ARE COMPLETED WHEN TERMINALS CLOSE\n\n";
+print "MD SIMULATIONS ARE COMPLETED\n\n";
 }
 
 ######################################################################################################

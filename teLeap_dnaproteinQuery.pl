@@ -88,7 +88,8 @@ open(LEAP_PROTEIN, ">"."$protein_label.bat") or die "could not open LEAP file\n"
 	print LEAP_PROTEIN "source "."$teleap_path"."leaprc.water.tip3p\n";
 	print LEAP_PROTEIN "protein$protein_label = loadpdb $protein_label.pdb\n";
 	print LEAP_PROTEIN "saveamberparm protein$protein_label vac_$protein_label.prmtop vac_$protein_label.inpcrd\n";
-	print LEAP_PROTEIN "addions protein$protein_label Na+ 0\n"; # only use to charge or neutralize explicit solvent
+	print LEAP_PROTEIN "addions protein$protein_label Na+ 0\n"; # to charge or neutralize explicit solvent
+     print LEAP_PROTEIN "addions protein$protein_label Cl- 0\n"; # to charge or neutralize explicit solvent
 	print LEAP_PROTEIN "saveamberparm protein$protein_label ion_$protein_label.prmtop ion_$protein_label.inpcrd\n";
 	print LEAP_PROTEIN "solvateoct protein$protein_label TIP3PBOX 10.0\n";
 	print LEAP_PROTEIN "saveamberparm protein$protein_label wat"."_$protein_label.prmtop wat"."_$protein_label.inpcrd\n";

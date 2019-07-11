@@ -45,7 +45,7 @@ my @chainlen2;
 
 #### Create GUI ####
 my $mw = MainWindow -> new; # Creates a new main window
-$mw -> title("AMBER 16 MD control settings"); # Titles the main window
+$mw -> title("AMBER MD control settings"); # Titles the main window
 $mw->setPalette("gray");
 
 my $MDheatScale = $mw->Scale(-label=>"Length of MD heating run (ps) :",
@@ -290,6 +290,8 @@ $MDheatScale->pack(-side=>"top");
 $MDeqScale->pack(-side=>"top");
 $MDprodScale->pack(-side=>"top");
 $MDsaltScale->pack(-side=>"top");
+
+print "\nNOTE: if ligand is a small protein, use protein forcefield for ligand and then skip Antechamber force field modifications\n\n";
 
 MainLoop; # Allows Window to Pop Up
 
@@ -588,7 +590,11 @@ sleep(5);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
-system "parmchk -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+print "check mol2 file and then close\n";
+system("$chimera_path"."chimera $fileIDl"."REDUCED.mol2\n");
+print "check force field modifications file and then close\n";
+system "gedit $fileIDl"."REDUCED.frcmod\n";
 sleep(1);
 print "\n\nparmchk is completed\n\n";
 }

@@ -118,7 +118,7 @@ my @chainlen2;
 
 #### Create GUI ####
 my $mw = MainWindow -> new; # Creates a new main window
-$mw -> title("AMBER 16 MD control settings for ML deployment"); # Titles the main window
+$mw -> title("AMBER MD control settings for ML deployment"); # Titles the main window
 $mw->setPalette("gray");
 
 my $MDheatScale = $mw->Scale(-label=>"Length of MD heating run (ps) :",
@@ -269,9 +269,9 @@ my $antechamberButton = $mw -> Button(-text => "ligand force field modification 
 my $reduceButton = $mw -> Button(-text => "dry and reduce structure (run pdb4amber)", 
 				-command => \&reduce
 				); # Creates a pdb4amber button
-my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
-				-command => \&align
-				); # Creates a align button
+#my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
+#				-command => \&align
+#				); # Creates a align button
 my $launchButton = $mw -> Button(-text => "launch MD run", 
 				-command => \&launch,
 				-background => 'gray45',
@@ -315,9 +315,9 @@ $teLeapButton->pack(-side=>"bottom",
 $antechamberButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
-$alignButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
+#$alignButton->pack(-side=>"bottom",
+#			-anchor=>"s"
+#			);
 $reduceButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
@@ -378,6 +378,8 @@ $MDeqScale->pack(-side=>"top");
 #$MDprodScale->pack(-side=>"top");
 $MDsaltScale->pack(-side=>"top");
 
+print "\nNOTE: if ligand is a small protein, use protein forcefield for ligand and then skip Antechamber force field modifications\n\n";
+
 MainLoop; # Allows Window to Pop Up
 
 
@@ -395,22 +397,22 @@ if ($num_copy eq ''){$num_copy = 2;}
 # make copies of query protein file for deploy 
 for (my $c = 0; $c <= $num_copy ; $c++){
 if ($c == 0){next;}
-my $oldfilename = "$fileIDq".".pdb";
-my $newfilename = "$fileIDq"."_$c.pdb";
+my $oldfilename = "$fileIDr".".pdb";
+my $newfilename = "$fileIDr"."_$c.pdb";
 copy($oldfilename, $newfilename);
 }
 open(MUT, ">"."copy_list.txt");
 print MUT "PDB_IDs\n";
-for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDq"."_$c\n";}
+for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
 close MUT;
-print "check PDB ID's for copies of $fileIDq then save and close\n\n";
+print "check PDB ID's for copies of $fileIDr then save and close\n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_list.txt");
 print MUT "PDB_IDs\n";
-print MUT "$fileIDq"."_1\n";
-print MUT "$fileIDq"."_2\n";
+print MUT "$fileIDr"."_1\n";
+print MUT "$fileIDr"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target proteins of variants under 'PDB_IDs' then save and close\n\n";
@@ -425,9 +427,10 @@ system "gedit variant_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_ligand_list.txt");
+$fileIDl_label = substr($fileIDl, 0, length($fileIDl)-7);
 print MUT "PDB_IDs\n";
-print MUT "$fileIDl\n";
-print MUT "$fileIDl\n";
+print MUT "$fileIDl_label\n";
+print MUT "$fileIDl_label\n";
 close MUT;
 print "opening ligand_list.txt using gedit\n\n";
 print "type PDB ID's for additional ligands under 'PDB_IDs' then save and close\n\n";
@@ -753,7 +756,11 @@ sleep(5);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
-system "parmchk -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+print "check mol2 file and then close\n";
+system("$chimera_path"."chimera $fileIDl"."REDUCED.mol2\n");
+print "check force field modifications file and then close\n";
+system "gedit $fileIDl"."REDUCED.frcmod\n";
 sleep(1);
 print "\n\nparmchk is completed\n\n";
 } #end for loop
