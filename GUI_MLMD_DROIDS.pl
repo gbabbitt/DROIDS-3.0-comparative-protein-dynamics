@@ -179,7 +179,32 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 						-variable=>\$solvType
 						);
 
-
+# MD production length Frame
+my $mdprodFrame = $mw->Frame(	-label => "LENGTH OF PRODUCTION",
+				-relief => "groove",
+				-borderwidth => 2
+				);
+	my $oneCheck = $mdprodFrame->Radiobutton( -text => "1x training run",
+						-value=>1,
+						-variable=>\$prodLen
+						);
+	my $twoCheck = $mdprodFrame->Radiobutton( -text => "2x training run",
+						-value=>2,
+						-variable=>\$prodLen
+						);
+     my $threeCheck = $mdprodFrame->Radiobutton( -text => "3x training run",
+						-value=>3,
+						-variable=>\$prodLen
+						);
+	my $fiveCheck = $mdprodFrame->Radiobutton( -text => "5x training run",
+						-value=>5,
+						-variable=>\$prodLen
+						);
+     my $tenCheck = $mdprodFrame->Radiobutton( -text => "10x training run",
+						-value=>10,
+						-variable=>\$prodLen
+						);
+     
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
 #	my $QfileFrame = $pdbFrame->Frame();
@@ -196,7 +221,7 @@ my $pdbFrame = $mw->Frame();
 					);
 	
     my $prodFrame = $pdbFrame->Frame();
-		my $prodLabel = $prodFrame->Label(-text=>"length of MD run (DO NOT CHANGE): ");
+		my $prodLabel = $prodFrame->Label(-text=>"length of training MD run (DO NOT CHANGE): ");
 		my $prodEntry = $prodFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$cutoffValueProd
@@ -255,9 +280,9 @@ my $teLeapButton = $mw -> Button(-text => "generate topology and coordinate file
 my $reduceButton = $mw -> Button(-text => "dry and reduce structure (run pdb4amber)", 
 				-command => \&reduce
 				); # Creates a pdb4amber button
-#my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
-#				-command => \&align
-#				); # Creates a align button
+my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
+				-command => \&align
+				); # Creates a align button
 my $launchButton = $mw -> Button(-text => "launch MD run", 
 				-command => \&launch,
 				-background => 'gray45',
@@ -298,9 +323,9 @@ $launchButton->pack(-side=>"bottom",
 $teLeapButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
-#$alignButton->pack(-side=>"bottom",
-#			-anchor=>"s"
-#			);
+$alignButton->pack(-side=>"bottom",
+			-anchor=>"s"
+			);
 $reduceButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
@@ -352,6 +377,14 @@ $MDheatScale->pack(-side=>"top");
 $MDeqScale->pack(-side=>"top");
 #$MDprodScale->pack(-side=>"top");
 $MDsaltScale->pack(-side=>"top");
+
+$mdprodFrame->pack(-side=>"top",
+		-anchor=>"n");
+$oneCheck->pack();
+$twoCheck->pack();
+$threeCheck->pack();
+$fiveCheck->pack();
+$tenCheck->pack();
 
 MainLoop; # Allows Window to Pop Up
 
@@ -405,6 +438,13 @@ print "\ncopy_list.txt, and variant_list.txt files were created\n";
 
 ########################################################################################
 sub control { # Write a control file and then call appropriate scripts that reference control file
+
+# append MDframes.ctl
+print "appending MDframes.ctl\n";
+sleep(1);
+open (OUT, ">>"."MDframes.ctl") || die "could not open MDframes.ctl file\n";
+print OUT "framegrpfactor\t"."$prodLen\n";
+close OUT;
 	
 for (my $g = 0; $g < 2; $g++){
 if ($g == 0) {open(MUT, "<"."copy_list.txt");}
@@ -430,7 +470,7 @@ for (my $p = 0; $p < scalar @MUT; $p++){
 	$cutoffValueEqFS = $cutoffValueEq*1000000;
 	$cutoffValueProdFS = $cutoffValueProd*1000;
 
-$currentProdTime = $cutoffValueProdFS;
+$currentProdTime = $cutoffValueProdFS*$prodLen;
 
    
 ### make query protein control file ###
@@ -476,7 +516,7 @@ DNA_Field\t$dforceID\t# AMBER force field to use in MD runs
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
 Heating_Time\t$cutoffValueHeatFS\t# length of heating run (fs)
 Equilibration_Time\t$cutoffValueEqFS\t# length of equilibration run (fs)
-Production_Time\t$cutoffValueProdFS\t# length of production run (fs)
+Production_Time\t$currentProdTime\t# length of production run (fs)
 Solvation_Method\t$repStr\t# method of solvation (implicit or explicit)
 Salt_Conc\t$cutoffValueSalt\t# salt concentration (implicit only, PME=O)
 Temperature_Query\t$tempQ\t# temperature of query run (300K is same as ref run)";
@@ -818,7 +858,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
 	 my @INrow = split (/\s+/, $INrow);
 	 my $header = @INrow[0];
 	 my $value = @INrow[1];
-	 if ($header eq "framenumber"){$framenumber = $value;}
+	 if ($header eq "framenumber"){$framenumber = $value*$prodLen;}
       if ($header eq "framestep"){$framestep = $value;}
       if ($header eq "framegroups"){$framegroups = $value;}
 }

@@ -24,6 +24,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
 	 if ($header eq "framenumber"){$framenumber = $value;}
       if ($header eq "framestep"){$framestep = $value;}
       if ($header eq "framegroups"){$framegroups = $value;}
+      if ($header eq "framegrpfactor"){$framefactor = $value;}
 }
 close IN;
 
@@ -548,6 +549,9 @@ close OUT;
 if ($method_bnp == 1){
      print "running KNN classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassKNNtemp");     
+ for (my $p = 1; $p<=$framefactor; $p++){
+     $add = $p*$framegroups-$framegroups;
+     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nKNN classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -561,9 +565,20 @@ if ($method_bnp == 1){
    print Rinput "class <- dataT\$class\n"; # training class
    #print Rinput "print(dataD)\n";
    print Rinput "train <- dataT\n";
-   print Rinput "test <- dataD\n";
    print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "test <- dataD\n";
+   #print Rinput "print(test)\n";
+   # define subset of dataD to match size of dataT
+   if ($p > 1){
+   print Rinput "test <- test[,$add:$total]\n";
+   #print Rinput "print(test)\n";
+   }
+   if ($p == 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassKNNtemp/classAA_$fileIDq"."_$r.txt')\n";
+   }
+   if ($p > 1){
+   print Rinput "sink('./testingData_$fileIDq/indAAclassKNNtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
+   }
    print Rinput "for(i in 1:length(train)){
    train_slice <- train[,i, drop=FALSE]
    ref_train_slice <- train_slice[class == 0,]
@@ -593,7 +608,7 @@ if ($method_bnp == 1){
    print Rinput "n\n";# save workspace image?
    close Rinput;
    }
-  
+ } # end iterations 
  mkdir("./testingData_$fileIDq/indAAclassKNN");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -700,7 +715,7 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassNBtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(train)){
+   print Rinput "for(i in 1:length(test)){
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -838,7 +853,7 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassLDAtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(train)){
+   print Rinput "for(i in 1:length(test)){
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -975,7 +990,7 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassQDAtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(train)){
+   print Rinput "for(i in 1:length(test)){
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -1076,6 +1091,9 @@ if ($method_dist == 1){
 if ($method_kern == 1){
      print "running SVM classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassSVMtemp");
+ for (my $p = 1; $p<=$framefactor; $p++){
+     $add = $p*$framegroups-$framegroups;
+     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nSVM classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -1099,7 +1117,24 @@ if ($method_kern == 1){
    print Rinput "test <- dataD\n";
    #print Rinput "print(train)\n";
    #print Rinput "print(test)\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassSVMtemp/classAA_$fileIDq"."_$r.txt')\n";
+   #print Rinput "print(test)\n";
+   # define subset of dataD to match size of dataT
+   if ($p > 1){
+   print Rinput "test <- test[,$add:$total]\n";
+   #print Rinput "print(test)\n";
+   print Rinput "for(i in 1:$framegroups){
+   names(test)[i]<-paste('X',i, sep='')
+   }\n";
+   #print Rinput "print(test)\n";
+   }
+   #print Rinput "train <- train[-c(1)]\n"; # drops class column
+   if ($p == 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassSVMtemp/classAA_$fileIDq"."_$r.txt')\n";
+   }
+   if ($p > 1){
+   print Rinput "sink('./testingData_$fileIDq/indAAclassSVMtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
+   }
    #print Rinput "numCores <- detectCores()-1\n";
    #print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
@@ -1135,7 +1170,7 @@ if ($method_kern == 1){
    print Rinput "n\n";# save workspace image?
    close Rinput;
    }
-  
+ } # end iterations 
  mkdir("./testingData_$fileIDq/indAAclassSVM");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -1205,6 +1240,9 @@ if ($method_kern == 1){
 if ($method_ens == 1){
     print "running random forest classifier\n";
     mkdir("./testingData_$fileIDq/indAAclassRFORtemp");     
+ for (my $p = 1; $p<=$framefactor; $p++){
+     $add = $p*$framegroups-$framegroups;
+     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nRFOR classifier learning residue $r on $fileIDq\n\n";
    #sleep(1);
@@ -1226,7 +1264,24 @@ if ($method_ens == 1){
    print Rinput "train <- dataT\n";
    print Rinput "train <- train[-c(1)]\n";
    print Rinput "test <- dataD\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassRFORtemp/classAA_$fileIDq"."_$r.txt')\n";
+   #print Rinput "print(test)\n";
+   # define subset of dataD to match size of dataT
+   if ($p > 1){
+    print Rinput "test <- test[,$add:$total]\n";
+    #print Rinput "print(test)\n";
+    print Rinput "for(i in 1:$framegroups){
+    names(test)[i]<-paste('X',i, sep='')
+    }\n";
+    #print Rinput "print(test)\n";
+   }
+   #print Rinput "train <- train[-c(1)]\n"; # drops class column
+   if ($p == 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassRFORtemp/classAA_$fileIDq"."_$r.txt')\n";
+   }
+   if ($p > 1){
+   print Rinput "sink('./testingData_$fileIDq/indAAclassRFORtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
+   }
    print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
@@ -1263,7 +1318,7 @@ if ($method_ens == 1){
    print Rinput "n\n";# save workspace image?
    close Rinput;
    }
-  
+ } # end iterations 
  mkdir("./testingData_$fileIDq/indAAclassRFOR");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -1332,6 +1387,9 @@ if ($method_ens == 1){
 if ($method_ens == 1){
     print "running adaptive boosting classifier\n";
     mkdir("./testingData_$fileIDq/indAAclassADAtemp");     
+ for (my $p = 1; $p<=$framefactor; $p++){
+     $add = $p*$framegroups-$framegroups;
+     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nADA classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -1353,7 +1411,24 @@ if ($method_ens == 1){
    print Rinput "train <- dataT\n";
    print Rinput "train <- train[-c(1)]\n";
    print Rinput "test <- dataD\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassADAtemp/classAA_$fileIDq"."_$r.txt')\n";
+   #print Rinput "print(test)\n";
+   # define subset of dataD to match size of dataT
+   if ($p > 1){
+    print Rinput "test <- test[,$add:$total]\n";
+    #print Rinput "print(test)\n";
+    print Rinput "for(i in 1:$framegroups){
+    names(test)[i]<-paste('X',i, sep='')
+    }\n";
+    #print Rinput "print(test)\n";
+   }
+   #print Rinput "train <- train[-c(1)]\n"; # drops class column
+   if ($p == 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassADAtemp/classAA_$fileIDq"."_$r.txt')\n";
+   }
+   if ($p > 1){
+   print Rinput "sink('./testingData_$fileIDq/indAAclassADAtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
+   }
    print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
@@ -1391,7 +1466,7 @@ if ($method_ens == 1){
   print Rinput "n\n";# save workspace image?
   close Rinput;
   }
-  
+ } # end iterations 
  mkdir("./testingData_$fileIDq/indAAclassADA");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif

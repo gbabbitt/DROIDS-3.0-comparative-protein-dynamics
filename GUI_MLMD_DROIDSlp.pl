@@ -118,7 +118,7 @@ my @chainlen2;
 
 #### Create GUI ####
 my $mw = MainWindow -> new; # Creates a new main window
-$mw -> title("AMBER MD control settings for ML deployment"); # Titles the main window
+$mw -> title("AMBER 16 MD control settings for ML deployment"); # Titles the main window
 $mw->setPalette("gray");
 
 my $MDheatScale = $mw->Scale(-label=>"Length of MD heating run (ps) :",
@@ -179,6 +179,31 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 						-variable=>\$solvType
 						);
 
+# MD production length Frame
+my $mdprodFrame = $mw->Frame(	-label => "LENGTH OF PRODUCTION",
+				-relief => "groove",
+				-borderwidth => 2
+				);
+	my $oneCheck = $mdprodFrame->Radiobutton( -text => "1x training run",
+						-value=>1,
+						-variable=>\$prodLen
+						);
+	my $twoCheck = $mdprodFrame->Radiobutton( -text => "2x training run",
+						-value=>2,
+						-variable=>\$prodLen
+						);
+     my $threeCheck = $mdprodFrame->Radiobutton( -text => "3x training run",
+						-value=>3,
+						-variable=>\$prodLen
+						);
+	my $fiveCheck = $mdprodFrame->Radiobutton( -text => "5x training run",
+						-value=>5,
+						-variable=>\$prodLen
+						);
+     my $tenCheck = $mdprodFrame->Radiobutton( -text => "10x training run",
+						-value=>10,
+						-variable=>\$prodLen
+						);
 
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
@@ -207,7 +232,7 @@ my $pdbFrame = $mw->Frame();
 					-textvariable=>\$dforceID
 					);
     my $prodFrame = $pdbFrame->Frame();
-		my $prodLabel = $prodFrame->Label(-text=>"length of MD run (DO NOT CHANGE): ");
+		my $prodLabel = $prodFrame->Label(-text=>"length of training MD run (DO NOT CHANGE): ");
 		my $prodEntry = $prodFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$cutoffValueProd
@@ -269,9 +294,9 @@ my $antechamberButton = $mw -> Button(-text => "ligand force field modification 
 my $reduceButton = $mw -> Button(-text => "dry and reduce structure (run pdb4amber)", 
 				-command => \&reduce
 				); # Creates a pdb4amber button
-#my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
-#				-command => \&align
-#				); # Creates a align button
+my $alignButton = $mw -> Button(-text => "create sequence and structural alignment (UCSF Chimera)", 
+				-command => \&align
+				); # Creates a align button
 my $launchButton = $mw -> Button(-text => "launch MD run", 
 				-command => \&launch,
 				-background => 'gray45',
@@ -315,9 +340,9 @@ $teLeapButton->pack(-side=>"bottom",
 $antechamberButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
-#$alignButton->pack(-side=>"bottom",
-#			-anchor=>"s"
-#			);
+$alignButton->pack(-side=>"bottom",
+			-anchor=>"s"
+			);
 $reduceButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
@@ -378,7 +403,13 @@ $MDeqScale->pack(-side=>"top");
 #$MDprodScale->pack(-side=>"top");
 $MDsaltScale->pack(-side=>"top");
 
-print "\nNOTE: if ligand is a small protein, use protein forcefield for ligand and then skip Antechamber force field modifications\n\n";
+$mdprodFrame->pack(-side=>"top",
+		-anchor=>"n");
+$oneCheck->pack();
+$twoCheck->pack();
+$threeCheck->pack();
+$fiveCheck->pack();
+$tenCheck->pack();
 
 MainLoop; # Allows Window to Pop Up
 
@@ -397,22 +428,22 @@ if ($num_copy eq ''){$num_copy = 2;}
 # make copies of query protein file for deploy 
 for (my $c = 0; $c <= $num_copy ; $c++){
 if ($c == 0){next;}
-my $oldfilename = "$fileIDr".".pdb";
-my $newfilename = "$fileIDr"."_$c.pdb";
+my $oldfilename = "$fileIDq".".pdb";
+my $newfilename = "$fileIDq"."_$c.pdb";
 copy($oldfilename, $newfilename);
 }
 open(MUT, ">"."copy_list.txt");
 print MUT "PDB_IDs\n";
-for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
+for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDq"."_$c\n";}
 close MUT;
-print "check PDB ID's for copies of $fileIDr then save and close\n\n";
+print "check PDB ID's for copies of $fileIDq then save and close\n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_list.txt");
 print MUT "PDB_IDs\n";
-print MUT "$fileIDr"."_1\n";
-print MUT "$fileIDr"."_2\n";
+print MUT "$fileIDq"."_1\n";
+print MUT "$fileIDq"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target proteins of variants under 'PDB_IDs' then save and close\n\n";
@@ -427,10 +458,9 @@ system "gedit variant_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_ligand_list.txt");
-$fileIDl_label = substr($fileIDl, 0, length($fileIDl)-7);
 print MUT "PDB_IDs\n";
-print MUT "$fileIDl_label\n";
-print MUT "$fileIDl_label\n";
+print MUT "$fileIDl\n";
+print MUT "$fileIDl\n";
 close MUT;
 print "opening ligand_list.txt using gedit\n\n";
 print "type PDB ID's for additional ligands under 'PDB_IDs' then save and close\n\n";
@@ -450,6 +480,13 @@ print "\ncopy_list.txt, variant_list.txt and variant_ligand_list.txt files were 
 
 ########################################################################################
 sub control { # Write a control file and then call appropriate scripts that reference control file
+
+# append MDframes.ctl
+print "appending MDframes.ctl\n";
+sleep(1);
+open (OUT, ">>"."MDframes.ctl") || die "could not open MDframes.ctl file\n";
+print OUT "framegrpfactor\t"."$prodLen\n";
+close OUT;
 
 for (my $g = 0; $g < 2; $g++){
 if ($g == 0) {open(MUT, "<"."copy_list.txt");}
@@ -481,7 +518,7 @@ for (my $p = 0; $p < scalar @MUT; $p++){
 	$cutoffValueEqFS = $cutoffValueEq*1000000;
 	$cutoffValueProdFS = $cutoffValueProd*1000;
 
-$currentProdTime = $cutoffValueProdFS;
+$currentProdTime = $cutoffValueProdFS*$prodLen;
 
    
 ### make query protein control file ###
@@ -526,7 +563,7 @@ ADD_Field\t$dforceID\t# AMBER force field to use in MD runs
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
 Heating_Time\t$cutoffValueHeatFS\t# length of heating run (fs)
 Equilibration_Time\t$cutoffValueEqFS\t# length of equilibration run (fs)
-Production_Time\t$cutoffValueProdFS\t# length of production run (fs)
+Production_Time\t$currentProdTime\t# length of production run (fs)
 Solvation_Method\t$repStr\t# method of solvation (implicit or explicit)
 Salt_Conc\t$cutoffValueSalt\t# salt concentration (implicit only, PME=O)
 Temperature_Query\t$tempQ\t# temperature of query run (300K is same as ref run)";
@@ -754,15 +791,9 @@ print "note: also be sure to inspect warning messages on the terminal\n\n";
 print "\n============================================================================\n\n";
 sleep(5);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
-print "check scaled quantum mechanical optimizations (close file when done)\n";
-system "gedit sqm.out\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
-system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
-print "check mol2 file and then close\n";
-system("$chimera_path"."chimera $fileIDl"."REDUCED.mol2\n");
-print "check force field modifications file and then close\n";
-system "gedit $fileIDl"."REDUCED.frcmod\n";
+system "parmchk -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
 sleep(1);
 print "\n\nparmchk is completed\n\n";
 } #end for loop
@@ -911,7 +942,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
 	 my @INrow = split (/\s+/, $INrow);
 	 my $header = @INrow[0];
 	 my $value = @INrow[1];
-	 if ($header eq "framenumber"){$framenumber = $value;}
+	 if ($header eq "framenumber"){$framenumber = $value*$prodLen;}
       if ($header eq "framestep"){$framestep = $value;}
       if ($header eq "framegroups"){$framegroups = $value;}
 }
