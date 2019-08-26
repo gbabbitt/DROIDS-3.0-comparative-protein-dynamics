@@ -1769,7 +1769,7 @@ print Rinput "dataframe2 = data.frame(pos2=$AAposition2, Y2val=$trainingflux_ref
 print Rinput "dataframe3 = data.frame(pos3=$AAposition2, Y3val=$trainingflux_query)\n";
 
 # lineplots
-print Rinput "myplot1 <- ggplot() + ggtitle('       relative learning along protein backbone for MD test set') + labs(x = 'position (residue number)', y = 'avg classification over time intervals') + geom_line(data = dataframeKNN, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'K nearest neighbors')) + geom_line(data = dataframeNB, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'naive Bayes')) + geom_line(data = dataframeLDA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'linear discriminant - LDA')) + geom_line(data = dataframeQDA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'quadratic discriminant - QDA')) + geom_line(data = dataframeSVM, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'support vector machine-SVM')) + geom_line(data = dataframeRFOR, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'random forest')) + geom_line(data = dataframeADA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'adaboost')) + scale_color_brewer(palette='Set1')\n"; 
+print Rinput "myplot1 <- ggplot() + ggtitle('       learning performance along protein backbone for MD validation set') + labs(x = 'position (residue number)', y = 'avg classification over time intervals') + geom_line(data = dataframeKNN, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'K nearest neighbors')) + geom_line(data = dataframeNB, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'naive Bayes')) + geom_line(data = dataframeLDA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'linear discriminant - LDA')) + geom_line(data = dataframeQDA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'quadratic discriminant - QDA')) + geom_line(data = dataframeSVM, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'support vector machine-SVM')) + geom_line(data = dataframeRFOR, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'random forest')) + geom_line(data = dataframeADA, mapping = aes(x = pos1, y = Y1val, ymin = 0, ymax = 1, color = 'adaboost')) + scale_color_brewer(palette='Set1')\n"; 
 print Rinput "myplot2 <- ggplot() + labs(x = 'position (residue number)', y = 'avg FLUX') + geom_line(data = dataframe2, mapping = aes(x = pos2, y = Y2val, color = 'MD training set - reference protein=$refID')) + geom_line(data = dataframe3, mapping = aes(x = pos3, y = Y3val, color = 'MD training set - query protein=$queryID'))\n"; 
 
 print Rinput "library(grid)\n";
@@ -2583,8 +2583,6 @@ print Rinput "for(i in 1:(mylength-$window)){
    q = 1
    mypvaltest <- p.asym(myselfcor, N, p, q, tstat = 'Wilks')
    mypval <- mypvaltest\$p.value[1]
-   if(abs(mycor) < 0.05){mycor = mycor + 0.05}
-   if(abs(myselfcor) < 0.05){myselfcor = myselfcor + 0.05}
    if(mypval <= $cancor_threshold){mybar = 1}
    if(mypval > $cancor_threshold){mybar = 0}
    if($v == 0){
@@ -2625,7 +2623,7 @@ print Rinput "sink()\n";
 
 # lineplots
 # create plot 1
-print Rinput "myplot1 <- ggplot() + ggtitle('relative learning along protein backbone for MD query and variant sets') + labs(x = 'position (residue number)', y = 'avg class over time intervals') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot1 <- ggplot() + ggtitle('learning performance along protein backbone for MD validation sets') + labs(x = 'position (residue number)', y = 'avg class over time intervals') + theme(legend.title = element_blank())\n"; 
 print Rinput "mylist1 <- list()\n";
 # create lines for plot 1
 for (my $v = 0; $v < scalar(@copies); $v++){
@@ -2784,8 +2782,6 @@ print Rinput "for(i in 1:(mylength-$window)){
    q = 1
    mypvaltest <- p.asym(myselfcor, N, p, q, tstat = 'Wilks')
    mypval <- mypvaltest\$p.value[1]
-   if(abs(mycor) < 0.05){mycor = mycor + 0.05}
-   if(abs(myselfcor) < 0.05){myselfcor = myselfcor + 0.05}
    if(mypval <= $cancor_threshold){mybar = 1}
    if(mypval > $cancor_threshold){mybar = 0}
    if($v == 0){
