@@ -428,22 +428,22 @@ if ($num_copy eq ''){$num_copy = 2;}
 # make copies of query protein file for deploy 
 for (my $c = 0; $c <= $num_copy ; $c++){
 if ($c == 0){next;}
-my $oldfilename = "$fileIDq".".pdb";
-my $newfilename = "$fileIDq"."_$c.pdb";
+my $oldfilename = "$fileIDr".".pdb";
+my $newfilename = "$fileIDr"."_$c.pdb";
 copy($oldfilename, $newfilename);
 }
 open(MUT, ">"."copy_list.txt");
 print MUT "PDB_IDs\n";
-for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDq"."_$c\n";}
+for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
 close MUT;
-print "check PDB ID's for copies of $fileIDq then save and close\n\n";
+print "check PDB ID's for copies of $fileIDr then save and close\n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_list.txt");
 print MUT "PDB_IDs\n";
-print MUT "$fileIDq"."_1\n";
-print MUT "$fileIDq"."_2\n";
+print MUT "$fileIDr"."_1\n";
+print MUT "$fileIDr"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target proteins of variants under 'PDB_IDs' then save and close\n\n";
@@ -455,12 +455,13 @@ print "etc...\n\n\n";
 print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
 
 system "gedit variant_list.txt\n";
-
+# create trimmed $fileIDl w/o 'REDUCED' on end
+$fileIDl_trim = substr($fileIDl, 0, -7);
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_ligand_list.txt");
 print MUT "PDB_IDs\n";
-print MUT "$fileIDl\n";
-print MUT "$fileIDl\n";
+print MUT "$fileIDl_trim\n";
+print MUT "$fileIDl_trim\n";
 close MUT;
 print "opening ligand_list.txt using gedit\n\n";
 print "type PDB ID's for additional ligands under 'PDB_IDs' then save and close\n\n";
@@ -791,9 +792,15 @@ print "note: also be sure to inspect warning messages on the terminal\n\n";
 print "\n============================================================================\n\n";
 sleep(5);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
+print "check scaled quantum mechanical optimizations (close file when done)\n";
+system "gedit sqm.out\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
-system "parmchk -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+print "check mol2 file and then close\n";
+system("$chimera_path"."chimera $fileIDl"."REDUCED.mol2\n");
+print "check force field modifications file and then close\n";
+system "gedit $fileIDl"."REDUCED.frcmod\n";
 sleep(1);
 print "\n\nparmchk is completed\n\n";
 } #end for loop
