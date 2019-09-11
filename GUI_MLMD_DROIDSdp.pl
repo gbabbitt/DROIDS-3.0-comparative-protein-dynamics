@@ -434,14 +434,31 @@ print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target protein variants under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
+print "1cdw_unbound_validation1\n";
+print "1cdw_unbound_validation2\n";
 print "1cdw_unbound_F34G\n";
 print "1cdw_unbound_H57D\n";
 print "etc...\n\n\n";
-print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DNA BINDING VARIANTS\n\n";
-
+print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DNA BINDING VARIANTS\n\n";
 system "gedit variant_list.txt\n";
 
-print "\ncopy_list.txt, and variant_list.txt files were created\n";
+open(MUT, ">"."variant_label_list.txt");
+print MUT "names\n";
+print MUT "validation_run1\n";
+print MUT "validation_run2\n";
+close MUT;
+print "opening variant_label_list.txt using gedit\n\n";
+print "type names for additional variants as you want them to appear in plots then save and close\n\n";
+print "for example\n\n";
+print "names\n";
+print "validation_run1\n";
+print "validation_run2\n";
+print "variant1\n";
+print "variant2\n";
+print "etc...\n\n\n";
+print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
+
+print "\ncopy_list.txt, variant_label_list.txt, and variant_list.txt files were created\n";
 
 }
 

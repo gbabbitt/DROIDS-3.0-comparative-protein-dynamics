@@ -111,7 +111,7 @@ my $methodFrame = $mw->Frame(	-label => "MACHINE LEARNING METHOD",
                               #-value=>"bnp",
 						-variable=>\$method_bnp
 						);
-     my $distCheck = $methodFrame->Checkbutton( -text => "distributional methods (LDA, QDA, naive Bayes)",
+     my $distCheck = $methodFrame->Checkbutton( -text => "probabilistic methods (naive Bayes, LDA, QDA)",
 						-foreground => 'navy',
                               #-value=>"dist",
 						-variable=>\$method_dist
@@ -675,7 +675,7 @@ if ($method_bnp == 1){
 }
 
 ############################################
-if ($method_dist == 1){
+if ($method_dist == 1){ # METHOD IS PERMANENTLY DISABLED (it duplicates QDA)...change to 1 to enable it again
      print "running naive Bayes classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassNBtemp");     
  for (my $r = 0; $r<$lengthID; $r++){
@@ -686,6 +686,7 @@ if ($method_dist == 1){
    print Rinput "library(ggplot2)\n";
    print Rinput "library(class)\n";
    print Rinput "library(e1071)\n";
+   print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
@@ -715,7 +716,12 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassNBtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(test)){
+   print Rinput "numCores <- detectCores()\n";
+   print Rinput "print(numCores)\n";
+   #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
+   print Rinput "registerDoParallel(numCores)\n";
+   #print Rinput "for(i in 1:length(test)){
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -824,6 +830,7 @@ if ($method_dist == 1){
    print Rinput "library(ggplot2)\n";
    print Rinput "library(class)\n";
    print Rinput "library(MASS)\n";
+   print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
@@ -853,7 +860,12 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassLDAtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(test)){
+   print Rinput "numCores <- detectCores()\n";
+   print Rinput "print(numCores)\n";
+   #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
+   print Rinput "registerDoParallel(numCores)\n";
+   #print Rinput "for(i in 1:length(test)){
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -911,8 +923,8 @@ if ($method_dist == 1){
         @IN2row = split(/\s+/, $IN2row);
         $AApos = @IN2row[0];
         $ns = @IN2row[5];
-        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns"){print OUT "0\n";}
-        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns" && $classvalue <= 1){print OUT "0\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
         }
      }
    close IN;
@@ -938,7 +950,7 @@ if ($method_dist == 1){
      $search = @INrow[0];
      $classvalue = @nextINrow[1];
      $dRMSF = @nextnextINrow[1];
-     if ($search eq "Levels:"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
+     if ($search eq "Levels:" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
      }
    close IN;
    close OUT;
@@ -961,6 +973,7 @@ if ($method_dist == 1){
    print Rinput "library(ggplot2)\n";
    print Rinput "library(class)\n";
    print Rinput "library(MASS)\n";
+   print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
@@ -990,7 +1003,12 @@ if ($method_dist == 1){
    names(stack_train)<-c(\"c1\", \"slice\")
    stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassQDAtemp/classAA_$fileIDq"."_$r.txt')\n";
-   print Rinput "for(i in 1:length(test)){
+   print Rinput "numCores <- detectCores()\n";
+   print Rinput "print(numCores)\n";
+   #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
+   print Rinput "registerDoParallel(numCores)\n";
+   #print Rinput "for(i in 1:length(test)){
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
    train_slice = stack_train_slice
    class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
@@ -1048,8 +1066,8 @@ if ($method_dist == 1){
         @IN2row = split(/\s+/, $IN2row);
         $AApos = @IN2row[0];
         $ns = @IN2row[5];
-        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns"){print OUT "0\n";}
-        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns" && $classvalue <= 1){print OUT "0\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
         }
      }
    close IN;
@@ -1075,7 +1093,7 @@ if ($method_dist == 1){
      $search = @INrow[0];
      $classvalue = @nextINrow[1];
      $dRMSF = @nextnextINrow[1];
-     if ($search eq "Levels:"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
+     if ($search eq "Levels:" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
      }
    close IN;
    close OUT;
@@ -1102,7 +1120,7 @@ if ($method_kern == 1){
    print Rinput "library(ggplot2)\n";
    print Rinput "library(class)\n";
    print Rinput "library(kernlab)\n";
-   #print Rinput "library(doParallel)\n";
+   print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
@@ -1135,13 +1153,13 @@ if ($method_kern == 1){
    if ($p > 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassSVMtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
    }
-   #print Rinput "numCores <- detectCores()-1\n";
-   #print Rinput "print(numCores)\n";
+   print Rinput "numCores <- detectCores()\n";
+   print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
-   #print Rinput "registerDoParallel(numCores)\n";
-   #print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
-   print Rinput "for(i in 1:length(train)){
-   train_slice <- train[,i, drop=FALSE]
+   print Rinput "registerDoParallel(numCores)\n";
+   #print Rinput "for(i in 1:length(train)){
+   print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
+      train_slice <- train[,i, drop=FALSE]
    ref_train_slice <- train_slice[class == 0,]
    test_slice <- test[,i, drop=FALSE]
    mean_test_slice <- mean(test_slice[,1])
@@ -1196,8 +1214,8 @@ if ($method_kern == 1){
         @IN2row = split(/\s+/, $IN2row);
         $AApos = @IN2row[0];
         $ns = @IN2row[5];
-        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns"){print OUT "0\n";}
-        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns eq "ns" && $classvalue <= 1){print OUT "0\n";}
+        if ($AApos == $t && $search eq "Levels:" && $ns ne "ns" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";}
         }
      }
    close IN;
@@ -1223,7 +1241,7 @@ if ($method_kern == 1){
      $search = @INrow[0];
      $classvalue = @nextINrow[1];
      $dRMSF = @nextnextINrow[1];
-     if ($search eq "Levels:"){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
+     if ($search eq "Levels:" && $classvalue <= 1){print OUT "$classvalue\n"; print OUT2 "$dRMSF\n";} 
      }
    close IN;
    close OUT;
@@ -1556,7 +1574,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1567,7 +1585,7 @@ for (my $r = 0; $r<$lengthID; $r++){
 close OUT;
 }
 
-if ($method_dist == 1){
+if ($method_dist == 1){  # this is permanently disabled (replicates QDA)
 # NB method
 open (OUT, ">"."./testingData_$fileIDq/classpositionHISTOnb.txt\n");
 print OUT "position\t"."sum\n";
@@ -1580,7 +1598,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1604,7 +1622,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1628,7 +1646,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1652,7 +1670,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1677,7 +1695,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -1701,7 +1719,7 @@ for (my $r = 0; $r<$lengthID; $r++){
       $INrow = $IN[$i];
       @INrow = split(/\s+/, $INrow);
       $class_value = @INrow[0];
-      push(@class_values, $class_value);
+      if ($class_value == 0 ||$class_value == 0.5 || $class_value == 1){push(@class_values, $class_value);}
       }
       close IN;
       $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
@@ -2418,6 +2436,14 @@ system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 #####################################################
 sub canon{
 
+# prompt user - choose graphing option
+sleep(1);
+print "CHOOSE BAR PLOT TYPE - total mutational impact or just conserved regions\n";
+print "(type 'total', 'conserved')\n\n";
+my $bartype = <STDIN>;
+chop($bartype);
+
+
 # create array of names of copies and variants
 open(MUT, "<"."copy_list.txt");
 my @MUT = <MUT>;
@@ -2448,6 +2474,23 @@ for (my $p = 0; $p < scalar @MUT; $p++){
       } #end for loop
 close MUT;
 print "\n variants are @variants\n\n";
+sleep(1);
+
+
+# create array of names of copies and variants
+open(MUT, "<"."variant_label_list.txt");
+my @MUT = <MUT>;
+#print @MUT;
+@variant_labels = ();
+for (my $p = 0; $p < scalar @MUT; $p++){
+	 if ($p == 0){next;}
+      my $MUTrow = $MUT[$p];
+      my @MUTrow = split (/\s+/, $MUTrow);
+	 $fileIDq = $MUTrow[0];
+      push (@variant_labels, $fileIDq);
+      } #end for loop
+close MUT;
+print "\n variant labels are @variant_labels\n\n";
 sleep(1);
 
 print " plotting canonical correlation and flux profiles\n\n";
@@ -2483,7 +2526,8 @@ print Rinput "library(boot)\n";
 for (my $v = 0; $v < scalar(@copies); $v++){
      $copyID = $copies[$v];
      $queryID = $copies[0];
-     
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
 # read test MD data into R
 # KNN
 print Rinput "datatableKNN = read.table('./testingData_$copyID/classpositionHISTOknn.txt', header = TRUE)\n"; 
@@ -2536,6 +2580,8 @@ print Rinput "dataframe3 = data.frame(pos3=$AAposition2, Y3val=$trainingflux_que
 for (my $v = 0; $v < scalar(@copies); $v++){
      $copyID = $copies[$v];
      $queryID = $copies[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
 print Rinput "newMD <- cbind(dataframeKNN_".$v."[2], dataframeNB_".$v."[2], dataframeLDA_".$v."[2], dataframeQDA_".$v."[2], dataframeSVM_".$v."[2], dataframeRFOR_".$v."[2], dataframeADA_".$v."[2])\n";
 print Rinput "queryMDref <- cbind(dataframeKNN_0[2], dataframeNB_0[2], dataframeLDA_0[2], dataframeQDA_0[2], dataframeSVM_0[2], dataframeRFOR_0[2], dataframeADA_0[2])\n";
 print Rinput "queryMD <- cbind(dataframeKNN_1[2], dataframeNB_1[2], dataframeLDA_1[2], dataframeQDA_1[2], dataframeSVM_1[2], dataframeRFOR_1[2], dataframeADA_1[2])\n";
@@ -2554,6 +2600,8 @@ print Rinput "cat('1 = KNN, 2 = naive Bayes, 3 = LDA, 4 = QDA, 5 = SVM, 6 = rand
 for (my $v = 0; $v < scalar(@copies); $v++){
      $copyID = $copies[$v];
      $queryID = $copies[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
 print Rinput "cat('CANONICAL CORRELATION ANALYSIS OF $queryID and $copyID\n\n')\n";
 print Rinput "newMD <- cbind(dataframeKNN_".$v."[2], dataframeNB_".$v."[2], dataframeLDA_".$v."[2], dataframeQDA_".$v."[2], dataframeSVM_".$v."[2], dataframeRFOR_".$v."[2], dataframeADA_".$v."[2])\n";
 print Rinput "queryMDref <- cbind(dataframeKNN_0[2], dataframeNB_0[2], dataframeLDA_0[2], dataframeQDA_0[2], dataframeSVM_0[2], dataframeRFOR_0[2], dataframeADA_0[2])\n";
@@ -2623,25 +2671,29 @@ print Rinput "sink()\n";
 
 # lineplots
 # create plot 1
-print Rinput "myplot1 <- ggplot() + ggtitle('learning performance along protein backbone for MD validation sets') + labs(x = 'position (residue number)', y = 'avg class over time intervals') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot1 <- ggplot() + ggtitle('learning performance - 2 MD validation sets') + labs(x = 'position (residue number)', y = 'avg class over time intervals') + theme(legend.position = 'none', plot.title = element_text(size = 10))\n"; 
 print Rinput "mylist1 <- list()\n";
 # create lines for plot 1
 for (my $v = 0; $v < scalar(@copies); $v++){
      $copyID = $copies[$v];
      $queryID = $copies[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
      print Rinput "mylines_$v <- list(geom_line(data = dataframeKNN_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID', ymin = 0, ymax = 1)), geom_line(data = dataframeNB_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')), geom_line(data = dataframeLDA_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')), geom_line(data = dataframeQDA_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')), geom_line(data = dataframeSVM_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')), geom_line(data = dataframeRFOR_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')), geom_line(data = dataframeADA_$v, mapping = aes(x = pos1, y = Y1val, color = '$copyID')))\n"; 
      print Rinput "mylist1 <- list(mylist1, mylines_$v)\n";
 } # end for loop
 print Rinput "myplot1final <- myplot1 + mylist1 + scale_color_brewer(palette='Set1')\n"; 
 # create plot 2
-print Rinput "myplot2 <- ggplot() + ggtitle('cancor for $window AA window and conserved dynamics zones -Wilks lamda') + geom_area(data = dataframe4_$copyID, mapping = aes(x = pos, y = bars, color = 'conserved dynamics'), alpha = 0.8) + labs(x = 'position (residue number)', y = 'local R value for cancor') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot2 <- ggplot() + ggtitle('cancor for $window AA window + conserved dynamics zones -Wilks lamda') + geom_area(data = dataframe4_$copyID, mapping = aes(x = pos, y = bars, color = 'conserved dynamics'), alpha = 0.8) + labs(x = 'position (residue number)', y = 'local R value for cancor') + theme(legend.title = element_blank())\n"; 
 print Rinput "mylist2 <- list()\n";
 # create lines for plot 2
 for (my $v = 0; $v < scalar(@copies); $v++){
      if ($v == 0) {next;} # skip first line
      $copyID = $copies[$v];
      $queryID = $copies[0];
-     print Rinput "myline_$v <- geom_line(data = dataframe4_$copyID, mapping = aes(x = pos, y = cc, color = '$copyID', ymin = 0, ymax = 1))\n"; 
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
+     print Rinput "myline_$v <- geom_line(data = dataframe4_$copyID, mapping = aes(x = pos, y = cc, color = '$variantID_label', ymin = 0, ymax = 1))\n"; 
      print Rinput "mylist2 <- list(mylist2, myline_$v)\n";
 } # end for loop
 print Rinput "myplot2final <- myplot2 + mylist2 + scale_color_brewer(palette='Set2')\n"; 
@@ -2675,6 +2727,8 @@ system "gedit ./testingData_$queryID/cancor_stats.txt\n";
 for (my $v = 0; $v < scalar(@copies); $v++){
      $copyID = $copies[$v];
      $queryID = $copies[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
      system "gedit ./testingData_$queryID/cancor_stats_$copyID.txt\n";
 } # end for loop  
      
@@ -2690,8 +2744,11 @@ exit;
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
      $queryID = $variants[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
      
-# read test MD data into R
+     
+# read test MD data into Rprint Rinput "my_pvals_$variantID <- c()\n";
 # KNN
 print Rinput "datatableKNN = read.table('./testingData_$variantID/classpositionHISTOknn.txt', header = TRUE)\n"; 
 $AAposition_knn = "datatableKNN\$position"; # AA position
@@ -2734,6 +2791,8 @@ print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada, Y1val=$sum_clas
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
      $queryID = $variants[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
 print Rinput "newMD <- cbind(dataframeKNN_".$v."[2], dataframeNB_".$v."[2], dataframeLDA_".$v."[2], dataframeQDA_".$v."[2], dataframeSVM_".$v."[2], dataframeRFOR_".$v."[2], dataframeADA_".$v."[2])\n";
 print Rinput "queryMDref <- cbind(dataframeKNN_0[2], dataframeNB_0[2], dataframeLDA_0[2], dataframeQDA_0[2], dataframeSVM_0[2], dataframeRFOR_0[2], dataframeADA_0[2])\n";
 print Rinput "queryMD <- cbind(dataframeKNN_1[2], dataframeNB_1[2], dataframeLDA_1[2], dataframeQDA_1[2], dataframeSVM_1[2], dataframeRFOR_1[2], dataframeADA_1[2])\n";
@@ -2749,9 +2808,16 @@ print Rinput "cat('cor = overall correlation of all learners in each dimension\n
 print Rinput "cat('coef = slope of each pairwise learner correlation for each dimension\n')\n";
 print Rinput "cat('center = mean of each learner\n\n')\n";
 print Rinput "cat('1 = KNN, 2 = naive Bayes, 3 = LDA, 4 = QDA, 5 = SVM, 6 = random forest, 7 = adaboost\n\n')\n";
+
+print Rinput "my_impact_IDs <- c()\n";
+print Rinput "my_impact_sums <- c()\n";
+print Rinput "my_impact_cons_sums <- c()\n";
+
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
      $queryID = $variants[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
 print Rinput "cat('CANONICAL CORRELATION ANALYSIS OF $queryID and $copyID\n\n')\n";
 print Rinput "newMD <- cbind(dataframeKNN_".$v."[2], dataframeNB_".$v."[2], dataframeLDA_".$v."[2], dataframeQDA_".$v."[2], dataframeSVM_".$v."[2], dataframeRFOR_".$v."[2], dataframeADA_".$v."[2])\n";
 print Rinput "queryMDref <- cbind(dataframeKNN_0[2], dataframeNB_0[2], dataframeLDA_0[2], dataframeQDA_0[2], dataframeSVM_0[2], dataframeRFOR_0[2], dataframeADA_0[2])\n";
@@ -2766,6 +2832,8 @@ print Rinput "my_cancors_$variantID <- c()\n";
 print Rinput "my_pvals_$variantID <- c()\n";
 print Rinput "my_ccpos_$variantID <- c()\n";
 print Rinput "my_impact_$variantID <- c()\n";
+print Rinput "my_impact_sum_$variantID = 0\n";
+print Rinput "my_impact_cons_sum_$variantID = 0\n";
 print Rinput "my_bars_$variantID <- c()\n";
 print Rinput "mylength <- length(newMD[,1])\n";
 print Rinput "print(mylength)\n";
@@ -2788,21 +2856,29 @@ print Rinput "for(i in 1:(mylength-$window)){
    my_bars_$queryID <- c(my_bars_$queryID, mybar)
    }
    myimpact = abs(myselfcor*(log(mycor/myselfcor)))
-   if ($v > 0){
+   my_impact_sum_$variantID = my_impact_sum_$variantID + myimpact
+   if(mybar == 1){my_impact_cons_sum_$variantID = my_impact_cons_sum_$variantID + myimpact}
+   if(mybar == 0){my_impact_cons_sum_$variantID = my_impact_cons_sum_$variantID + 0}
+   if ($v > 0){ 
      if (myimpact >= myupper){myimpact = abs(myselfcor*(log(mycor/myselfcor)))}
      if (myimpact < myupper){myimpact = 0}
    }
+   my_impact_$variantID <- c(my_impact_$variantID, myimpact)
    my_ccpos_$variantID <- c(my_ccpos_$variantID, i)
    my_cancors_$variantID <- c(my_cancors_$variantID, mycor)
    my_pvals_$variantID <- c(my_pvals_$variantID, mypval)
-   my_impact_$variantID <- c(my_impact_$variantID, myimpact)
-   }\n";
+   }\n";  # NOTE: can set impact to zero if less than upper bound
 print Rinput "print(my_cancors_$variantID)\n";
 print Rinput "print(my_pvals_$variantID)\n";
 print Rinput "my_adjpvals_$variantID <- p.adjust(my_pvals_$variantID, method = 'fdr', n = length(my_pvals_$variantID))\n";
 print Rinput "print(my_adjpvals_$variantID)\n";
 print Rinput "print(my_ccpos_$variantID)\n";
 print Rinput "print(my_impact_$variantID)\n";
+print Rinput "print(my_impact_sum_$variantID)\n";
+print Rinput "print(my_impact_cons_sum_$variantID)\n";
+print Rinput "my_impact_IDs <- c('$variantID_label', my_impact_IDs)\n";
+print Rinput "my_impact_sums <- c(my_impact_sum_$variantID, my_impact_sums)\n";
+print Rinput "my_impact_cons_sums <- c(my_impact_cons_sum_$variantID, my_impact_cons_sums)\n";
 print Rinput "print(my_bars_$queryID)\n";
 print Rinput "my_adjbars_$queryID <- c()\n";
 print Rinput "print(my_adjpvals_$variantID\[i])\n";
@@ -2830,7 +2906,7 @@ if($variantID eq $variants[0]){
     print Rinput "print(my_impact_$variantID)\n";
     print Rinput "mymean <- mean(my_impact_$variantID)\n";
     print Rinput "mysd <- sd(my_impact_$variantID)\n";
-    print Rinput "myupper <- mymean + (3*mysd)\n";
+    print Rinput "myupper <- mymean + (2*mysd)\n";
     print Rinput "print(myupper)\n";
     }
 # create output impact files for movie render
@@ -2841,21 +2917,46 @@ print Rinput "sink()\n";
 } # end for loop
 
 # create plot 3
-print Rinput "myplot3 <- ggplot() + ggtitle('mutational impact index for $window AA window') + labs(x = 'position (residue number)', y = 'local index of impact') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot3 <- ggplot() + ggtitle('signif local mutational impact for $window AA window (+2sd of validation set)') + labs(x = 'position (residue number)', y = 'local index of impact') + theme(legend.title = element_blank())\n"; 
 print Rinput "mylist3 <- list()\n";
 # create lines for plot 3
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
      $queryID = $variants[0];
-     print Rinput "myline_$v <- geom_line(data = dataframe5_$variantID, mapping = aes(x = pos, y = cc, color = '$variantID'))\n"; 
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
+     print Rinput "myline_$v <- geom_line(data = dataframe5_$variantID, mapping = aes(x = pos, y = cc, color = '$variantID_label'))\n"; 
      print Rinput "mylist3 <- list(mylist3, myline_$v)\n";
 } # end for loop
 print Rinput "myplot3final <- myplot3 + mylist3 + scale_color_brewer(palette='Set2')\n"; 
+
+
+print Rinput "print(my_impact_IDs)\n";
+print Rinput "print(my_impact_sums)\n";
+
+
+# create plot 4 
+if ($bartype eq "total"){
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_sums)\n";
+print Rinput "print(dataframe6)\n";
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + scale_fill_brewer(palette = 'Set2') + ggtitle('total mutational impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4final <- myplot4\n"; 
+}
+if ($bartype eq "conserved"){
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums)\n";
+print Rinput "print(dataframe6)\n";
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + scale_fill_brewer(palette = 'Set2') + ggtitle('conserved region impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4final <- myplot4\n"; 
+}
+
+#####################################
+
 print Rinput "library(grid)\n";
-print Rinput "pushViewport(viewport(layout = grid.layout(3, 1)))\n";
-print Rinput "print(myplot1final, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))\n";
-print Rinput "print(myplot2final, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))\n";
-print Rinput "print(myplot3final, vp = viewport(layout.pos.row = 3, layout.pos.col = 1))\n";
+print Rinput "pushViewport(viewport(layout = grid.layout(3, 2)))\n";
+print Rinput "print(myplot2final, vp = viewport(layout.pos.row = 1, layout.pos.col = 1:2))\n";
+print Rinput "print(myplot3final, vp = viewport(layout.pos.row = 2, layout.pos.col = 1:2))\n";
+print Rinput "print(myplot1final, vp = viewport(layout.pos.row = 3, layout.pos.col = 1))\n";
+print Rinput "print(myplot4final, vp = viewport(layout.pos.row = 3, layout.pos.col = 2))\n";
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
 print Rinput "n\n";# save workspace image?

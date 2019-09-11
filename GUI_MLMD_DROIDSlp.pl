@@ -449,12 +449,14 @@ print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target proteins of variants under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
+print "3toz_unbound_validation1\n";
+print "3t0z_unbound_validation2\n";
 print "3toz_unbound_drug1\n";
 print "3t0z_unbound_drug2\n";
 print "etc...\n\n\n";
-print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
-
+print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
 system "gedit variant_list.txt\n";
+
 # create trimmed $fileIDl w/o 'REDUCED' on end
 $fileIDl_trim = substr($fileIDl, 0, -7);
 # create mutate_protein.cmd script
@@ -463,19 +465,35 @@ print MUT "PDB_IDs\n";
 print MUT "$fileIDl_trim\n";
 print MUT "$fileIDl_trim\n";
 close MUT;
-print "opening ligand_list.txt using gedit\n\n";
+print "opening variant_ligand_list.txt using gedit\n\n";
 print "type PDB ID's for additional ligands under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
+print "3t0z_validation_drug1\n";
+print "3t0z_validation_drug2\n";
 print "3t0z_ligand_drug1\n";
 print "3t0z_ligand_drug2\n";
 print "etc...\n\n\n";
-print "LEAVE EMPTY IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
-
+print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
 system "gedit variant_ligand_list.txt\n";
 
+open(MUT, ">"."variant_label_list.txt");
+print MUT "names\n";
+print MUT "validation_run1\n";
+print MUT "validation_run2\n";
+close MUT;
+print "opening variant_label_list.txt using gedit\n\n";
+print "type names for additional variants as you want them to appear in plots then save and close\n\n";
+print "for example\n\n";
+print "names\n";
+print "validation_run1\n";
+print "validation_run2\n";
+print "drug1\n";
+print "drug2\n";
+print "etc...\n\n\n";
+print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
 
-print "\ncopy_list.txt, variant_list.txt and variant_ligand_list.txt files were created\n";
+print "\ncopy_list.txt, variant_list.txt variant_label_list.txt, and variant_ligand_list.txt files were created\n";
 
 }
 
