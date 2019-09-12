@@ -492,6 +492,7 @@ print "drug1\n";
 print "drug2\n";
 print "etc...\n\n\n";
 print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DRUG BINDING VARIANTS\n\n";
+system "gedit variant_label_list.txt\n";
 
 print "\ncopy_list.txt, variant_list.txt variant_label_list.txt, and variant_ligand_list.txt files were created\n";
 
