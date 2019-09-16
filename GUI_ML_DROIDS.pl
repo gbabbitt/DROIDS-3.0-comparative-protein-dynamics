@@ -2444,6 +2444,11 @@ my $bartype = <STDIN>;
 chop($bartype);
 
 
+print "Enter position of N terminal amino acid (default = 0)\n";
+my $startN = <STDIN>;
+chop($startN);
+if ($startN eq ''){$startN = 0;}
+
 # create array of names of copies and variants
 open(MUT, "<"."copy_list.txt");
 my @MUT = <MUT>;
@@ -2533,37 +2538,37 @@ for (my $v = 0; $v < scalar(@copies); $v++){
 print Rinput "datatableKNN = read.table('./testingData_$copyID/classpositionHISTOknn.txt', header = TRUE)\n"; 
 $AAposition_knn = "datatableKNN\$position"; # AA position
 $sum_classifiers_knn = "datatableKNN\$sum"; # sum of classifiers
-print Rinput "dataframeKNN_$v = data.frame(pos1=$AAposition_knn, Y1val=$sum_classifiers_knn)\n";
+print Rinput "dataframeKNN_$v = data.frame(pos1=$AAposition_knn + $startN, Y1val=$sum_classifiers_knn)\n";
 # naive Bayes
 print Rinput "datatableNB = read.table('./testingData_$copyID/classpositionHISTOnb.txt', header = TRUE)\n"; 
 $AAposition_nb = "datatableNB\$position"; # AA position
 $sum_classifiers_nb = "datatableNB\$sum"; # sum of classifiers
-print Rinput "dataframeNB_$v = data.frame(pos1=$AAposition_nb, Y1val=$sum_classifiers_nb)\n";
+print Rinput "dataframeNB_$v = data.frame(pos1=$AAposition_nb + $startN, Y1val=$sum_classifiers_nb)\n";
 # LDA
 print Rinput "datatableLDA = read.table('./testingData_$copyID/classpositionHISTOlda.txt', header = TRUE)\n"; 
 $AAposition_lda = "datatableLDA\$position"; # AA position
 $sum_classifiers_lda = "datatableLDA\$sum"; # sum of classifiers
-print Rinput "dataframeLDA_$v = data.frame(pos1=$AAposition_lda, Y1val=$sum_classifiers_lda)\n";
+print Rinput "dataframeLDA_$v = data.frame(pos1=$AAposition_lda + $startN, Y1val=$sum_classifiers_lda)\n";
 # QDA
 print Rinput "datatableQDA = read.table('./testingData_$copyID/classpositionHISTOqda.txt', header = TRUE)\n"; 
 $AAposition_qda = "datatableQDA\$position"; # AA position
 $sum_classifiers_qda = "datatableQDA\$sum"; # sum of classifiers
-print Rinput "dataframeQDA_$v = data.frame(pos1=$AAposition_qda, Y1val=$sum_classifiers_qda)\n";
+print Rinput "dataframeQDA_$v = data.frame(pos1=$AAposition_qda + $startN, Y1val=$sum_classifiers_qda)\n";
 # SVM
 print Rinput "datatableSVM = read.table('./testingData_$copyID/classpositionHISTOsvm.txt', header = TRUE)\n"; 
 $AAposition_svm = "datatableSVM\$position"; # AA position
 $sum_classifiers_svm = "datatableSVM\$sum"; # sum of classifiers
-print Rinput "dataframeSVM_$v = data.frame(pos1=$AAposition_svm, Y1val=$sum_classifiers_svm)\n";
+print Rinput "dataframeSVM_$v = data.frame(pos1=$AAposition_svm + $startN, Y1val=$sum_classifiers_svm)\n";
 # random forest
 print Rinput "datatableRFOR = read.table('./testingData_$copyID/classpositionHISTOrfor.txt', header = TRUE)\n"; 
 $AAposition_rfor = "datatableRFOR\$position"; # AA position
 $sum_classifiers_rfor = "datatableRFOR\$sum"; # sum of classifiers
-print Rinput "dataframeRFOR_$v = data.frame(pos1=$AAposition_rfor, Y1val=$sum_classifiers_rfor)\n";
+print Rinput "dataframeRFOR_$v = data.frame(pos1=$AAposition_rfor + $startN, Y1val=$sum_classifiers_rfor)\n";
 # adaboost
 print Rinput "datatableADA = read.table('./testingData_$copyID/classpositionHISTOada.txt', header = TRUE)\n"; 
 $AAposition_ada = "datatableADA\$position"; # AA position
 $sum_classifiers_ada = "datatableADA\$sum"; # sum of classifiers
-print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada, Y1val=$sum_classifiers_ada)\n";
+print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada + $startN, Y1val=$sum_classifiers_ada)\n";
 
 } #end for loop
 
@@ -2573,8 +2578,8 @@ $AAposition2 = "datatable2\$pos_ref"; # AA position
 $AAlabel = "datatable2\$res_ref"; # AA  identity
 $trainingflux_ref = "datatable2\$flux_ref_avg"; # flux profile ref training
 $trainingflux_query = "datatable2\$flux_query_avg"; # flux profile query training
-print Rinput "dataframe2 = data.frame(pos2=$AAposition2, Y2val=$trainingflux_ref)\n";
-print Rinput "dataframe3 = data.frame(pos3=$AAposition2, Y3val=$trainingflux_query)\n";
+print Rinput "dataframe2 = data.frame(pos2=$AAposition2 + $startN, Y2val=$trainingflux_ref)\n";
+print Rinput "dataframe3 = data.frame(pos3=$AAposition2 + $startN, Y3val=$trainingflux_query)\n";
 
 # canonical correlations
 for (my $v = 0; $v < scalar(@copies); $v++){
@@ -2659,7 +2664,7 @@ print Rinput "sink('./testingData_$queryID/cancor_stats_$copyID.txt')\n";
 print Rinput "cat('CANONICAL CORRELATION ANALYSIS OF $queryID and $copyID ($window AA sliding window)\n\n')\n";
 print Rinput "print(my_cancors_$copyID)\n";
 print Rinput "sink()\n";
-print Rinput "dataframe4_$copyID = data.frame(pos=my_ccpos_$copyID, cc=my_cancors_$copyID, bars=my_adjbars_$queryID)\n";
+print Rinput "dataframe4_$copyID = data.frame(pos=my_ccpos_$copyID + $startN, cc=my_cancors_$copyID, bars=my_adjbars_$queryID)\n";
 print Rinput "my_overall <- cancor(newMD, queryMD)\n"; # overall
 print Rinput "my_ccor_$copyID <- my_overall\$cor[1]\n";
 print Rinput "print(my_ccor_$copyID)\n";
@@ -2753,37 +2758,37 @@ for (my $v = 0; $v < scalar(@variants); $v++){
 print Rinput "datatableKNN = read.table('./testingData_$variantID/classpositionHISTOknn.txt', header = TRUE)\n"; 
 $AAposition_knn = "datatableKNN\$position"; # AA position
 $sum_classifiers_knn = "datatableKNN\$sum"; # sum of classifiers
-print Rinput "dataframeKNN_$v = data.frame(pos1=$AAposition_knn, Y1val=$sum_classifiers_knn)\n";
+print Rinput "dataframeKNN_$v = data.frame(pos1=$AAposition_knn + $startN, Y1val=$sum_classifiers_knn)\n";
 # naive Bayes
 print Rinput "datatableNB = read.table('./testingData_$variantID/classpositionHISTOnb.txt', header = TRUE)\n"; 
 $AAposition_nb = "datatableNB\$position"; # AA position
 $sum_classifiers_nb = "datatableNB\$sum"; # sum of classifiers
-print Rinput "dataframeNB_$v = data.frame(pos1=$AAposition_nb, Y1val=$sum_classifiers_nb)\n";
+print Rinput "dataframeNB_$v = data.frame(pos1=$AAposition_nb + $startN, Y1val=$sum_classifiers_nb)\n";
 # LDA
 print Rinput "datatableLDA = read.table('./testingData_$variantID/classpositionHISTOlda.txt', header = TRUE)\n"; 
 $AAposition_lda = "datatableLDA\$position"; # AA position
 $sum_classifiers_lda = "datatableLDA\$sum"; # sum of classifiers
-print Rinput "dataframeLDA_$v = data.frame(pos1=$AAposition_lda, Y1val=$sum_classifiers_lda)\n";
+print Rinput "dataframeLDA_$v = data.frame(pos1=$AAposition_lda + $startN, Y1val=$sum_classifiers_lda)\n";
 # QDA
 print Rinput "datatableQDA = read.table('./testingData_$variantID/classpositionHISTOqda.txt', header = TRUE)\n"; 
 $AAposition_qda = "datatableQDA\$position"; # AA position
 $sum_classifiers_qda = "datatableQDA\$sum"; # sum of classifiers
-print Rinput "dataframeQDA_$v = data.frame(pos1=$AAposition_qda, Y1val=$sum_classifiers_qda)\n";
+print Rinput "dataframeQDA_$v = data.frame(pos1=$AAposition_qda + $startN, Y1val=$sum_classifiers_qda)\n";
 # SVM
 print Rinput "datatableSVM = read.table('./testingData_$variantID/classpositionHISTOsvm.txt', header = TRUE)\n"; 
 $AAposition_svm = "datatableSVM\$position"; # AA position
 $sum_classifiers_svm = "datatableSVM\$sum"; # sum of classifiers
-print Rinput "dataframeSVM_$v = data.frame(pos1=$AAposition_svm, Y1val=$sum_classifiers_svm)\n";
+print Rinput "dataframeSVM_$v = data.frame(pos1=$AAposition_svm + $startN, Y1val=$sum_classifiers_svm)\n";
 # random forest
 print Rinput "datatableRFOR = read.table('./testingData_$variantID/classpositionHISTOrfor.txt', header = TRUE)\n"; 
 $AAposition_rfor = "datatableRFOR\$position"; # AA position
 $sum_classifiers_rfor = "datatableRFOR\$sum"; # sum of classifiers
-print Rinput "dataframeRFOR_$v = data.frame(pos1=$AAposition_rfor, Y1val=$sum_classifiers_rfor)\n";
+print Rinput "dataframeRFOR_$v = data.frame(pos1=$AAposition_rfor + $startN, Y1val=$sum_classifiers_rfor)\n";
 # adaboost
 print Rinput "datatableADA = read.table('./testingData_$variantID/classpositionHISTOada.txt', header = TRUE)\n"; 
 $AAposition_ada = "datatableADA\$position"; # AA position
 $sum_classifiers_ada = "datatableADA\$sum"; # sum of classifiers
-print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada, Y1val=$sum_classifiers_ada)\n";
+print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada + $startN, Y1val=$sum_classifiers_ada)\n";
 
 } #end for loop
 
@@ -2895,8 +2900,8 @@ print Rinput "print(my_cancors_$variantID)\n";
 print Rinput "cat('\nMUTATIONAL IMPACT ANALYSIS OF $queryID and $variantID ($window AA sliding window)\n\n')\n";
 print Rinput "print(my_impact_$variantID)\n";
 print Rinput "sink()\n";
-print Rinput "dataframe4_$variantID = data.frame(pos=my_ccpos_$variantID, cc=my_cancors_$variantID, bars=my_adjbars_$queryID)\n";
-print Rinput "dataframe5_$variantID = data.frame(pos=my_ccpos_$variantID, cc=my_impact_$variantID)\n";
+print Rinput "dataframe4_$variantID = data.frame(pos=my_ccpos_$variantID + $startN, cc=my_cancors_$variantID, bars=my_adjbars_$queryID)\n";
+print Rinput "dataframe5_$variantID = data.frame(pos=my_ccpos_$variantID + $startN, cc=my_impact_$variantID)\n";
 print Rinput "my_overall <- cancor(newMD, queryMD)\n"; # overall
 print Rinput "my_ccor_$variantID <- my_overall\$cor[1]\n";
 print Rinput "print(my_ccor_$variantID)\n";
