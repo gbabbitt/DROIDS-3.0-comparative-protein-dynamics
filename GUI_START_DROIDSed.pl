@@ -62,9 +62,9 @@ my $MDeqScale = $mw->Scale(-label=>"Length of MD equilibration run (ns) :",
 			-orient=>'h',
 			-digit=>3,
 			-from=>0,
-			-to=>100,
+			-to=>20,
 			-variable=>\$cutoffValueEq,
-			-tickinterval=>20,
+			-tickinterval=>5,
 			-resolution=>1,
 			-length=>205
 			);
