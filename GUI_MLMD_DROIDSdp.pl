@@ -410,34 +410,36 @@ my $num_copy = <STDIN>;
 chop($num_copy);
 if ($num_copy eq ''){$num_copy = 2;}
 
+#NOTE: for DNA bound structures in DROIDS, the DNA bound form is the reference and so the reference homologs are simulated here
+
 # make copies of query protein file for deploy 
 for (my $c = 0; $c <= $num_copy ; $c++){
 if ($c == 0){next;}
-my $oldfilename = "$fileIDq".".pdb";
-my $newfilename = "$fileIDq"."_$c.pdb";
+my $oldfilename = "$fileIDr".".pdb";
+my $newfilename = "$fileIDr"."_$c.pdb";
 copy($oldfilename, $newfilename);
 }
 open(MUT, ">"."copy_list.txt");
 print MUT "PDB_IDs\n";
-for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDq"."_$c\n";}
+for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
 close MUT;
-print "check PDB ID's for copies of $fileIDq then save and close\n\n";
+print "check PDB ID's for copies of $fileIDr then save and close\n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
 open(MUT, ">"."variant_list.txt");
 print MUT "PDB_IDs\n";
-print MUT "$fileIDq"."_1\n";
-print MUT "$fileIDq"."_2\n";
+print MUT "$fileIDr"."_1\n";
+print MUT "$fileIDr"."_2\n";
 close MUT;
 print "opening variant_list.txt using gedit\n\n";
 print "type PDB ID's for additional target protein variants under 'PDB_IDs' then save and close\n\n";
 print "for example\n\n";
 print "PDB_IDs\n";
-print "1cdw_unbound_validation1\n";
-print "1cdw_unbound_validation2\n";
-print "1cdw_unbound_F34G\n";
-print "1cdw_unbound_H57D\n";
+print "1cdw_bound_validation1\n";
+print "1cdw_bound_validation2\n";
+print "1cdw_bound_F34G\n";
+print "1cdw_bound_H57D\n";
 print "etc...\n\n\n";
 print "LEAVE AS IS IF YOU ARE NOT ANALYZING ANY GENETIC OR DNA BINDING VARIANTS\n\n";
 system "gedit variant_list.txt\n";

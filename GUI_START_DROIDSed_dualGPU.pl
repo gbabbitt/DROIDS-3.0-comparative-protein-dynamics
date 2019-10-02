@@ -62,9 +62,9 @@ my $MDeqScale = $mw->Scale(-label=>"Length of MD equilibration run (ns) :",
 			-orient=>'h',
 			-digit=>3,
 			-from=>0,
-			-to=>20,
+			-to=>100,
 			-variable=>\$cutoffValueEq,
-			-tickinterval=>5,
+			-tickinterval=>20,
 			-resolution=>1,
 			-length=>205
 			);
@@ -962,13 +962,13 @@ print "          (this will allow sites of mutations to be visualized later)\n\n
 print " loose  = collect any aligned residues\n";
 print "          (e.g. position 5 -> LEU LEU or position 5 -> LEU ALA)\n"; 
 print "          (this will NOT allow sites of mutations to be visualized later)\n\n";
-## choose homology
-#my $homology = <STDIN>;
-#chop($homology);
+# choose homology
+my $homology = <STDIN>;
+chop($homology);
 
-$homology = "loose";
-print "\nHOMOLOGY WILL BE LOOSE FOR THIS ANALYSIS\n\n";
-sleep(2);
+#$homology = "loose";
+#print "\nHOMOLOGY WILL BE LOOSE FOR THIS ANALYSIS\n\n";
+#sleep(2);
 
 #$homology = "strict";
 #print "\nHOMOLOGY WILL BE STRICT FOR THIS ANALYSIS\n\n";

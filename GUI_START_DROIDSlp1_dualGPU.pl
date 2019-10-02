@@ -63,9 +63,9 @@ my $MDeqScale = $mw->Scale(-label=>"Length of MD equilibration run (ns) :",
 			-orient=>'h',
 			-digit=>3,
 			-from=>0,
-			-to=>20,
+			-to=>100,
 			-variable=>\$cutoffValueEq,
-			-tickinterval=>5,
+			-tickinterval=>20,
 			-resolution=>1,
 			-length=>205
 			);
@@ -587,6 +587,13 @@ print "note: if this step fails, be sure your ligand PDB comprises ONLY a single
 print "note: also be sure to inspect warning messages on the terminal\n\n";
 print "\n============================================================================\n\n";
 sleep(5);
+print "\nNOTE: Ligand structure must be single multi atom unit for antechamber. If ligand
+consists of multiple parts or if multiple ligands are used, create a separate PDB file for
+each part, rerun pdb4amber, make new ctl files, and rerun antechamber for each part.
+Finally, edit .bat files when running teLeAP to load each ligand or part.  If single atom
+ions are included in protein structure file then add a line to .bat file that says
+'loadoff atomic_ions.lib' and check charges in your mol2 files. \n\n";
+sleep (4);
 system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
 print "check scaled quantum mechanical optimizations (close file when done)\n";
 system "gedit sqm.out\n";

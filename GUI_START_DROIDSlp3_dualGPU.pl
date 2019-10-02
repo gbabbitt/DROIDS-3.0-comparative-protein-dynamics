@@ -110,23 +110,29 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
 	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID with ligand (e.g. 1hho_bound) : ");
+		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID with first ligand (e.g. 1hho_bound) : ");
 		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDq
 					);
 	my $RfileFrame = $pdbFrame->Frame();
-		my $RfileLabel = $RfileFrame->Label(-text=>"pdb ID without ligand (e.g. 1hho_unbound) : ");
+		my $RfileLabel = $RfileFrame->Label(-text=>"pdb ID with second ligand (e.g. 2hho_bound) : ");
 		my $RfileEntry = $RfileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDr
 					);
-	my $LfileFrame = $pdbFrame->Frame();
-		my $LfileLabel = $LfileFrame->Label(-text=>"pdb ID for ligand (e.g. 1hho_ligand) : ");
-		my $LfileEntry = $LfileFrame->Entry(-borderwidth => 2,
+	my $L1fileFrame = $pdbFrame->Frame();
+		my $L1fileLabel = $L1fileFrame->Label(-text=>"pdb ID for first ligand (e.g. 1hho_ligand) : ");
+		my $L1fileEntry = $L1fileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
-					-textvariable=>\$fileIDl
-					);	
+					-textvariable=>\$fileIDl1
+					);
+      my $L2fileFrame = $pdbFrame->Frame();
+		my $L2fileLabel = $L2fileFrame->Label(-text=>"pdb ID for second ligand (e.g. 2hho_ligand) : ");
+		my $L2fileEntry = $L2fileFrame->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$fileIDl2
+					);    
 	my $forceFrame = $pdbFrame->Frame();
 		my $forceLabel = $forceFrame->Label(-text=>"protein force field (e.g. leaprc.protein.ff14SB): ");
 		my $forceEntry = $forceFrame->Entry(-borderwidth => 2,
@@ -150,7 +156,7 @@ my $pdbFrame = $mw->Frame();
 		my $chainEntry = $chainFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$chainN
-					);
+					); 
 	my $startFrame = $pdbFrame->Frame();
 		my $startLabel = $startFrame->Label(-text=>"start numbering AA's on chain at (e.g. 1): ");
 		my $startEntry = $startFrame->Entry(-borderwidth => 2,
@@ -163,9 +169,7 @@ my $pdbFrame = $mw->Frame();
 my $controlButton = $mw -> Button(-text => "make MD, cpptraj, and DROIDS control files (.ctl)", 
 				-command => \&control
 				); # Creates a ctl file button
-my $mutlistButton = $mw -> Button(-text => "create list of amino acid substitutions in .txt file", 
-				-command => \&mutlist
-				); # Creates a txt file button
+
 my $launchButton = $mw -> Button(-text => "launch MD run (pmemd.cuda) - may take many hours", 
 				-command => \&launch,
 				-background => 'gray45',
@@ -179,9 +183,7 @@ my $killButton = $mw -> Button(-text => "kill MD run (pmemd.cuda) on GPU",
 my $survButton = $mw -> Button(-text => "open GPU job survellience", 
 				-command => \&surv
 				); # Creates a surv button
-my $mutButton = $mw -> Button(-text => "create mutant PDB files", 
-				-command => \&mutate
-				); # Creates a mutation file  button
+
 my $teLeapButton = $mw -> Button(-text => "generate topology and coordinate files (teLeap)", 
 				-command => \&teLeap
 				); # Creates a teLeap button
@@ -238,12 +240,6 @@ $antechamberButton->pack(-side=>"bottom",
 $alignButton->pack(-side=>"bottom",
 			-anchor=>"s"
     		);
-$mutButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
-$mutlistButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
 $controlButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
@@ -259,8 +255,10 @@ $QfileLabel->pack(-side=>"left");
 $QfileEntry->pack(-side=>"left");
 $RfileLabel->pack(-side=>"left");
 $RfileEntry->pack(-side=>"left");
-$LfileLabel->pack(-side=>"left");
-$LfileEntry->pack(-side=>"left");
+$L1fileLabel->pack(-side=>"left");
+$L1fileEntry->pack(-side=>"left");
+$L2fileLabel->pack(-side=>"left");
+$L2fileEntry->pack(-side=>"left");
 $forceLabel->pack(-side=>"left");
 $forceEntry->pack(-side=>"left");
 $dforceLabel->pack(-side=>"left");
@@ -280,7 +278,9 @@ $QfileFrame->pack(-side=>"top",
 		-anchor=>"e");
 $RfileFrame->pack(-side=>"top",
 		-anchor=>"e");
-$LfileFrame->pack(-side=>"top",
+$L1fileFrame->pack(-side=>"top",
+		-anchor=>"e");
+$L2fileFrame->pack(-side=>"top",
 		-anchor=>"e");
 $runsFrame->pack(-side=>"top",
 		-anchor=>"e");
@@ -311,6 +311,7 @@ MainLoop; # Allows Window to Pop Up
 ########################################################################################
 sub stop {exit;}
 ########################################################################################
+
 sub control { # Write a control file and then call appropriate scripts that reference control file
 
 	if ($solvType eq "im") {$repStr = "implicit";}
@@ -358,7 +359,7 @@ for(my $ent = 0; $ent < scalar @chainlen; $ent++){
     print "length$chain\t$chainlen[$ent]\t #end of chain designated\n";
 }
 print $ctlFile1
-"LIGAND_ID\t".$fileIDl."REDUCED\t# Protein Data Bank ID for MD run
+"LIGAND_ID\t".$fileIDl1."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
 LIGAND_Field\t$dforceID\t# AMBER force field to use in MD runs
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
@@ -407,7 +408,7 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     
 }
 print $ctlFile2
-"LIGAND_ID\t".$fileIDl."REDUCED\t# Protein Data Bank ID for MD run
+"LIGAND_ID\t".$fileIDl2."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
 LIGAND_Field\t$dforceID\t# AMBER force field to use in MD runs
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
@@ -547,112 +548,6 @@ print "you will need to edit...re-enter lengths manually in MDq.ctl, MDr.ctl, DR
 
 #####################################################################################################
 
-sub mutate{
-
-print "\nNOTE: mutant models should be appropriately energy minimized
-using Structure editing tools Chimera after running this subroutine\n\n";
-sleep (4);
-
- print "IMPORTANT: ligands may sometimes offset the AA positions in your bound protein\n";
-print "ENTER THE OFFSET VALUE HERE TO PUT MUTATIONS IN SAME PLACE IN BOUND AND UNBOUND FILES\n\n";
- print "e.g. if ligand occupies first 6 positions in PDB, then enter 6, for no offset, enter 0\n\n";
-my $offset = <STDIN>;
-chop($offset);
-
-# open file for offset positions in bound PDB file
-open(MUT2, ">"."mutate_list_offset.txt");
-print MUT2 "substitution\t"."position\n";
-
-# create mutate_protein.cmd script
-open (LST, "<"."mutate_list.txt") || die "could not find mutate_list_trans.txt\n";
-@LST = <LST>;
-#mutate unbound protein
-open(MUT, ">"."mutate_protein_unbound.cmd");
-print MUT "open $fileIDq"."REDUCED.pdb\n";
-    for (my $l = 0; $l < scalar @LST; $l++){
-        if ($l == 0){next;}
-        $LSTrow = $LST[$l];
-        @LSTrow = split(/\s+/, $LSTrow);
-        $subsTYPE = $LSTrow[0];
-        $subsPOS = $LSTrow[1];
-        if ($subsTYPE ne '') {print MUT "swapaa $subsTYPE"." #0:$subsPOS\n";}
-        }
-print MUT "write 0 $fileIDq"."REDUCED.pdb\n";
-close MUT;
-
-# run mutate_protein.cmd script
-sleep(1);
-system("$chimera_path"."chimera --nogui mutate_protein_unbound.cmd > mutate_protein_unbound.log\n");
-print "\nmutant protein PDB file was created for unbound protein\n";
-
-# reducing new mutations and check
-sleep (1);
-print "\nreducing new mutations that were added\n";
-sleep (1);
-system "pdb4amber -i". $fileIDq."REDUCED.pdb -o ".$fileIDq."REDUCEDtemp.pdb --reduce \n";
-copy($fileIDq."REDUCEDtemp.pdb", $fileIDq."REDUCED.pdb");
-print "\nif no errors here, new mutations were created and reduced\n";
-print "\n check your mutant protein PDB file = $fileIDq.REDUCED.pdb \n";
-system("$chimera_path"."chimera $fileIDq"."REDUCED.pdb\n");
-
-#mutate bound protein
-open(MUT, ">"."mutate_protein_bound.cmd");
-print MUT "open $fileIDr"."REDUCED.pdb\n";
-    for (my $l = 0; $l < scalar @LST; $l++){ #trans reg mutations
-        if ($l == 0){next;}
-        $LSTrow = $LST[$l];
-        @LSTrow = split(/\s+/, $LSTrow);
-        $subsTYPE = $LSTrow[0];
-        $subsPOS = $LSTrow[1] + $offset;
-        if ($subsTYPE ne '') {print MUT "swapaa $subsTYPE"." #0:$subsPOS\n";
-                              print MUT2 "$subsTYPE\t"."$subsPOS\n";}
-        }
-print MUT "write 0 $fileIDr"."REDUCED.pdb\n";
-close MUT;
-close MUT2;
-
-# run mutate_protein.cmd script
-sleep(1);
-system("$chimera_path"."chimera --nogui mutate_protein_bound.cmd > mutate_protein_bound.log\n");
-print "\nmutant protein PDB file was created for bound protein\n";
-
-# reducing new mutations and check
-sleep (1);
-print "\nreducing new mutations that were added\n";
-sleep (1);
-system "pdb4amber -i". $fileIDr."REDUCED.pdb -o ".$fileIDr."REDUCEDtemp.pdb --reduce \n";
-copy($fileIDr."REDUCEDtemp.pdb", $fileIDr."REDUCED.pdb");
-print "\nif no errors here, new mutations were created and reduced\n";
-print "\n check your mutant protein PDB file = $fileIDr.REDUCED.pdb \n";
-system("$chimera_path"."chimera $fileIDr"."REDUCED.pdb\n");
-
-}
-#####################################################################################################
-
-sub mutlist{
-# create mutate_protein.cmd script
-open(MUT, ">"."mutate_list.txt");
-print MUT "substitution\t"."position\n";
-close MUT;
-print "opening mutate_list.txt using gedit\n\n";
-print "type two tab separated columns under 'substitution' and 'position' then save and close\n\n";
-print "for example\n\n";
-print "substitution\t"."position\n";
-print "ALA\t"."23\n";
-print "TYR\t"."31\n";
-print "PRO\t"."35\n";
-print "LEU\t"."47\n";
-print "ARG\t"."52\n";
-
-system "gedit mutate_list.txt\n";
-
-# run mutate_protein.cmd script
-print "\nmutant list file (mutate_list.txt) was created\n";
-
-}
-
-#####################################################################################################
-
 sub teLeap { # create topology and coordinate files 
 system "perl teLeap_ligandproteinQuery.pl\n";
 system "perl teLeap_ligandproteinReference.pl\n";
@@ -660,25 +555,25 @@ my $filecheck1 = "vac_".$fileIDq."REDUCED.prmtop";
 my $filecheck3 = "vac_".$fileIDr."REDUCED.prmtop";
 my $filecheck2 = "wat_".$fileIDq."REDUCED.inpcrd";
 my $filecheck4 = "wat_".$fileIDr."REDUCED.inpcrd";
-my $filecheck5 = "vac_".$fileIDl."REDUCED.prmtop";
-my $filecheck6 = "wat_".$fileIDl."REDUCED.inpcrd";
+my $filecheck5 = "vac_".$fileIDl1."REDUCED.prmtop";
+my $filecheck6 = "wat_".$fileIDl1."REDUCED.inpcrd";
+my $filecheck7 = "vac_".$fileIDl2."REDUCED.prmtop";
+my $filecheck8 = "wat_".$fileIDl2."REDUCED.inpcrd";
 my $size1 = -s $filecheck1;
 my $size2 = -s $filecheck2;
 my $size3 = -s $filecheck3;
 my $size4 = -s $filecheck4;
 my $size5 = -s $filecheck5;
 my $size6 = -s $filecheck6;
-print "$size1\t"."$size2\t"."$size3\t"."$size4\t"."$size5\t"."$size6\n";
-if ($size1 <= 10 || $size2 <= 10 || $size3 <= 10 || $size4 <= 10 || $size5 <= 10 || $size6 <= 10){print "teLeap may have failed (double check pdb files for problems)\n";}
+my $size7 = -s $filecheck7;
+my $size8 = -s $filecheck8;
+print "$size1\t"."$size2\t"."$size3\t"."$size4\t"."$size5\t"."$size6\t"."$size7\t"."$size8\n";
+if ($size1 <= 10 || $size2 <= 10 || $size3 <= 10 || $size4 <= 10 || $size5 <= 10 || $size6  || $size7 <= 10 || $size8 <= 10){print "teLeap may have failed (double check pdb files for problems)\n";}
 else {print "teLeap procedure appears to have run (double check .prmtop and .inpcrd files)\n";}
 }
 
 ######################################################################################################
 sub reduce { # create PDB files for teLeap
-copy($fileIDr.".pdb", $fileIDr."mut.pdb");
-copy($fileIDq.".pdb", $fileIDq."mut.pdb");
-$fileIDr = $fileIDr."mut"; # redefine label
-$fileIDq = $fileIDq."mut"; # redefine label
 sleep(1);print "DO YOU WANT TO REDUCE THE ENTIRE STRUCTURE? (y or n)\n";
 print "i.e. answer 'n' if protonation state is already prepared ahead of time \n";
 my $reduce_enter = <STDIN>;
@@ -687,8 +582,10 @@ if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUC
 if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
 if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl1.pdb -o ".$fileIDl1."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl1.pdb -o ".$fileIDl1."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl2.pdb -o ".$fileIDl2."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl2.pdb -o ".$fileIDl2."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry --reduce \n";}
 if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
@@ -713,21 +610,32 @@ Finally, edit .bat files when running teLeAP to load each ligand or part.  If si
 ions are included in protein structure file then add a line to .bat file that says
 'loadoff atomic_ions.lib' and check charges in your mol2 files. \n\n";
 sleep (4);
-system "antechamber -i $fileIDl"."REDUCED.pdb -fi pdb -o $fileIDl"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
+system "antechamber -i $fileIDl1"."REDUCED.pdb -fi pdb -o $fileIDl1"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
 print "check scaled quantum mechanical optimizations (close file when done)\n";
 system "gedit sqm.out\n";
 sleep(1);
 print "running parmchk to test if all parameters required are available";
-system "parmchk2 -i $fileIDl"."REDUCED.mol2 -f mol2 -o $fileIDl"."REDUCED.frcmod\n";
+system "parmchk2 -i $fileIDl1"."REDUCED.mol2 -f mol2 -o $fileIDl1"."REDUCED.frcmod\n";
 print "check mol2 file and then close\n";
-system("$chimera_path"."chimera $fileIDl"."REDUCED.mol2\n");
+system("$chimera_path"."chimera $fileIDl1"."REDUCED.mol2\n");
 print "check force field modifications file and then close\n";
-system "gedit $fileIDl"."REDUCED.frcmod\n";
+system "gedit $fileIDl1"."REDUCED.frcmod\n";
+sleep(1);
+print "\n\nparmchk is completed\n\n";
+sleep(3);
+system "antechamber -i $fileIDl2"."REDUCED.pdb -fi pdb -o $fileIDl2"."REDUCED.mol2 -fo mol2 -c bcc -s 2\n";
+print "check scaled quantum mechanical optimizations (close file when done)\n";
+system "gedit sqm.out\n";
+sleep(1);
+print "running parmchk to test if all parameters required are available";
+system "parmchk2 -i $fileIDl2"."REDUCED.mol2 -f mol2 -o $fileIDl2"."REDUCED.frcmod\n";
+print "check mol2 file and then close\n";
+system("$chimera_path"."chimera $fileIDl2"."REDUCED.mol2\n");
+print "check force field modifications file and then close\n";
+system "gedit $fileIDl2"."REDUCED.frcmod\n";
 sleep(1);
 print "\n\nparmchk is completed\n\n";
 }
-
-
 ######################################################################################################
 
 sub launch { # launch MD run
@@ -818,6 +726,7 @@ print "\n\n alignment procedure is complete\n";
 sleep(0.5);
 	
 }
+
 
 ###################################################################################################
 
@@ -1151,9 +1060,9 @@ print "          (e.g. position 5 -> LEU LEU or position 5 -> LEU ALA)\n";
 print "          (this will NOT allow sites of mutations to be visualized later)\n\n";
 #my $homology = <STDIN>;
 #chop($homology);
-print "for mutations on simple protein-ligand interaction analysis 'homology' will be strict\n";
-$homology = "strict";
-sleep(2);
+print "for protein-ligand analysis homology will be loose\n";
+$homology = "loose";
+sleep(1);
 
 open(CTL, '>>', "DROIDS.ctl") or die "Could not open output file";
 print CTL "homology\t"."$homology\t # homology as 'strict' or 'loose'\n";
@@ -1202,7 +1111,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
 					     $flux_query_avg = $statSCORE->mean();
                               #$flux_query_n = $statSCORE->count();
                               #print "flux_query_n\t"."$flux_query_n\n";
-					     $delta_flux = ($flux_query_avg - $flux_ref_avg); # note ref and query are reversed due to GUI input
+					     $delta_flux = ($flux_query_avg - $flux_ref_avg); 
 					     $abs_delta_flux = abs($flux_query_avg - $flux_ref_avg);
                               # calculate JS divergence
                               open (TMP1, ">"."flux_values_temp.txt") or die "could not create temp file\n";
@@ -1259,7 +1168,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
 					     $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - query
                               $statSCORE->add_data (@QUERYfluxAvg);
 					     $flux_query_avg = $statSCORE->mean();
-					     $delta_flux = ($flux_query_avg - $flux_ref_avg); # note ref and query are reversed due to GUI input
+					     $delta_flux = ($flux_query_avg - $flux_ref_avg); 
 					     $abs_delta_flux = abs($flux_query_avg - $flux_ref_avg);
 					     # calculate JS divergence
                               open (TMP1, ">"."flux_values_temp.txt") or die "could not create temp file\n";
@@ -1368,7 +1277,7 @@ print "chain lengths added to DROIDSfluctuationAVGchain.txt file\n\n";
 
 #############################################
 
-system "perl GUI_STATS_DROIDSlp2.pl\n";	
+system "perl GUI_STATS_DROIDSlp3.pl\n";	
 }
 
 ##################################################################################################

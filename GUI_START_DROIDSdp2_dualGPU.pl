@@ -61,9 +61,9 @@ my $MDeqScale = $mw->Scale(-label=>"Length of MD equilibration run (ns) :",
 			-orient=>'h',
 			-digit=>3,
 			-from=>0,
-			-to=>20,
+			-to=>100,
 			-variable=>\$cutoffValueEq,
-			-tickinterval=>5,
+			-tickinterval=>20,
 			-resolution=>1,
 			-length=>205
 			);
@@ -539,6 +539,11 @@ print "you will need to edit...re-enter lengths manually in MDq.ctl, MDr.ctl, DR
 #####################################################################################################
 
 sub mutate{
+
+print "\nNOTE: mutant models should be appropriately energy minimized
+using Structure editing tools Chimera after running this subroutine\n\n";
+sleep (4);
+
  print "IMPORTANT:DNA chains will usually offset the AA positions in your bound protein\n";
 print "ENTER THE OFFSET VALUE HERE TO PUT MUTATIONS IN SAME PLACE IN BOUND AND UNBOUND FILES\n\n";
  print "e.g. if DNA chains occupy first 29 positions in PDB, then enter 29\n\n";

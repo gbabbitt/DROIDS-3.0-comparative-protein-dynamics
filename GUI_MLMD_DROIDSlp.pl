@@ -425,6 +425,8 @@ my $num_copy = <STDIN>;
 chop($num_copy);
 if ($num_copy eq ''){$num_copy = 2;}
 
+#NOTE: for ligand bound structures in DROIDS, the unbound reference form is loaded first than ligand files are added
+
 # make copies of query protein file for deploy 
 for (my $c = 0; $c <= $num_copy ; $c++){
 if ($c == 0){next;}
