@@ -27,20 +27,23 @@ you want to compare and move them into the DROIDS folder.  Naming convention
 should be PDB_ID.pdb. Be sure to check that they are 'sensibly' homologous in
 that they differ only in with regards to the effect you want to observe (i.e.
 sequence difference, solvent or binding state).  Edit in Chimera if neccessary.
-Remove crystalographic waters, mirrored structures or unusual ligands. Atypical
-Amber preparations (e.g. beyond adding H and missing atoms using teleap) can be
-done at the command line using Antechamber for further ligand library prep
+Remove mirrored structures or unusual ligands used in crystal prep. Atypical
+Amber preparations (e.g. beyond adding H, removing crystallographic waters
+and missing atoms using teleap) can be done at the command line using
+Antechamber for further ligand library prep
 
-NOTE: this program assumes .pdb files are completely ready for teLeap
+NOTE: this program assumes .pdb files are ready for run through pdb4amber and teLeap
 
 Dependencies - perl, perl module (Descriptive), perl-tk, python, python-tk,
   python-gi, R-base, R-dev, R package(ggplot2), USCF Chimera 1.11, evince(pdf viewer)
   Amber16 (licensed from Univ of Ca; visit ambermd.org), Ambertools16
- (tested on Linux Mint 18.1 Cinnamon 64-bit Kernel 4.4.0-53-generic)
+ (tested on Linux Mint 18 and 19 Cinnamon 64-bit Kernel 4.4.0-53-generic)
+ 
+ DROIDSinstaller.pl will setup your fresh Linux Mint system for DROIDS.pl
 
 BabbittLab - Rochester Inst. Technol. Rochester NY
 
-DROIDS 1.0               Copyright 2017 G.A. Babbitt.\n\n";
+DROIDS 3.0               Copyright 2019 G.A. Babbitt.\n\n";
 
 
 print "continue to GPL license? (y/n)\n";
@@ -51,18 +54,18 @@ if ($go eq "n") {exit;}
 
 print " 
 
-    DROIDS 2.0 is free software: you can redistribute it and/or modify
+    DROIDS 3.0 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DROIDS 2.0 is distributed in the hope that it will be useful,
+    DROIDS 3.0 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DROIDS 2.0.  If not, see <http://www.gnu.org/licenses/>.
+    along with DROIDS 3.0.  If not, see <http://www.gnu.org/licenses/>.
 
     Visit us on GitHub. \n\n";
 
@@ -119,29 +122,39 @@ my $pipeFrame = $mw->Frame(	-label => "CHOOSE MODE OF MOLECULAR DYNAMIC COMPARIS
                         -value=>"ed",
 						-variable=>\$testType
 						);
-    my $dp1Radio = $pipeFrame->Radiobutton( -text => "(4) analyze impact of DNA-protein interaction upon binding    					   	                      (requires 2 PDB ID's for DNA-protein complex and protein-only)",
+     my $ppRadio = $pipeFrame->Radiobutton( -text => "(4) analyze impact of protein-protein interaction upon binding   			                                                                    (requires 2 PDB ID's representing the complex and unbound protein)",
+						-foreground => 'lightyellow',
+                        -value=>"pp",
+						-variable=>\$testType
+						);
+    my $dp1Radio = $pipeFrame->Radiobutton( -text => "(5) analyze impact of DNA-protein interaction upon binding    					   	                      (requires 2 PDB ID's for DNA-protein complex and protein-only)",
 						-foreground => 'lightgreen',
                         -value=>"dp1",
 						-variable=>\$testType
 						);
-	 my $dp2Radio = $pipeFrame->Radiobutton( -text => "(5) analyze impact of mutation(s) on DNA-protein interaction		 		                 (requires 2 PDB ID's as in #4 and (locations/types) of cis or trans regulatory mutation)",
+	 my $dp2Radio = $pipeFrame->Radiobutton( -text => "(6) analyze impact of mutation(s) on DNA-protein interaction		 		                 (requires 2 PDB ID's as in #4 and (locations/types) of cis or trans regulatory mutation)",
 						-foreground => 'lightgreen',
                         -value=>"dp2",
 						-variable=>\$testType
 						);
-	 my $dp3Radio = $pipeFrame->Radiobutton( -text => "(6) analyze comparison of two DNA-protein interactions 				 			    	             (requires 2 PDB ID representing binding protein homologs)",
+	 my $dp3Radio = $pipeFrame->Radiobutton( -text => "(7) analyze comparison of two DNA-protein interactions 				 			    	             (requires 2 PDB ID representing binding protein homologs)",
 						-foreground => 'lightgreen',
                         -value=>"dp3",
 						-variable=>\$testType
 						);
-    my $lp1Radio = $pipeFrame->Radiobutton( -text => "(7)  analyze impact of a protein-ligand interaction upon binding drug, toxin, or activator  				(requires 3 PDB ID's = protein-ligand complex, protein-only, and ligand only)",
+    my $lp1Radio = $pipeFrame->Radiobutton( -text => "(8)  analyze impact of a protein-ligand interaction upon binding drug, toxin, or activator  				(requires 3 PDB ID's = protein-ligand complex, protein-only, and ligand only)",
 						-foreground => 'pink',
                         -value=>"lp1",
 						-variable=>\$testType
 						);
-	 my $lp2Radio = $pipeFrame->Radiobutton( -text => "(8)  analyze impact of mutation(s) on protein-ligand interaction		 			   	            (requires 3 PDB ID's as in #7 and list of (locations/types) of mutation)",
+	 my $lp2Radio = $pipeFrame->Radiobutton( -text => "(9)  analyze impact of mutation(s) on protein-ligand interaction		 			   	            (requires 3 PDB ID's as in #7 and list of (locations/types) of mutation)",
 						-foreground => 'pink',
                         -value=>"lp2",
+						-variable=>\$testType
+						);
+     my $lp3Radio = $pipeFrame->Radiobutton( -text => "(10)  analyze comparison of two protein-ligand interactions 				 			    	             (requires 2 PDB ID representing binding protein homologs)",
+						-foreground => 'pink',
+                        -value=>"lp3",
 						-variable=>\$testType
 						);
 	 
@@ -195,12 +208,13 @@ $pipeFrame->pack(-side=>"top",
 $ssRadio->pack(-anchor=>"w");
 $sdmRadio->pack(-anchor=>"w");
 $edRadio->pack(-anchor=>"w");
-
+$ppRadio->pack(-anchor=>"w");
 $dp1Radio->pack(-anchor=>"w");
 $dp2Radio->pack(-anchor=>"w");
 $dp3Radio->pack(-anchor=>"w");
 $lp1Radio->pack(-anchor=>"w");
 $lp2Radio->pack(-anchor=>"w");
+$lp3Radio->pack(-anchor=>"w");
 $droidsButton1->pack(-side=>"right",
 			-anchor=>"n");
 $droidsButton2->pack(-side=>"left",
@@ -234,22 +248,25 @@ print("\nlaunching DROIDS 2.0...\n");
   
      if ($testType eq "ss" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSss.pl\n";}  
 	elsif ($testType eq "ss" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSss_dualGPU.pl\n";}
-   elsif ($testType eq "sdm" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSsdm.pl\n";}  
+    elsif ($testType eq "sdm" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSsdm.pl\n";}  
 	elsif ($testType eq "sdm" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSsdm_dualGPU.pl\n";}
 	elsif ($testType eq "ed" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSed.pl\n";}
 	elsif ($testType eq "ed" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSed_dualGPU.pl\n";}
+    elsif ($testType eq "pp" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSpp.pl\n";}
+	elsif ($testType eq "pp" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSpp_dualGPU.pl\n";}
 	elsif ($testType eq "dp1" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSdp1.pl\n";}
-        elsif ($testType eq "dp1" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp1_dualGPU.pl\n";}
+    elsif ($testType eq "dp1" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp1_dualGPU.pl\n";}
 	elsif ($testType eq "dp2" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSdp2.pl\n";}
-        elsif ($testType eq "dp2" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp2_dualGPU.pl\n";}
+    elsif ($testType eq "dp2" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp2_dualGPU.pl\n";}
 	elsif ($testType eq "dp3" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSdp3.pl\n";}
-        elsif ($testType eq "dp3" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp3_dualGPU.pl\n";}
+    elsif ($testType eq "dp3" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSdp3_dualGPU.pl\n";}
 	elsif ($testType eq "lp1" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSlp1.pl\n";}
-        elsif ($testType eq "lp1" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSlp1_dualGPU.pl\n";}
+    elsif ($testType eq "lp1" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSlp1_dualGPU.pl\n";}
 	elsif ($testType eq "lp2" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSlp2.pl\n";}
-        elsif ($testType eq "lp2" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSlp2_dualGPU.pl\n";}
-        
-        else {print " PLEASE SELECT OPTIONS\n"}
+    elsif ($testType eq "lp2" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSlp2_dualGPU.pl\n";}
+    elsif ($testType eq "lp3" && $gpuType eq "gpu1") {system "perl GUI_START_DROIDSlp3.pl\n";}
+    elsif ($testType eq "lp3" && $gpuType eq "gpu2") {system "perl GUI_START_DROIDSlp3_dualGPU.pl\n";}   
+    else {print " PLEASE SELECT OPTIONS\n"}
         
   
   
