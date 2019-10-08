@@ -163,7 +163,11 @@ my $structureFrame = $mw->Frame(	-label => "STRUCTURE TYPE BEING DEPLOYED",
                               -value=>"ligand",
 						-variable=>\$stype
 						);
-
+     my $protprotRadio = $structureFrame->Radiobutton( -text => "protein bound to another protein",
+						-foreground => 'darkred',
+                              -value=>"protprot",
+						-variable=>\$stype
+						);
 
 # movie viewing option Frame
 my $viewFrame = $mw->Frame(	-label => "MOVIE VIEWING OPTIONS",
@@ -354,6 +358,7 @@ $fixRadio->pack();
 $rollRadio->pack();
 $stereoRadio->pack();
 $proteinRadio->pack();
+$protprotRadio->pack();
 $dnaRadio->pack();
 $ligandRadio->pack();
 MainLoop; # Allows Window to Pop Up
@@ -1846,11 +1851,20 @@ my $orig_queryID = $queryID;  # create tag for original query in training set
 my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
 print "queryID label is adjusted to "."$queryID\n\n\n";
 
- 
-if($stype eq 'dna'|| $stype eq 'ligand'){
-   print "ENTER OFFSET VALUE TO ACCOUNT FOR NON-PROTEINS IN FILE (e.g. '31' if first 30 positions in file are not amino acid)\n\n";
+print "Enter chain ID where color map should start (default = A)\n";
+   print "i.e. color map only to homologous parts of bound and unbound
+   structure (e.g. PDB 2oob = B)\n";
+   $chainMAP = <STDIN>;
+   chop($chainMAP);
+   if ($chainMAP eq ''){$chainMAP = 'A';}
+
+if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
+   print "Enter number position of N terminal on this chain (default = 0)\n";
+   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
+   $offset = $offset-2;
+   if ($offset eq ''){$offset = 0;}
    }
 # create mask for signif Wilks lamda
 open(OUT, ">"."./testingData_$queryID/adj_vertpvals_$queryID.txt")||die "could not create mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
@@ -1871,13 +1885,13 @@ close IN;
 close OUT;
 
 # make learned class attribute files for image rendering
-
-  open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";  
+  if ($stype ne "protprot"){open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
+  if ($stype eq "protprot"){open(OUT, ">"."./attribute_files/classATTR_$orig_queryID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
   print OUT "recipient: residues\n";
   print OUT "attribute: class\n";
   print OUT "\n";
   
-   for (my $a = 0; $a < $lengthID; $a++){
+   for (my $a = 0; $a < $lengthID+$offset+1; $a++){
    if ($a eq '' || $a <= $offset){next;}
    open(IN, "<"."./testingData_$queryID/adj_vertpvals_$queryID.txt")||die "could not open mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
     my @IN = <IN>;
@@ -1887,9 +1901,9 @@ close OUT;
    
      #print "$a\t"."$frame\t"."$value\n";
      $pos = $a+1;
-     if ($maskvalue == 1){print OUT "\t:"."$pos\t"."1\n";}
+     if ($maskvalue == 1){print OUT "\t:"."$pos".".$chainMAP\t"."1\n";}
      #if ($f == $frame && $maskvalue == 1){print OUT "\t:"."$pos\t"."1\n";} # to test mask positioning
-     if ($maskvalue == 0){print OUT "\t:"."$pos\t"."0\n";}
+     if ($maskvalue == 0){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
      
  
  close IN;
@@ -1913,6 +1927,12 @@ $max_val = 1;
 if ($stype eq "protein"){
 if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$orig_queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$orig_queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+print("\n\n Display complete\n\n");
+}
+
+if ($stype eq "protprot"){
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 }
 
@@ -1943,11 +1963,21 @@ my $orig_queryID = $queryID;  # create tag for original query in training set
 my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
 print "queryID label is adjusted to "."$queryID\n\n\n";
 
+print "Enter chain ID where color map should start (default = A)\n";
+   print "i.e. color map only to homologous parts of bound and unbound
+   structure (e.g. PDB 2oob = B)\n";
+   $chainMAP = <STDIN>;
+   chop($chainMAP);
+   if ($chainMAP eq ''){$chainMAP = 'A';}
 
-if($stype eq 'dna'|| $stype eq 'ligand'){
-   print "ENTER OFFSET VALUE TO ACCOUNT FOR NON-PROTEINS IN FILE (e.g. '31' if first 30 positions in file are not amino acid)\n\n";
+if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
+   
+   print "Enter number position of N terminal on this chain (default = 0)\n";
+   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
+   $offset = $offset-2;
+   if ($offset eq ''){$offset = 0;}
    }
 
 # create array of names of copies and variants
@@ -2014,7 +2044,7 @@ close OUT;
   print OUT "recipient: residues\n";
   print OUT "attribute: dRMSF\n";
   print OUT "\n";
-  for (my $a = 0; $a < $lengthID; $a++){
+  for (my $a = 0; $a < $lengthID+$offset+1; $a++){
    if ($a eq '' || $a <= $offset){next;}
    open(IN, "<"."./testingData_$queryID/impact_vert_$variantID.txt")||die "could not open mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
     my @IN = <IN>;
@@ -2024,9 +2054,9 @@ close OUT;
      
      #print "$f\t"."$a\t"."$frame\t"."$value\n";
      $pos = $a+1;
-     if ($maskvalue > 0){print OUT "\t:"."$pos\t"."1\n";}
+     if ($maskvalue > 0){print OUT "\t:"."$pos".".$chainMAP\t"."1\n";}
      #if ($f == $frame && $maskvalue > 0){print OUT "\t:"."$pos\t"."1\n";} # test mask positioning
-     if ($maskvalue == 0){print OUT "\t:"."$pos\t"."0\n";}
+     if ($maskvalue == 0){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
       
    close IN;
  }
@@ -2051,6 +2081,12 @@ sleep(1);
 if ($stype eq "protein"){
 if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnrmsf_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnrmsf_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+print("\n\n Display complete\n\n");
+}
+
+if ($stype eq "protprot"){
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 }
 
@@ -2095,11 +2131,23 @@ sleep(1);print "SHOW LEARNERS ONLY WITHIN CONSERVED DYNAMIC REGIONS? (y or n)\n\
 my $masktype = <STDIN>;
 chop($masktype);
 
-if($stype eq 'dna'|| $stype eq 'ligand'){
-   print "ENTER OFFSET VALUE TO ACCOUNT FOR NON-PROTEINS IN FILE (e.g. '31' if first 30 positions in file are not amino acid)\n\n";
+print "Enter chain ID where color map should start (default = A)\n";
+   print "i.e. color map only to homologous parts of bound and unbound
+   structure (e.g. PDB 2oob = B)\n";
+   $chainMAP = <STDIN>;
+   chop($chainMAP);
+   if ($chainMAP eq ''){$chainMAP = 'A';}
+
+if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
+   
+   print "Enter number position of N terminal on this chain (default = 0)\n";
+   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
+   $offset = $offset-2;
+   if ($offset eq ''){$offset = 0;}
    }
+
 # create mask for signif Wilks lamda
 open(OUT, ">"."./testingData_$queryID/adj_vertpvals_$queryID.txt")||die "could not create mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
 open(IN, "<"."./testingData_$queryID/adj_pvals_$queryID.txt")||die "could not open mask file /testingData_$queryID/adj_pvals_$queryID.txt\n";  
@@ -2120,6 +2168,8 @@ close OUT;
 
 # make learned class attribute files for movie rendering
 print "\n creating class attribute files for all frames\n";
+#if($stype eq "protprot"){open(IN, "<"."./testingData_$refID/indAAclass$learner/classAA_$refID"."_1".".txt")||die "could not open time series file /testingData_$refID/indAAclass$learner/classAA_$refID"."_1".".txt\n";}
+#if($stype ne "protprot"){open(IN, "<"."./testingData_$queryID/indAAclass$learner/classAA_$refID"."_1".".txt")||die "could not open time series file /testingData_$queryID/indAAclass$learner/classAA_$refID"."_1".".txt\n";}
 open(IN, "<"."./testingData_$queryID/indAAclass$learner/classAA_$refID"."_1".".txt")||die "could not open time series file /testingData_$queryID/indAAclass$learner/classAA_$refID"."_1".".txt\n";
 my @IN = <IN>;
 $fgroups = scalar @IN;
@@ -2127,19 +2177,22 @@ close IN;
 print "            number of groups of frames\t"."$fgroups\n";
 mkdir("./testingData_$queryID/indAAclass_attr");
 for (my $f = 1; $f <= $fgroups; $f++){
-  open(OUT, ">"."./testingData_$queryID/indAAclass_attr/classATTR_$refID"."_$f".".dat")||die "could not create ATTR time series file\n";  
+  open(OUT, ">"."./testingData_$queryID/indAAclass_attr/classATTR_$refID"."_$f".".dat")||die "could not create ATTR time series file\n";
   print OUT "recipient: residues\n";
   print OUT "attribute: class\n";
   print OUT "\n";
   
-   for (my $a = 0; $a < $lengthID; $a++){
+   for (my $a = 0; $a < $lengthID+$offset+1; $a++){
    if ($a eq '' || $a <= $offset){next;}
    open(IN, "<"."./testingData_$queryID/adj_vertpvals_$queryID.txt")||die "could not open mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
     my @IN = <IN>;
+   $rowINDEX = $a-$offset-1;
    $INrow = $IN[$a-$offset];
     @INrow = split(/\s+/, $INrow);
     $maskvalue = $INrow[0];
-   open(IN2, "<"."./testingData_$queryID/indAAclass$learner/classAA_$refID"."_$a".".txt")||die "could not open time series file  /testingData_$queryID/indAAclass$learner/classAA_$refID"."_$a".".txt\n";
+   #if($stype eq "protprot"){open(IN2, "<"."./testingData_$refID/indAAclass$learner/classAA_$refID"."_$a".".txt")||die "could not open time series file  /testingData_$refID/indAAclass$learner/classAA_$refID"."_$a".".txt\n";}
+   #if($stype ne "protprot"){open(IN2, "<"."./testingData_$queryID/indAAclass$learner/classAA_$refID"."_$a".".txt")||die "could not open time series file  /testingData_$queryID/indAAclass$learner/classAA_$refID"."_$a".".txt\n";}
+   open(IN2, "<"."./testingData_$queryID/indAAclass$learner/classAA_$refID"."_$rowINDEX".".txt")||die "could not open time series file  /testingData_$queryID/indAAclass$learner/classAA_$refID"."_$a".".txt\n";
     my @IN2 = <IN2>;
     $frame = 0;
     for (my $i = 0; $i < scalar @IN2; $i++) {
@@ -2149,14 +2202,14 @@ for (my $f = 1; $f <= $fgroups; $f++){
 	$value = $IN2row[0];
      #print "$f\t"."$a\t"."$frame\t"."$value\n";
      $pos = $a+1;
-     if ($f == $frame && $maskvalue == 1){print OUT "\t:"."$pos\t"."$value\n";}
+     if ($f == $frame && $maskvalue == 1){print OUT "\t:"."$pos".".$chainMAP\t"."$value\n";}
      #if ($f == $frame && $maskvalue == 1){print OUT "\t:"."$pos\t"."1\n";} # to test mask positioning
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "n"){print OUT "\t:"."$pos\t"."$value\n";}
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "y"){print OUT "\t:"."$pos\t"."0\n";}
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "N"){print OUT "\t:"."$pos\t"."$value\n";}
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "Y"){print OUT "\t:"."$pos\t"."0\n";}
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "no"){print OUT "\t:"."$pos\t"."$value\n";}
-     if ($f == $frame && $maskvalue == 0 && $masktype eq "yes"){print OUT "\t:"."$pos\t"."0\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "n"){print OUT "\t:"."$pos".".$chainMAP\t"."$value\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "y"){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "N"){print OUT "\t:"."$pos".".$chainMAP\t"."$value\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "Y"){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "no"){print OUT "\t:"."$pos".".$chainMAP\t"."$value\n";}
+     if ($f == $frame && $maskvalue == 0 && $masktype eq "yes"){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
      }
  close IN2;
  close IN;
@@ -2177,8 +2230,14 @@ if ($colorScheme eq "c2" ){$colorType = "wb";}
 $attr = "class";
 $min_val = 0;
 $max_val = 1;
+if ($stype ne "protprot"){ 
 if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+}
+if ($stype eq "protprot"){ 
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learnclass_tan_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learnclass_gray_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+}
 print("\n\n Movies rendered\n");
  
      
@@ -2196,11 +2255,23 @@ my $orig_queryID = $queryID;  # create tag for original query in training set
 my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
 print "queryID label is adjusted to "."$queryID\n\n\n";
 
-if($stype eq 'dna'|| $stype eq 'ligand'){
-   print "ENTER OFFSET VALUE TO ACCOUNT FOR NON-PROTEINS IN FILE (e.g. '31' if first 30 positions in file are not amino acid)\n\n";
+print "Enter chain ID where color map should start (default = A)\n";
+   print "i.e. color map only to homologous parts of bound and unbound
+   structure (e.g. PDB 2oob = B)\n";
+   $chainMAP = <STDIN>;
+   chop($chainMAP);
+   if ($chainMAP eq ''){$chainMAP = 'A';}
+
+if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
+   
+   print "Enter number position of N terminal on this chain (default = 0)\n";
+   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
+   $offset = $offset-2;
+   if ($offset eq ''){$offset = 0;}
    }
+
 
 # create array of names of copies and variants
 open(MUT, "<"."copy_list.txt");
@@ -2273,14 +2344,15 @@ for (my $f = 1; $f <= $fgroups; $f++){
   print OUT "recipient: residues\n";
   print OUT "attribute: dRMSF\n";
   print OUT "\n";
-  for (my $a = 0; $a < $lengthID; $a++){
+  for (my $a = 0; $a < $lengthID+$offset+1; $a++){
    if ($a eq '' || $a <= $offset){next;}
    open(IN, "<"."./testingData_$queryID/impact_vert_$variantID.txt")||die "could not open mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
     my @IN = <IN>;
+   $rowINDEX = $a-$offset-1;
    $INrow = $IN[$a-$offset];
     @INrow = split(/\s+/, $INrow);
     $maskvalue = $INrow[0];
-   open(IN2, "<"."./testingData_$queryID/indAAdrmsf/drmsfAA_$refID"."_$a".".txt")||die "could not open time series file  drmsfAA_$refID"."_$a".".txt\n";
+   open(IN2, "<"."./testingData_$queryID/indAAdrmsf/drmsfAA_$refID"."_$rowINDEX".".txt")||die "could not open time series file  drmsfAA_$refID"."_$a".".txt\n";
     my @IN2 = <IN2>;
     $frame = 0;
     for (my $i = 0; $i < scalar @IN2; $i++) {
@@ -2318,6 +2390,7 @@ sleep(1);
 @dRMSF=();
 for (my $a = 0; $a < $lengthID; $a++){
    if ($a eq ''){next;}
+   #$rowINDEX = $a-$offset-1;
    open(IN, "<"."./testingData_$queryID/indAAdrmsf/drmsfAA_$refID"."_$a".".txt")||die "could not open time series file  drmsfAA_$refID"."_$a".".txt\n";
     my @IN = <IN>;
     for (my $i = 0; $i < scalar @IN; $i++) {
@@ -2341,8 +2414,14 @@ $max_val = $max_dRMSF;
 
 print "color range = "."$min_val\t"."to\t"."$max_val\n";
 sleep(1);
+if ($stype ne "protprot"){ 
 if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learndrmsf_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$framenumber\"\n");}
 if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learndrmsf_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$framenumber\"\n");}
+}
+if ($stype eq "protprot"){
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learndrmsf_tan_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$framenumber\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learndrmsf_gray_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$framenumber\"\n");}
+}
 print("\n\n Movies rendered\n");
 
 
@@ -2362,7 +2441,7 @@ print "queryID label is adjusted to "."$queryID\n\n\n";
 
 ########################################
 
-if($view eq "fix") {
+if($view eq "fix" && $stype ne "protprot") {
 $attr = "class";
 print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
@@ -2385,7 +2464,7 @@ system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
 }
 
-if($view eq "roll") {
+if($view eq "roll" && $stype ne "protprot") {
 $attr = "class";     
 print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
@@ -2407,7 +2486,7 @@ my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 }
 
-if($view eq "stereo") {
+if($view eq "stereo" && $stype ne "protprot") {
 $attr = "class";       
 print("Preparing movie display...\n");
 system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
@@ -2429,8 +2508,81 @@ my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
-} 
 }
+####################################
+# reverse query and reference for prot-prot interaction
+if($view eq "fix" && $stype eq "protprot") {
+$attr = "class";
+print("Preparing movie display...\n");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+
+$attr = "dRMSF";
+print("Preparing movie display...\n");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+
+}
+
+if($view eq "roll" && $stype eq "protprot") {
+$attr = "class";     
+print("Preparing movie display...\n");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+
+$attr = "dRMSF";     
+print("Preparing movie display...\n");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+}
+
+if($view eq "stereo" && $stype eq "protprot") {
+$attr = "class";       
+print("Preparing movie display...\n");
+system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+
+$attr = "dRMSF";       
+print("Preparing movie display...\n");
+system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
+print("close DROIDS movie windows to exit\n\n");
+my @movies;
+my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+my $movieStr = join(" ", @movies);
+system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+}
+
+
+}
+
 ###########################################################################################################
 ###########################################################################################################
 #####################################################

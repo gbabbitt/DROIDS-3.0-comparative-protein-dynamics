@@ -404,6 +404,19 @@ print("CTL file made\n");
 ########################################################################
 sub attribute_file {
 
+
+print "Enter chain ID where color map should start (default = A)\n";
+print "i.e. color map only to homologous parts of bound and unbound
+structure (e.g. PDB 2oob = B)\n";
+my $chainMAP = <STDIN>;
+chop($chainMAP);
+if ($chainMAP eq ''){$chainMAP = 'A';}
+print "Enter number position of N terminal on this chain (default = 0)\n";
+print "(e.g. PDB ID 200b = 44)\n";
+my $posN = <STDIN>;
+chop($posN);
+if ($posN eq ''){$posN = 0;}
+
 # Make Chimera-readable attribute file needed
 my $relevant_column = 0;
 $input_folder = "DROIDS_results_$queryID"."_$refID"."_$testStr"."_$cutoffValue";
@@ -433,7 +446,7 @@ if($attr eq "gdist") {
 #print("$relevant_column\n");
 #print "$input_folder\n";
 #print "$input_file\n";
-$output_file = "attr_$queryID"."_$refID"."_$attr"."_$testStr"."_$cutoffValue.dat";
+$output_file = "attr_$refID"."_$queryID"."_$attr"."_$testStr"."_$cutoffValue.dat";
 $unit = "residues";
 my $symbol;
 if ($unit eq "residues") { $symbol = "\:"; } 
@@ -450,11 +463,11 @@ open(INPUT, "<"."$input_folder/$input_file") or die "Could not find $input_file"
 	my $value = $INrow[$relevant_column];
 	#print $value;
 	$valuesList[$a] = $value;
-	$index = int $index;
+	$index = int $index + $posN;
 #	if ($attr eq "pval" and $value > $cutoffValue) {
 #		$OUTrows[$a] = "\t$symbol"."$index\tns\n";
 #	} else { 
-		$OUTrows[$a] = "\t$symbol"."$index\t$value\n";
+		$OUTrows[$a] = "\t$symbol"."$index".".$chainMAP\t$value\n";
 #	}
  }
 close(INPUT);
@@ -481,6 +494,7 @@ sleep(1);
 if (! -e "attribute_files") {mkdir "attribute_files";}
 open(OUTPUT, ">"."attribute_files/$output_file");
  print OUTPUT "recipient: $unit\nattribute: $attr\n\n";
+ # start at offset value for bound protein
  for (my $b = 1; $b < scalar @IN; $b++) {
 	print OUTPUT $OUTrows[$b]
  }
@@ -501,8 +515,8 @@ print("Rendering 10 movies on XYZ axes...\n");
 print("this may take several minutes...\n\n");
 print("close Chimera window when 10 movie files appear in movies folder\n\n");
 #print("/opt/UCSF/Chimera64-1.11/bin/chimera --script \"render_movies.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Movies rendered\n");
 }
 
@@ -512,8 +526,8 @@ sub display{
 print("Preparing static display...\n");
 print("close Chimera window to exit\n\n");
 print("ignore MD movie window unless you want to make a custom movie\n\n");
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 
 }
@@ -526,7 +540,7 @@ print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 #for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");     
@@ -538,7 +552,7 @@ print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 #for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");     
 }
@@ -550,7 +564,7 @@ print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 #for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");
 }
