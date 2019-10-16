@@ -287,12 +287,13 @@ $stopButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
 
-$mlButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
-$seriesButton->pack(-side=>"bottom",
-			-anchor=>"s"
-			);
+### maxDemon is not available for this comparison
+#$mlButton->pack(-side=>"bottom",
+#			-anchor=>"s"
+#			);
+#$seriesButton->pack(-side=>"bottom",
+#			-anchor=>"s"
+#			);
 $playCHXbutton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);

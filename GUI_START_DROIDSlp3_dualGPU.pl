@@ -109,26 +109,38 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
-	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"pdb ID with first ligand (e.g. 1hho_bound) : ");
-		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
+	my $Q1fileFrame = $pdbFrame->Frame();
+		my $Q1fileLabel = $Q1fileFrame->Label(-text=>"first pdb ID with ligand (e.g. 1hho_bound) : ");
+		my $Q1fileEntry = $Q1fileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDq
 					);
-	my $RfileFrame = $pdbFrame->Frame();
-		my $RfileLabel = $RfileFrame->Label(-text=>"pdb ID with second ligand (e.g. 2hho_bound) : ");
-		my $RfileEntry = $RfileFrame->Entry(-borderwidth => 2,
+	my $R1fileFrame = $pdbFrame->Frame();
+		my $R1fileLabel = $R1fileFrame->Label(-text=>"second pdb ID with ligand (e.g. 2hho_bound) : ");
+		my $R1fileEntry = $R1fileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDr
 					);
+     my $Q2fileFrame = $pdbFrame->Frame();
+		my $Q2fileLabel = $Q2fileFrame->Label(-text=>"first pdb ID without ligand (e.g. 1hho_unbound) : ");
+		my $Q2fileEntry = $Q2fileFrame->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$fileIDq_unbound
+					);
+	my $R2fileFrame = $pdbFrame->Frame();
+		my $R2fileLabel = $R2fileFrame->Label(-text=>"second pdb ID without ligand (e.g. 2hho_unbound) : ");
+		my $R2fileEntry = $R2fileFrame->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$fileIDr_unbound
+					);  
 	my $L1fileFrame = $pdbFrame->Frame();
-		my $L1fileLabel = $L1fileFrame->Label(-text=>"pdb ID for first ligand (e.g. 1hho_ligand) : ");
+		my $L1fileLabel = $L1fileFrame->Label(-text=>"first pdb ID for ligand (e.g. 1hho_ligand) : ");
 		my $L1fileEntry = $L1fileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDl1
 					);
       my $L2fileFrame = $pdbFrame->Frame();
-		my $L2fileLabel = $L2fileFrame->Label(-text=>"pdb ID for second ligand (e.g. 2hho_ligand) : ");
+		my $L2fileLabel = $L2fileFrame->Label(-text=>"second pdb ID for ligand (e.g. 2hho_ligand) : ");
 		my $L2fileEntry = $L2fileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDl2
@@ -251,10 +263,14 @@ $survButton->pack(-side=>"bottom",
 			);
 
 
-$QfileLabel->pack(-side=>"left");
-$QfileEntry->pack(-side=>"left");
-$RfileLabel->pack(-side=>"left");
-$RfileEntry->pack(-side=>"left");
+$Q1fileLabel->pack(-side=>"left");
+$Q1fileEntry->pack(-side=>"left");
+$R1fileLabel->pack(-side=>"left");
+$R1fileEntry->pack(-side=>"left");
+$Q2fileLabel->pack(-side=>"left");
+$Q2fileEntry->pack(-side=>"left");
+$R2fileLabel->pack(-side=>"left");
+$R2fileEntry->pack(-side=>"left");
 $L1fileLabel->pack(-side=>"left");
 $L1fileEntry->pack(-side=>"left");
 $L2fileLabel->pack(-side=>"left");
@@ -274,9 +290,13 @@ $forceFrame->pack(-side=>"top",
 		-anchor=>"e");
 $dforceFrame->pack(-side=>"top",
 		-anchor=>"e");
-$QfileFrame->pack(-side=>"top",
+$Q1fileFrame->pack(-side=>"top",
 		-anchor=>"e");
-$RfileFrame->pack(-side=>"top",
+$R1fileFrame->pack(-side=>"top",
+		-anchor=>"e");
+$Q2fileFrame->pack(-side=>"top",
+		-anchor=>"e");
+$R2fileFrame->pack(-side=>"top",
 		-anchor=>"e");
 $L1fileFrame->pack(-side=>"top",
 		-anchor=>"e");
@@ -351,6 +371,7 @@ for(my $line = 0; $line < scalar @fullfile; $line++){
 open(my $ctlFile1, '>', "MDq.ctl") or die "Could not open output file";
 print $ctlFile1 
 "PDB_ID\t".$fileIDq."REDUCED\t# Protein Data Bank ID for MD run
+UNBOUND_ID\t".$fileIDq_unbound."REDUCED\t# Protein Data Bank ID for MD run
 Number_Chains\t$chainN\t# Number of chains on structure\n";
 for(my $ent = 0; $ent < scalar @chainlen; $ent++){
     my $chain = chr($ent + 65);
@@ -396,6 +417,7 @@ for(my $line = 0; $line < scalar @fullfile2; $line++){
 open(my $ctlFile2, '>', "MDr.ctl") or die "Could not open output file";
 print $ctlFile2 
 "PDB_ID\t".$fileIDr."REDUCED\t# Protein Data Bank ID for MD run
+UNBOUND_ID\t".$fileIDr_unbound."REDUCED\t# Protein Data Bank ID for MD run
 Number_Chains\t$chainN\t# Number of chains on structure\n";
 for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     my $chain = chr($cnt + 65);
@@ -549,8 +571,8 @@ print "you will need to edit...re-enter lengths manually in MDq.ctl, MDr.ctl, DR
 #####################################################################################################
 
 sub teLeap { # create topology and coordinate files 
-system "perl teLeap_ligandproteinQuery.pl\n";
-system "perl teLeap_ligandproteinReference.pl\n";
+system "perl teLeap_ligandproteinQuery_lp3.pl\n";
+system "perl teLeap_ligandproteinReference_lp3.pl\n";
 my $filecheck1 = "vac_".$fileIDq."REDUCED.prmtop";
 my $filecheck3 = "vac_".$fileIDr."REDUCED.prmtop";
 my $filecheck2 = "wat_".$fileIDq."REDUCED.inpcrd";
@@ -568,7 +590,7 @@ my $size6 = -s $filecheck6;
 my $size7 = -s $filecheck7;
 my $size8 = -s $filecheck8;
 print "$size1\t"."$size2\t"."$size3\t"."$size4\t"."$size5\t"."$size6\t"."$size7\t"."$size8\n";
-if ($size1 <= 10 || $size2 <= 10 || $size3 <= 10 || $size4 <= 10 || $size5 <= 10 || $size6  || $size7 <= 10 || $size8 <= 10){print "teLeap may have failed (double check pdb files for problems)\n";}
+if ($size1 <= 10 || $size2 <= 10 || $size3 <= 10 || $size4 <= 10 || $size5 <= 10 || $size6 <= 10 || $size7 <= 10 || $size8 <= 10){print "teLeap may have failed (double check pdb files for problems)\n";}
 else {print "teLeap procedure appears to have run (double check .prmtop and .inpcrd files)\n";}
 }
 
@@ -582,6 +604,10 @@ if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUC
 if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
 if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDq_unbound.pdb -o ".$fileIDq_unbound."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDq_unbound.pdb -o ".$fileIDq_unbound."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDr_unbound.pdb -o ".$fileIDr_unbound."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDr_unbound.pdb -o ".$fileIDr_unbound."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl1.pdb -o ".$fileIDl1."REDUCED.pdb --dry --reduce \n";}
 if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl1.pdb -o ".$fileIDl1."REDUCED.pdb --dry \n";}
 if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl2.pdb -o ".$fileIDl2."REDUCED.pdb --dry --reduce \n";}
