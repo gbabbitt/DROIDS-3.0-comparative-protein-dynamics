@@ -269,12 +269,12 @@ my $image2Button = $mw -> Button(-text => "show significant mutation and/or bind
                 -background => 'gray45',
                 -foreground => 'white'
                 ); # Creates a ctl file button
-my $movie2Button = $mw -> Button(-text => "render movies showing significant mutation and/or binding impact", 
-				-command => \&movie2,
-                -background => 'gray45',
-                -foreground => 'white'
-                ); # Creates a ctl file button
-my $play1Button = $mw -> Button(-text => "play dynamic dRMSF and classification movies", 
+#my $movie2Button = $mw -> Button(-text => "render movies showing significant mutation and/or binding impact", 
+#				-command => \&movie2,
+ #               -background => 'gray45',
+  #              -foreground => 'white'
+   #             ); # Creates a ctl file button
+my $play1Button = $mw -> Button(-text => "play machine learning classification movies", 
 				-command => \&play1,
                 -background => 'gray45',
                 -foreground => 'white'
@@ -339,9 +339,9 @@ $variantEntry->pack(-side=>"left");
 $image2Button->pack(-side=>"top",
 			-anchor=>"s"
 			);
-$movie2Button->pack(-side=>"top",
-			-anchor=>"s"
-			);
+#$movie2Button->pack(-side=>"top",
+#			-anchor=>"s"
+#			);
 $viewFrame->pack(-side=>"top",
 		-anchor=>"s"
 		);
@@ -453,6 +453,13 @@ if($stype eq 'ligand'){system("perl GUI_MLMD_DROIDSlp.pl");}
 ###########################################################################################################
 ###########################################################################################################
 sub mlstats {
+
+sleep(1);
+print "BUG NOTE: if following error is encountered\n";
+print "'cant open temp test file'\n";
+print "then simply close the maxDemon GUI and reopen it\n";
+print "at the terminal with 'perl GUI_ML_DROIDS.pl' and continue\n\n";
+sleep(1);
 
 if ($method_kern == 1 || $method_other == 1){
 # prompt user - choose best learning model to display
@@ -2452,15 +2459,15 @@ for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";
-print("Preparing movie display...\n");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";
+#print("Preparing movie display...\n");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+##for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
 }
 
@@ -2475,15 +2482,15 @@ for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";     
-print("Preparing movie display...\n");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";     
+#print("Preparing movie display...\n");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+##for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 }
 
 if($view eq "stereo" && $stype ne "protprot") {
@@ -2498,16 +2505,16 @@ for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";       
-print("Preparing movie display...\n");
-system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";       
+#print("Preparing movie display...\n");
+#system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+##for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 }
 ####################################
 # reverse query and reference for prot-prot interaction
@@ -2522,15 +2529,15 @@ for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_q
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";
-print("Preparing movie display...\n");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";
+#print("Preparing movie display...\n");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+##for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
 }
 
@@ -2545,15 +2552,15 @@ for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";     
-print("Preparing movie display...\n");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";     
+#print("Preparing movie display...\n");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+##for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 }
 
 if($view eq "stereo" && $stype eq "protprot") {
@@ -2568,16 +2575,16 @@ for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_q
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
-$attr = "dRMSF";       
-print("Preparing movie display...\n");
-system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
-print("close DROIDS movie windows to exit\n\n");
-my @movies;
-my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-my $movieStr = join(" ", @movies);
-system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
+#$attr = "dRMSF";       
+#print("Preparing movie display...\n");
+#system("ffmpeg -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1L_6.mp4 -i Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_viewS1R_7.mp4 -filter_complex hstack Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_viewSTEREO.mp4");
+#print("close DROIDS movie windows to exit\n\n");
+#my @movies;
+#my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
+##for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#my $movieStr = join(" ", @movies);
+#system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 }
 
 
@@ -3069,7 +3076,7 @@ print Rinput "sink()\n";
 } # end for loop
 
 # create plot 3
-print Rinput "myplot3 <- ggplot() + ggtitle('signif local mutational impact for $window AA window (+2sd of validation set)') + labs(x = 'position (residue number)', y = 'local index of impact') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot3 <- ggplot() + ggtitle('signif local variant impact for $window AA window (+2sd of validation set)') + labs(x = 'position (residue number)', y = 'local index of impact') + theme(legend.title = element_blank())\n"; 
 print Rinput "mylist3 <- list()\n";
 # create lines for plot 3
 for (my $v = 0; $v < scalar(@variants); $v++){
