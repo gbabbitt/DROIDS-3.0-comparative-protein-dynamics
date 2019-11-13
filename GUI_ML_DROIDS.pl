@@ -1860,14 +1860,13 @@ print "queryID label is adjusted to "."$queryID\n\n\n";
 
 print "Enter chain ID where color map should start (default = A)\n";
    print "i.e. color map only to homologous parts of bound and unbound
-   structure (e.g. PDB 2oob = B)\n";
+   structure\n";
    $chainMAP = <STDIN>;
    chop($chainMAP);
    if ($chainMAP eq ''){$chainMAP = 'A';}
 
 if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
    print "Enter number position of N terminal on this chain (default = 0)\n";
-   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
    $offset = $offset-2;
@@ -1892,8 +1891,9 @@ close IN;
 close OUT;
 
 # make learned class attribute files for image rendering
-  if ($stype ne "protprot"){open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
-  if ($stype eq "protprot"){open(OUT, ">"."./attribute_files/classATTR_$orig_queryID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
+  open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";
+  #if ($stype ne "protprot"){open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
+  #if ($stype eq "protprot"){open(OUT, ">"."./attribute_files/classATTR_$orig_queryID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
   print OUT "recipient: residues\n";
   print OUT "attribute: class\n";
   print OUT "\n";
@@ -1938,8 +1938,8 @@ print("\n\n Display complete\n\n");
 }
 
 if ($stype eq "protprot"){
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan_pp.py	--rep=$repStr --test=$testStr --qID=$orig_queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray_pp.py	--rep=$repStr --test=$testStr --qID=$orig_queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 }
 
@@ -2140,7 +2140,7 @@ chop($masktype);
 
 print "Enter chain ID where color map should start (default = A)\n";
    print "i.e. color map only to homologous parts of bound and unbound
-   structure (e.g. PDB 2oob = B)\n";
+   structure\n";
    $chainMAP = <STDIN>;
    chop($chainMAP);
    if ($chainMAP eq ''){$chainMAP = 'A';}
@@ -2148,7 +2148,6 @@ print "Enter chain ID where color map should start (default = A)\n";
 if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
    
    print "Enter number position of N terminal on this chain (default = 0)\n";
-   print "(e.g. PDB ID 200b = 45)\n";
    $offset = <STDIN>;
    chop($offset);
    $offset = $offset-2;
@@ -2242,8 +2241,8 @@ if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_
 if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 }
 if ($stype eq "protprot"){ 
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learnclass_tan_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learnclass_gray_pp.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 }
 print("\n\n Movies rendered\n");
  
