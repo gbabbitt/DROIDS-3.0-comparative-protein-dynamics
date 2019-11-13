@@ -407,12 +407,11 @@ sub attribute_file {
 
 print "Enter chain ID where color map should start (default = A)\n";
 print "i.e. color map only to homologous parts of bound and unbound
-structure (e.g. PDB 2oob = B)\n";
+structure\n";
 my $chainMAP = <STDIN>;
 chop($chainMAP);
 if ($chainMAP eq ''){$chainMAP = 'A';}
 print "Enter number position of N terminal on this chain (default = 0)\n";
-print "(e.g. PDB ID 200b = 44)\n";
 my $posN = <STDIN>;
 chop($posN);
 if ($posN eq ''){$posN = 0;}
@@ -515,8 +514,8 @@ print("Rendering 10 movies on XYZ axes...\n");
 print("this may take several minutes...\n\n");
 print("close Chimera window when 10 movie files appear in movies folder\n\n");
 #print("/opt/UCSF/Chimera64-1.11/bin/chimera --script \"render_movies.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"render_movies_tan_pp.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"render_movies_gray_pp.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Movies rendered\n");
 }
 
@@ -526,8 +525,8 @@ sub display{
 print("Preparing static display...\n");
 print("close Chimera window to exit\n\n");
 print("ignore MD movie window unless you want to make a custom movie\n\n");
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_tan_pp.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_gray_pp.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 
 }
@@ -540,8 +539,8 @@ print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-#for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");     
 }
@@ -551,8 +550,8 @@ print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-#for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+#for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");     
 }
@@ -564,7 +563,7 @@ print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 #for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("python DROIDS_gstreamer.py @movies");
 }

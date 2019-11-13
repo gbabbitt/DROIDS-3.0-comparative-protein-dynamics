@@ -446,7 +446,7 @@ sleep(1);
 ###########################################################################################################
 ###########################################################################################################
 sub md {
-if($stype eq 'protein'){system("perl GUI_MLMD_DROIDS.pl");}    
+if($stype eq 'protein'|| $stype eq 'protprot'){system("perl GUI_MLMD_DROIDS.pl");}    
 if($stype eq 'dna'){system("perl GUI_MLMD_DROIDSdp.pl");}   
 if($stype eq 'ligand'){system("perl GUI_MLMD_DROIDSlp.pl");}     
 }
