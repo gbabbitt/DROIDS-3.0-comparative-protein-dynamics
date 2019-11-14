@@ -2051,6 +2051,7 @@ close OUT;
   print OUT "recipient: residues\n";
   print OUT "attribute: dRMSF\n";
   print OUT "\n";
+  @impacts = ();
   for (my $a = 0; $a < $lengthID+$offset+1; $a++){
    if ($a eq '' || $a <= $offset){next;}
    open(IN, "<"."./testingData_$queryID/impact_vert_$variantID.txt")||die "could not open mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
@@ -2061,10 +2062,10 @@ close OUT;
      
      #print "$f\t"."$a\t"."$frame\t"."$value\n";
      $pos = $a+1;
-     if ($maskvalue > 0){print OUT "\t:"."$pos".".$chainMAP\t"."1\n";}
+     if ($maskvalue > 0){print OUT "\t:"."$pos".".$chainMAP\t"."$maskvalue\n";}
      #if ($f == $frame && $maskvalue > 0){print OUT "\t:"."$pos\t"."1\n";} # test mask positioning
      if ($maskvalue == 0){print OUT "\t:"."$pos".".$chainMAP\t"."0\n";}
-      
+     push (@impacts, $maskvalue); 
    close IN;
  }
 close OUT;
@@ -2078,11 +2079,18 @@ print("this may take several minutes...\n\n");
 print("close Chimera window when 10 movie files appear in movies folder\n\n");
 if ($homology eq "loose"){$mutType = "gray50";}
 if ($homology eq "strict"){$mutType = "tan";}
-if ($colorScheme eq "c1" ){$colorType = "wo";}
-if ($colorScheme eq "c2" ){$colorType = "wo";}
+if ($colorScheme eq "c1" ){$colorType = "wr";}
+if ($colorScheme eq "c2" ){$colorType = "wr";}
 $attr = "dRMSF";
-$min_val = 0;
-$max_val = 1;
+$statSCORE = new Statistics::Descriptive::Full; # impact map
+$statSCORE->add_data (@impacts);
+$min_impact = $statSCORE->min();
+$max_impact = $statSCORE->max();
+$min_val = $min_impact;
+$max_val = $max_impact;
+
+
+
 
 sleep(1);
 if ($stype eq "protein"){
