@@ -46,7 +46,7 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     print "$header\t"."$value\n";
     if ($header eq "PDB_ID") { $PDB_ID = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
-    if ($header eq "ADD_Field") { $Add_Field = $value;}
+    if ($header eq "DNA_Field") { $DNA_Field = $value;}
     if ($header eq "Number_Runs") { $Number_Runs = $value;}
     if ($header eq "Heating_Time") { $Heating_Time = $value;}
     if ($header eq "Equilibration_Time") { $Equilibration_Time = $value;}
@@ -84,7 +84,7 @@ my $len_prod = $Production_Time; # Length of each production run in fs (nstlim v
 my $len_eq = $Equilibration_Time; # Length of equilibration run in fs
 my $len_heat = $Heating_Time; # Length of heat run in fs
 my $forcefield = $Force_Field; # specify AMBER forcefield
-my $addfield = $Add_Field; # specify AMBER forcefield
+my $dnafield = $DNA_Field; # specify AMBER forcefield
 =pod
 
 if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
@@ -98,7 +98,7 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 ####################################################################
 open(LEAP_PROTEIN, ">"."$protein_label.bat") or die "could not open LEAP file\n";
 	print LEAP_PROTEIN "source "."$teleap_path"."$forcefield\n";
-     print LEAP_PROTEIN "source "."$teleap_path"."$addfield\n";
+     print LEAP_PROTEIN "source "."$teleap_path"."$dnafield\n";
 	print LEAP_PROTEIN "source "."$teleap_path"."leaprc.water.tip3p\n";
      print LEAP_PROTEIN "protein$protein_label = loadpdb $protein_label.pdb\n";
 	print LEAP_PROTEIN "saveamberparm protein$protein_label vac_$protein_label.prmtop vac_$protein_label.inpcrd\n";
