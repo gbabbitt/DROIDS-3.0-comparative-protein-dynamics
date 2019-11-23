@@ -2531,7 +2531,7 @@ print("Preparing movie display...\n");
 print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
-for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 #for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
@@ -2555,7 +2555,7 @@ print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 #for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 8; $i < 10; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
@@ -2578,7 +2578,7 @@ print("close DROIDS movie windows to exit\n\n");
 my @movies;
 my @axes = ('Z1', 'Z2', 'X2', 'X1', 'Y1', 'Y2', 'S1L', 'S1R', 'R1', 'R2');
 #for (my $i = 0; $i < 6; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
-for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$orig_queryID"."_$refID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
+for (my $i = 6; $i < 8; $i++) { $axis = $axes[$i]; $movies[$i] = "Videos/$refID"."_$queryID"."_$repStr"."_$attr"."_$testStr"."_view$axis"."_$i.mp4"; }
 my $movieStr = join(" ", @movies);
 system("x-terminal-emulator -e python DROIDS_gstreamer.py @movies");
 
