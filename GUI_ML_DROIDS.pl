@@ -3135,19 +3135,29 @@ close Rinput;
 print "\n\n";
 print " copying plot\n\n";
 sleep(1);
+mkdir("maxDemon_results");
 my $oldfilename = "Rplots.pdf";
 my $newfilename = "./testingData_$queryID/learningPLOTcompare.pdf";
 copy($oldfilename, $newfilename);	
+my $oldfilename2 = "Rplots.pdf";
+my $newfilename2 = "./maxDemon_results/learningPLOTcompare.pdf";
+copy($oldfilename2, $newfilename2);
 print " machine learning is complete\n\n";
 print " close PDF and txt viewer to continue\n\n";
 system "evince ./testingData_$queryID/learningPLOTcompare.pdf\n";
 
 # open can corr results
 system "gedit ./testingData_$queryID/cancor_stats.txt\n";
+     my $oldfilename3 = "./testingData_$queryID/cancor_stats.txt";
+     my $newfilename3 = "./maxDemon_results/cancor_stats.txt";
+     copy($oldfilename3, $newfilename3);
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
      $queryID = $variants[0];
      system "gedit ./testingData_$queryID/cancor_stats_$variantID.txt\n";
+     my $oldfilename4 = "./testingData_$queryID/cancor_stats_$variantID.txt";
+     my $newfilename4 = "./maxDemon_results/cancor_stats_$variantID.txt";
+     copy($oldfilename4, $newfilename4);
 } # end for loop
 
 }
