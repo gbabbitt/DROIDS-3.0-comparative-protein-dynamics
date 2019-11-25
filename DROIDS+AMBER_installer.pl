@@ -32,6 +32,7 @@ sleep(1); print "\ninstalling gdebi\n\n"; sleep(1); system('sudo apt-get install
 sleep(1); print "\ninstalling gparted\n\n"; sleep(1); system('sudo apt-get install gparted'); sleep(1);
 sleep(1); print "\ninstalling vokoscreen\n\n"; sleep(1); system('sudo apt-get install vokoscreen'); sleep(1);
 sleep(1); print "\ninstalling evince\n\n"; sleep(1); system('sudo apt-get install evince'); sleep(1);
+sleep(1); print "\ninstalling grace\n\n"; sleep(1); system('sudo apt-get install grace'); sleep(1);
 sleep(1); print "\ninstalling perl-tk\n\n"; sleep(1); system('sudo apt-get install perl-tk'); sleep(1);
 sleep(1); print "\ninstalling python-tk\n\n"; sleep(1); system('sudo apt-get install python-tk'); sleep(1);
 sleep(1); print "\ninstalling python-gi\n\n"; sleep(1); system('sudo apt-get install python-gi'); sleep(1);
