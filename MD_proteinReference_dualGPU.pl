@@ -347,7 +347,7 @@ print "\n\nPLOTTING RMSD OVER FRAMES FOR EQUILIBRATION RUN\n\n";
 open(RMS, ">"."eq_RMS_$protein_label".".ctl");
 print RMS "parm wat_$protein_label".".prmtop\n";
 print RMS "trajin eq_$protein_label".".nc\n";
-print RMS "rms ToFirst :1-50&@"."CA,C,O,N,H&!(:WAT) first out eqRMS$protein_label.txt\n";
+print RMS "rms ToFirst @"."CA,C,O,N,H&!(:WAT) first out eqRMS$protein_label.txt\n";
 print RMS "run\n";
 print RMS "xmgrace eqRMS$protein_label.txt\n";
 close RMS;
