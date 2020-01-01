@@ -1,32 +1,62 @@
 #!/usr/bin/perl
 use File::Copy;
 
-print "INSTALLATION SCRIPT FOR DROIDS v2.0 DEPENDENCIES\n";
+print "INSTALLATION SCRIPT FOR DROIDS v3.0 DEPENDENCIES\n";
+sleep(2);
 
-print "\nEnter your admin user name for this computer\n\n";
+print "DROIDS v3.0 main dependencies include Amber16/18, R, and UCSF Chimera on a Debian\n";
+print "system Linux build or virtual machine with one or two dedicated Nvidia GPUs + CUDA 9.0\n";
+print "NOTE: avoid CUDA 7.0 and CUDA 10.0+ with Amber\n";
+sleep(2);
+
+print "You will need the following file\n";
+print "DROIDS-3.0.tar.gz (free from our website or GitHub repo)\n";
+print "You may need the following files as well for fresh system install\n";
+print "Amber18.tar.gz (licensed from https://ambermd.org/)\n";
+print "AmberTools18.tar.gz or AmberTools19.tar.gz (free from https://ambermd.org/)\n";
+print "chimera-1.14-linux_x86_64 or preferred version (free from https://www.cgl.ucsf.edu/chimera/)\n";
+print "Modeller .deb folder (e.g. modeller_9.20-1_amd64.deb from https://salilab.org/modeller/)";
+print "\n\nDo you need to open web links to these programs?\n\n";
+  $yn = <STDIN>; 
+  chop($yn);
+if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){
+sleep(1);
+system('xdg-open http://ambermd.org/'); sleep(1);
+system('xdg-open https://www.cgl.ucsf.edu/chimera/'); sleep(1);
+system('xdg-open https://salilab.org/modeller/'); sleep(1);
+print "you might also like ChimeraX (chimerax-daily.deb) for VR application\n\n";
+system('xdg-open https://www.rbvi.ucsf.edu/chimerax/'); sleep(1);
+};
+sleep(1);
+print "Please answer the following questions about your VM instance or Linux system\n";
+sleep(1);
+
+print "\nIs amber and UCSF Chimera already installed on your system? (e.g. 'yes','y' or 'n','no')\n\n";
+  $skipping = <STDIN>; 
+  chop($skipping);
+  
+print "\nEnter your admin user name for this computer or VM\n\n";
   $UserName = <STDIN>; 
   chop($UserName);
 
-print "\nEnter amber version you use or plan to install here (e.g. 'amber16' or 'amber18'\n\n";
-  $AmberName = <STDIN>; 
-  chop($AmberName);
-
-print "\nEnter chimera version you use or plan to install here (e.g. '1.11' or '1.13'\n\n";
+print "\nEnter chimera version you use or plan to install here (e.g. '1.11' or '1.13')\n\n";
   $ChimeraName = <STDIN>; 
   chop($ChimeraName);
 
 
-sleep(1); print "\nchecking perl version - should say something here\n\n"; system('perl -v'); sleep(1);
-print "\nIs Perl 5 already installed? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
+sleep(1); print "\nchecking perl version - looking for Perl 5.0\n\n"; system('perl -v'); sleep(1);
 
 #install Perl modules
 sleep(1); print "\ninstalling perl modules\n\n"; sleep(1);system('sudo cpan App::cpanminus'); system ('sudo apt install cpanminus'); system('sudo cpanm Statistics::Descriptive'); sleep(1);
 
 # install and update Debian packages
 sleep(1); print "\nchecking Debian packages\n\n"; sleep(1);
+print "\nDo you need to install the xfce4 desktop, xrdp, and VNC? (y/n) (this is needed for GCP VM instance)?\n\n";
+  $yn = <STDIN>; 
+  chop($yn);
+if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){sleep(1); print "\ninstalling xrdp and xfce4 desktop\n\n"; sleep(1); system('sudo apt-get install xrdp xfce4'); sleep(1);}
+if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){sleep(1); print "\ninstalling VNC\n\n"; sleep(1); system('sudo apt install tightvncserver'); sleep(1);}
+sleep(1); print "\ninstalling htop\n\n"; sleep(1); system('sudo apt-get install htop'); sleep(1);
 sleep(1); print "\ninstalling gedit\n\n"; sleep(1); system('sudo apt-get install gedit'); sleep(1);
 sleep(1); print "\ninstalling gdebi\n\n"; sleep(1); system('sudo apt-get install gdebi'); sleep(1);
 sleep(1); print "\ninstalling gparted\n\n"; sleep(1); system('sudo apt-get install gparted'); sleep(1);
@@ -42,21 +72,15 @@ sleep(1); print "\ninstalling Amber dependencies\n\n"; sleep(1); system('sudo ap
 sleep(1); print "\nrunning updates\n\n"; sleep(1); system('sudo apt-get update'); sleep(1);
 
 # skip Amber install option
-print "\nIs Amber and Ambertools already installed? (y/n)\n\n";
+if($skipping eq "y" || $skipping eq "Y" || $skipping eq "yes"){print "\n amber installation skipped\n\n"; goto Askip;}
+
+sleep(1); print "\nyou should have tar.bz2 versions of Ambertools18/19 and Amber18 on desktop\n\n"; 
+sleep(1); print "\ninstalling AmberTools18\n\n";
+print "\nAre you using AmberTools 18 or 19? (type '18 or '19')\n\n";
   $yn = <STDIN>; 
   chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n amber installation skipped\n\n"; goto Askip;}
-
-sleep(1); print "\nyou will need to download Linux tar.bz2 version of Ambertools18 and license and order Amber18\n\n"; sleep(1); system('xdg-open http://ambermd.org/'); sleep(1);
-
-# install Ambertools18 
-sleep(1); print "\ndownload ambertools18 tar.gz folder to your desktop\n\n"; sleep(1);
-print "\nAre you ready? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
-
-sleep(1); print "\nunzipping ambertools\n\n"; sleep(1); system('tar jxvf AmberTools18.tar.bz2'); sleep(1);
+if($yn eq "19"){sleep(1); print "\nunzipping ambertools\n\n"; sleep(1); system('tar jxvf AmberTools19.tar.bz2'); sleep(1);}
+if($yn eq "18"){sleep(1); print "\nunzipping ambertools\n\n"; sleep(1); system('tar jxvf AmberTools18.tar.bz2'); sleep(1);}
 system('export AMBERHOME=/home/'.$UserName.'/Desktop/amber18');
 system('gnome-terminal');
 sleep(1); print "\nin the new terminal run the following commands\n\n"; sleep(1);
@@ -64,7 +88,7 @@ print "cd amber18\n";
 print "./configure -noX11 gnu\n";
 print "make install\n";
 #print "make test\n\n";
-sleep(1); print "\nWhen Ambertools18 is installed, close secondary terminal\n\n"; sleep(1);
+sleep(1); print "\nWhen AmberTools is installed, close secondary terminal\n\n"; sleep(1);
 print "\nAre you ready to continue? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
@@ -76,28 +100,29 @@ sleep(1); print "\nyou need to add the following lines to the bashrc file\n\n"; 
 print "source /home/".$UserName."/Desktop/amber18/amber.sh\n";
 print "export AMBERHOME=/home/".$UserName."/Desktop/amber18\n";
 print "export PATH="."\$PATH:"."\$AMBERHOME/bin\n";
+#print "test -f /home/(host name)/Desktop/amber18/amber.sh\n";
 system('gedit ~/.bashrc');
 print "\nAre you ready to continue? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 
-# run tests on Ambertools18
-system('gnome-terminal');
-sleep(1); print "\nin the new terminal run the following commands\n\n"; sleep(1);
-print "cd \$AMBERHOME\n";
-print "make test\n\n";
-sleep(1); print "\nWhen Ambertools18 is done testing, close secondary terminal\n\n"; sleep(1);
-print "\nAre you ready to continue? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
+# run tests on AmberTools
+#system('gnome-terminal');
+#sleep(1); print "\nin the new terminal run the following commands\n\n"; sleep(1);
+#print "cd amber18\n";
+#print "make test\n\n";
+#sleep(1); print "\nWhen AmberTools is done testing, close secondary terminal\n\n"; sleep(1);
+#print "\nAre you ready to continue? (y/n)\n\n";
+#  $yn = <STDIN>; 
+#  chop($yn);
+#if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 
 # install CUDA
-print "\nIs CUDA and cuda toolkit already installed? (y/n)\n\n";
+print "\nIs CUDA and cuda toolkit already installed? (y/n) (can probably skip if GCP cloud VM) \n\n";
   $yn = <STDIN>; 
   chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n CUDA installation skipped\n\n"; goto CDskip;}
+if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){print "\n CUDA installation skipped\n\n"; goto CDskip;}
 #install cuda
 sleep(1); print "\ninstalling cuda tool kit\n\n"; sleep(1); system('sudo apt install nvidia-cuda-toolkit'); sleep(1);
 sleep(1); print "\nyou will need to download Linux .deb version of CUDA\n\n"; sleep(1); 
@@ -120,32 +145,24 @@ print "\nAre you ready to continue? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
+CDskip:
 
 # update cuda home
 sleep(1); print "\nupdating bashrc file\n"; sleep(1);
 print "\nyou need to add the following lines to the bashrc file\n\n";
-print "export CUDA_HOME=/usr/local/cuda-9.0\n";
-print "export PATH=\$CUDA_HOME/bin:/usr/local/cuda-9.0/bin:\$PATH\n";
+print "export CUDA_HOME=/usr/local/cuda-(version e.g. 9.0)\n";
+print "export PATH=\$CUDA_HOME/bin:/usr/local/cuda-(version e.g. 9.0)/bin:\$PATH\n";
 print "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${AMBERHOME}/lib:\$CUDA_HOME/lib64:\$CUDA_H\$\n";
-print "test -f /home/gabsbi/Desktop/amber18/amber.sh  && source /home/gabsbi/Desktop/amber18/amber.sh \n";
+print "test -f /home/".$UserName."/Desktop/amber18/amber.sh  && source /home/".$UserName."/Desktop/amber18/amber.sh \n";
 system('gedit ~/.bashrc');
 print "\nAre you ready to continue? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
-CDskip:
+
 
 # install Amber18
-print "\nDo you want to skip Amber18 installation? (y/n)(i.e. if computer has no GPU)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n amber installation skipped\n\n"; goto Askip;}
-
-sleep(1); print "\ndownload amber18(licensed) tar.gz folder to your desktop\n\n"; sleep(1);
-print "\nAre you ready? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
+sleep(1); print "\ninstalling Amber18 (pmemd.cuda)\n\n";
 sleep(1); print "\nchecking nvcc and c compilers\n\n"; sleep(1);
 system('nvcc -V');
 system('gcc --version');
@@ -183,19 +200,11 @@ system('chmod +x ./amber18/bin/pmemd1.cuda_DPFP');
 Askip: # skip Amber install option
 
 
-print "\nIs Chimera and ChimeraX already installed? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n Chimera installations skipped\n\n"; goto Cskip;}
-
-#pop website for download
-sleep(1); print "\nyou will need to download Linux runfile version of Chimera\n\n"; sleep(1); system('xdg-open https://www.cgl.ucsf.edu/chimera/'); sleep(1);
-sleep(1); print "\nyou will need to download Linux tar.gz version of ChimeraX\n\n"; sleep(1); system('xdg-open https://www.rbvi.ucsf.edu/chimerax/'); sleep(1);
-sleep(1); print "\nyou will need to download Linux deb version of Modeller\n\n"; sleep(1); system('xdg-open https://salilab.org/modeller/'); sleep(1);
+if($skipping eq "y" || $skipping eq "Y" || $skipping eq 'yes'){print "\n Chimera installations skipped\n\n"; goto Cskip;}
 
 # install Chimera, ChimeraX and Modeller
-sleep(1); print "\ndownload Chimera 1.13 binary file, and chimerax-daily tar.gz and Modeller(licensed) .deb folders to your desktop\n\n"; sleep(1);
-print "\n BE SURE to right click these, go to properties/permissions and allow them to run as executable\n\n"; sleep(1);
+sleep(1); print "\ninstalling UCSF Chimera binary file, and chimerax-daily tar.gz (option) and Modeller(option) .deb folders to your desktop\n\n"; sleep(1);
+print "\n NOTE: make sure to have right clicked these, go to properties/permissions and allow them to run as executable\n\n"; sleep(1);
 print "\nAre you ready? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
@@ -228,20 +237,12 @@ if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 Cskip:
 
 # check R installation
-print "\nIs R already installed? (y/n)  note: can type 'R' in another terminal to check\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n R installation skipped\n\n"; goto Rskip;}
-sleep(1); print "\ninstalling R\n\n"; sleep(1); system('sudo apt-get install r-base r-base-dev'); sleep(1);
+sleep(1); print "\ninstalling R\n\n"; sleep(1); system('sudo apt-get install r-base-core r-base r-base-dev'); sleep(1);
 sleep(1); print "\ninstalling R and R packages\n\n";
-Rskip:
-
-print "\nAre all necessary R packages for DROIDS installed? (y/n)\n\n";
-  $yn = <STDIN>; 
-  chop($yn);
-if($yn eq "y" || $yn eq "Y"){print "\n R installation skipped\n\n"; goto RPskip;}
 
 sleep(1); print "\ninstalling some R packages  (type 'y' if this hangs)\n\n";
+print "\nIf script fails here, open terminal and install R (sudo apt-get install r-base-core r-base r-base-dev) then type 'R' at command line, then 'install.packages('package name') ...names = ggplot2 gridExtra dply caret FNN e1071 kernlab class MASS ada randomForest CCA CCP doParallel foreach...then 'q()'\n\n";
+
 #install R and R packages
 open (Rinput, "| R --vanilla")||die "could not start R command line\n";
 print Rinput "chooseCRANmirror(graphics = getOption('menu.graphics'), ind = 81, local.only = TRUE)\n";
@@ -283,17 +284,14 @@ print Rinput "q()\n";# quit R
 print Rinput "n\n";# save workspace image?
 close Rinput;
 print "\n\n";
-RPskip:
 
 #unzip and move DROIDS
-sleep(1); print "\ndownload DROIDS tar.gz folder to your desktop\n\n"; sleep(1);
+sleep(1); print "\nlooking for DROIDS-3.0.tar.gz folder on desktop (rename download file if needed)\n\n"; sleep(1);
 print "\nAre you ready? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;} 
-print "\ntype name of DROIDS tar.gz file (e.g. )\n\n";
-  $Dname = <STDIN>; 
-  chop($Dname);
+$Dname = 'DROIDS-3.0.tar.gz'; 
 sleep(1); print "\nunzipping DROIDS\n\n"; sleep(1); system('tar xvzf '.$Dname); sleep(1);
 
 # find chimera paths
@@ -304,18 +302,18 @@ sleep(1); system ('locate /bin/chimera | egrep ./ | grep bin');
 # create paths.ctl
 sleep(1); print "\ncreating paths.ctl file\n";
 open (PTH, ">"."paths.ctl" || die "could not create paths.ctl file\n");
-print PTH "amber_path	/home/$UserName/Desktop/$AmberName/	# path to amber home folder\n";
-print PTH "chimera_path	/opt/UCSF/Chimera64-$ChimeraName/bin/	# path to Chimera executable\n";
+print PTH "amber_path	/home/$UserName/Desktop/amber18/	# path to amber home folder\n";
+print PTH "chimera_path	~/.local/UCSF-Chimera64-$ChimeraName/bin/	# path to Chimera executable\n";
 print PTH "chimerax_path	/home/$UserName/Desktop/chimerax-2019.01.19/bin/	# path to ChimeraX executable\n";
-print PTH "teleap_path	/home/$UserName/Desktop/$AmberName/dat/leap/cmd/	# path to teLeap force field folder\n";
+print PTH "teleap_path	/home/$UserName/Desktop/amber18/dat/leap/cmd/	# path to teLeap force field folder\n";
 print PTH "steam_path	/usr/bin/steam 	# path to steam executable\n";
 print "\ndouble check Chimera working paths and version numbers in paths.ctl file, edit if needed, then copy it manually into your DROIDS folder\n\n"; 
 print "\nDO NOT INCLUDE FILENAME FOR EXECUTABLE IN THE PATH\n"; sleep(2);
 
 system ('gedit paths.ctl');
-print "\n\nDROIDS v2.0 INSTALLATION COMPLETE\n\n";
+print "\n\nDROIDS v3.0 INSTALLATION COMPLETE\n\n";
 
-print "\nTO INSTALL md4vr, remove md4vr.zip from DROIDS folder to desktop and unzip\n";
+print "\n(optional) to install md4vr, remove md4vr.zip from DROIDS folder to desktop and unzip\n";
 print "make sure steamOS and steamVR are working correctly,then follow README\n\n";
 
 exit;  
