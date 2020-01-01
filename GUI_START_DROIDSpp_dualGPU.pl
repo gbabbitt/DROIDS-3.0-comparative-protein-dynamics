@@ -1112,7 +1112,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               $header = $TMP3row[0];
                               $value = $TMP3row[1];
                               #print "$header\t"."$value\n";
-                              if ($header eq "[1]"){$KL = $value;}pdb ID with binding partner (e.g. 2oob_bound) : 
+                              if ($header eq "[1]"){$KL = $value;} # pdb ID with binding partner (e.g. 2oob_bound) : 
                               }
                               if ($delta_flux <= 0){$KL = -$KL;} # make KL value negative if dFLUX is negative
                               print "my KL is "."$KL\n";
