@@ -2855,7 +2855,7 @@ for (my $v = 0; $v < scalar(@copies); $v++){
 } # end for loop
 print Rinput "myplot1final <- myplot1 + mylist1 + scale_color_brewer(palette='Set1')\n"; 
 # create plot 2
-print Rinput "myplot2 <- ggplot() + ggtitle('cancor for $window AA window + conserved dynamics zones -Wilks lamda') + geom_area(data = dataframe4_$copyID, mapping = aes(x = pos, y = bars, color = 'conserved dynamics'), alpha = 0.8) + labs(x = 'position (residue number)', y = 'local R value for cancor') + theme(legend.title = element_blank())\n"; 
+print Rinput "myplot2 <- ggplot() + ggtitle('cancor for $window AA window + conserved dynamics zones -Wilks lambda') + geom_area(data = dataframe4_$copyID, mapping = aes(x = pos, y = bars, color = 'conserved dynamics'), alpha = 0.8) + labs(x = 'position (residue number)', y = 'local R value for cancor') + theme(legend.title = element_blank())\n"; 
 print Rinput "mylist2 <- list()\n";
 # create lines for plot 2
 for (my $v = 0; $v < scalar(@copies); $v++){
@@ -2982,7 +2982,11 @@ print Rinput "cat('1 = KNN, 2 = naive Bayes, 3 = LDA, 4 = QDA, 5 = SVM, 6 = rand
 
 print Rinput "my_impact_IDs <- c()\n";
 print Rinput "my_impact_sums <- c()\n";
+print Rinput "my_impact_sums_upperSE <- c()\n";
+print Rinput "my_impact_sums_lowerSE <- c()\n";
 print Rinput "my_impact_cons_sums <- c()\n";
+print Rinput "my_impact_cons_sums_upperSE <- c()\n";
+print Rinput "my_impact_cons_sums_lowerSE <- c()\n";
 
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
@@ -3005,6 +3009,8 @@ print Rinput "my_ccpos_$variantID <- c()\n";
 print Rinput "my_impact_$variantID <- c()\n";
 print Rinput "my_impact_sum_$variantID = 0\n";
 print Rinput "my_impact_cons_sum_$variantID = 0\n";
+print Rinput "my_impact_length_$variantID = 0\n";
+print Rinput "my_impact_cons_length_$variantID = 0\n";
 print Rinput "my_bars_$variantID <- c()\n";
 print Rinput "mylength <- length(newMD[,1])\n";
 print Rinput "print(mylength)\n";
@@ -3034,6 +3040,9 @@ print Rinput "for(i in 1:(mylength-$window)){
      if (myimpact >= myupper){myimpact = abs(myselfcor*(log(mycor/myselfcor)))}
      if (myimpact < myupper){myimpact = 0}
    }
+   my_impact_length_$variantID = my_impact_length_$variantID + 1
+   if(mybar == 1){my_impact_cons_length_$variantID = my_impact_cons_length_$variantID + 1}
+   
    my_impact_$variantID <- c(my_impact_$variantID, myimpact)
    my_ccpos_$variantID <- c(my_ccpos_$variantID, i)
    my_cancors_$variantID <- c(my_cancors_$variantID, mycor)
@@ -3045,11 +3054,42 @@ print Rinput "my_adjpvals_$variantID <- p.adjust(my_pvals_$variantID, method = '
 print Rinput "print(my_adjpvals_$variantID)\n";
 print Rinput "print(my_ccpos_$variantID)\n";
 print Rinput "print(my_impact_$variantID)\n";
+print Rinput "custom.bootTTL <- function(times, data=my_impact_$variantID, length=my_impact_length_$variantID) { 
+  boots <- rep(NA, times)
+  for (i in 1:times) {
+    boots[i] <- sd(sample(data, length, replace=TRUE))/sqrt(length)  
+  }
+  boots
+}\n";
+print Rinput "custom.bootCONS <- function(times, data=my_impact_$variantID, length=my_impact_cons_length_$variantID) { 
+  boots <- rep(NA, times)
+  for (i in 1:times) {
+    boots[i] <- sd(sample(data, length, replace=TRUE))/sqrt(length)  
+  }
+  boots
+}\n";
+print Rinput "mySE <- sum(custom.bootTTL(times=1000))\n"; # bootstrap standard error of sum
+print Rinput "print(mySE)\n";
+print Rinput "myUpperSE <- (my_impact_sum_$variantID + 2*mySE)\n";
+print Rinput "myLowerSE <- (my_impact_sum_$variantID - 2*mySE)\n";
+print Rinput "print(mySE)\n";
 print Rinput "print(my_impact_sum_$variantID)\n";
+print Rinput "print(myUpperSE)\n";
+print Rinput "print(myLowerSE)\n";
+print Rinput "mySE_cons <- sum(custom.bootCONS(times=1000))\n"; # bootstrap standard error of sum
+print Rinput "print(mySE_cons)\n";
+print Rinput "myUpperSE_cons <- (my_impact_cons_sum_$variantID + mySE_cons)\n";
+print Rinput "myLowerSE_cons <- (my_impact_cons_sum_$variantID - mySE_cons)\n";
 print Rinput "print(my_impact_cons_sum_$variantID)\n";
+print Rinput "print(myUpperSE_cons)\n";
+print Rinput "print(myLowerSE_cons)\n";
 print Rinput "my_impact_IDs <- c('$variantID_label', my_impact_IDs)\n";
 print Rinput "my_impact_sums <- c(my_impact_sum_$variantID, my_impact_sums)\n";
+print Rinput "my_impact_sums_upperSE <- c(my_impact_sum_$variantID+mySE, my_impact_sums_upperSE)\n";
+print Rinput "my_impact_sums_lowerSE <- c(my_impact_sum_$variantID-mySE, my_impact_sums_lowerSE)\n";
 print Rinput "my_impact_cons_sums <- c(my_impact_cons_sum_$variantID, my_impact_cons_sums)\n";
+print Rinput "my_impact_cons_sums_upperSE <- c(my_impact_cons_sum_$variantID+mySE_cons, my_impact_cons_sums_upperSE)\n";
+print Rinput "my_impact_cons_sums_lowerSE <- c(my_impact_cons_sum_$variantID-mySE_cons, my_impact_cons_sums_lowerSE)\n";
 print Rinput "print(my_bars_$queryID)\n";
 print Rinput "my_adjbars_$queryID <- c()\n";
 print Rinput "print(my_adjpvals_$variantID\[i])\n";
@@ -3108,15 +3148,15 @@ print Rinput "print(my_impact_sums)\n";
 
 # create plot 4 
 if ($bartype eq "total"){
-print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_sums)\n";
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_sums, upperSE = my_impact_sums_upperSE, lowerSE = my_impact_sums_lowerSE)\n";
 print Rinput "print(dataframe6)\n";
-print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + scale_fill_brewer(palette = 'Set2') + ggtitle('total mutational impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, y = sum, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + scale_fill_brewer(palette = 'Set2') + ggtitle('total mutational impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
 print Rinput "myplot4final <- myplot4\n"; 
 }
 if ($bartype eq "conserved"){
-print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums)\n";
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, upperSE = my_impact_cons_sums_upperSE, lowerSE = my_impact_cons_sums_lowerSE)\n";
 print Rinput "print(dataframe6)\n";
-print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + scale_fill_brewer(palette = 'Set2') + ggtitle('conserved region impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + scale_fill_brewer(palette = 'Set2') + ggtitle('conserved region impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
 print Rinput "myplot4final <- myplot4\n"; 
 }
 

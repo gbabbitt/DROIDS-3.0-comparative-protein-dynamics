@@ -1360,22 +1360,22 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               close TMP1;
                               open (TMP2, ">"."flux_values_KL.txt") or die "could not create temp file\n";
                               close TMP2;
-                              open (Rinput, "| R --vanilla")||die "could not start R command line\n";
-                              print Rinput "library('FNN')\n";
-                              print Rinput "data = read.table('flux_values_temp.txt', header = TRUE)\n"; 
-                              $flux_ref = "data\$flux_ref"; # flux on reference residue
-                              $flux_query = "data\$flux_query"; # flux on query residue
-                              print Rinput "d1 = data.frame(fluxR=$flux_ref, fluxQ=$flux_query)\n";
-                              #print Rinput "print(d1)\n";
-                              print Rinput "myKL<-KL.dist($flux_ref, $flux_query, k=10)\n";
-                              print Rinput "print(myKL[10])\n";
-                              print Rinput "sink('flux_values_KL.txt')\n";
-                              print Rinput "print(myKL[10])\n";
-                              print Rinput "sink()\n";
-                              # write to output file and quit R
-                              print Rinput "q()\n";# quit R 
-                              print Rinput "n\n";# save workspace image?
-                              close Rinput;
+                              #open (Rinput, "| R --vanilla")||die "could not start R command line\n";
+                              #print Rinput "library('FNN')\n";
+                              #print Rinput "data = read.table('flux_values_temp.txt', header = TRUE)\n"; 
+                              #$flux_ref = "data\$flux_ref"; # flux on reference residue
+                              #$flux_query = "data\$flux_query"; # flux on query residue
+                              #print Rinput "d1 = data.frame(fluxR=$flux_ref, fluxQ=$flux_query)\n";
+                              ##print Rinput "print(d1)\n";
+                              #print Rinput "myKL<-KL.dist($flux_ref, $flux_query, k=10)\n";
+                              #print Rinput "print(myKL[10])\n";
+                              #print Rinput "sink('flux_values_KL.txt')\n";
+                              #print Rinput "print(myKL[10])\n";
+                              #print Rinput "sink()\n";
+                              ## write to output file and quit R
+                              #print Rinput "q()\n";# quit R 
+                              #print Rinput "n\n";# save workspace image?
+                              #close Rinput;
                               open (TMP3, "<"."flux_values_KL.txt") or die "could not create temp file\n";
                               my @TMP3 = <TMP3>;
                               for (my $tt = 0; $tt <= scalar @TMP3; $tt++){
@@ -1387,7 +1387,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               if ($header eq "[1]"){$KL = $value;}
                               }
                               if ($delta_flux <= 0){$KL = -$KL;} # make KL value negative if dFLUX is negative
-                              print "my KL is "."$KL\n";
+                              #print "my KL is "."$KL\n";
                               close TMP3;
                               print OUT2 "$pos_ref\t"."$res_ref\t"."$res_query\t"."$flux_ref_avg\t"."$flux_query_avg\t"."$delta_flux\t"."$abs_delta_flux\t"."$KL\n";
 					     @REFfluxAvg = ();
@@ -1417,22 +1417,22 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               close TMP1;
                               open (TMP2, ">"."flux_values_KL.txt") or die "could not create temp file\n";
                               close TMP2;
-                              open (Rinput, "| R --vanilla")||die "could not start R command line\n";
-                              print Rinput "library('FNN')\n";
-                              print Rinput "data = read.table('flux_values_temp.txt', header = TRUE)\n"; 
-                              $flux_ref = "data\$flux_ref"; # flux on reference residue
-                              $flux_query = "data\$flux_query"; # flux on query residue
-                              print Rinput "d1 = data.frame(fluxR=$flux_ref, fluxQ=$flux_query)\n";
-                              #print Rinput "print(d1)\n";
-                              print Rinput "myKL<-KL.dist($flux_ref, $flux_query, k=10)\n";
-                              print Rinput "print(myKL[10])\n";
-                              print Rinput "sink('flux_values_KL.txt')\n";
-                              print Rinput "print(myKL[10])\n";
-                              print Rinput "sink()\n";
-                              # write to output file and quit R
-                              print Rinput "q()\n";# quit R 
-                              print Rinput "n\n";# save workspace image?
-                              close Rinput;
+                              #open (Rinput, "| R --vanilla")||die "could not start R command line\n";
+                              #print Rinput "library('FNN')\n";
+                              #print Rinput "data = read.table('flux_values_temp.txt', header = TRUE)\n"; 
+                              #$flux_ref = "data\$flux_ref"; # flux on reference residue
+                              #$flux_query = "data\$flux_query"; # flux on query residue
+                              #print Rinput "d1 = data.frame(fluxR=$flux_ref, fluxQ=$flux_query)\n";
+                              ##print Rinput "print(d1)\n";
+                              #print Rinput "myKL<-KL.dist($flux_ref, $flux_query, k=10)\n";
+                              #print Rinput "print(myKL[10])\n";
+                              #print Rinput "sink('flux_values_KL.txt')\n";
+                              #print Rinput "print(myKL[10])\n";
+                              #print Rinput "sink()\n";
+                              ### write to output file and quit R
+                              #print Rinput "q()\n";# quit R 
+                              #print Rinput "n\n";# save workspace image?
+                              #close Rinput;
                               open (TMP3, "<"."flux_values_KL.txt") or die "could not create temp file\n";
                               my @TMP3 = <TMP3>;
                               for (my $tt = 0; $tt <= scalar @TMP3; $tt++){
@@ -1444,7 +1444,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               if ($header eq "[1]"){$KL = $value;}
                               }
                               if ($delta_flux <= 0){$KL = -$KL;} # make KL value negative if dFLUX is negative
-                              print "my KL is "."$KL\n";
+                              #print "my KL is "."$KL\n";
                               close TMP3;
                               print OUT2 "$pos_ref\t"."$res_ref\t"."$res_query\t"."$flux_ref_avg\t"."$flux_query_avg\t"."$delta_flux\t"."$abs_delta_flux\t"."$KL\n";
 					     @REFfluxAvg = ();
