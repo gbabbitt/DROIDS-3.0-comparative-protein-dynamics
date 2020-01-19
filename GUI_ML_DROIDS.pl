@@ -2605,6 +2605,7 @@ sub canon{
 # prompt user - choose graphing option
 sleep(1);
 print "CHOOSE BAR PLOT TYPE - total mutational impact or just conserved regions\n";
+print "NOTE: conserved regions option is intended only for very large proteins with proportionally small active sites and no allostery\n";
 print "(type 'total', 'conserved' -note: default is 'total')\n\n";
 my $bartype = <STDIN>;
 chop($bartype);
