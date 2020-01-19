@@ -261,7 +261,7 @@ print Rinput "install.packages('CCA')\n";
 print Rinput "install.packages('CCP')\n";
 print Rinput "install.packages('doParallel')\n";
 print Rinput "install.packages('foreach')\n";
-print Rinput "install.packages('boot')\n";
+print Rinput "install.packages('rpsychi')\n";
 # load some libraries to check installation
 print Rinput "library(ggplot2)\n";
 print Rinput "library(gridExtra)\n";
@@ -280,7 +280,7 @@ print Rinput "library('randomForest')\n";
 print Rinput "library('parallel')\n";
 print Rinput "library('foreach')\n";
 print Rinput "library('doParallel')\n";
-print Rinput "library('boot')\n";
+print Rinput "library('rpsychi')\n";
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
 print Rinput "n\n";# save workspace image?

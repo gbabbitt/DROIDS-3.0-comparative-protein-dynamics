@@ -2605,9 +2605,10 @@ sub canon{
 # prompt user - choose graphing option
 sleep(1);
 print "CHOOSE BAR PLOT TYPE - total mutational impact or just conserved regions\n";
-print "(type 'total', 'conserved')\n\n";
+print "(type 'total', 'conserved' -note: default is 'total')\n\n";
 my $bartype = <STDIN>;
 chop($bartype);
+if ($bartype eq ''){$bartype = 'total';}
 
 print "Enter number position of N terminal on this chain\n";
 print "(default = 0)\n\n";
@@ -2669,14 +2670,14 @@ print " plotting canonical correlation and flux profiles\n\n";
 $window = '';
 $cancor_threshold = '';
 # prompt user - choose best learning model to display
-sleep(1);print "CHOOSE SIZE OF SLIDING WINDOW (e.g. 20 = 20 AA window for r value)\n\n";
+sleep(1);print "CHOOSE SIZE OF SLIDING WINDOW (e.g. default = 20 = 20 AA window for r value)\n\n";
 my $window = <STDIN>;
 chop($window);
 if ($window eq ''){$window = 20};
 
 # set conserved threshold
 $cancor_threshold = 0.3;
-sleep(1);print "CHOOSE LEVEL OF SIGNIFICANCE FOR CONSERVED CAN CORR (0.01 is default)\n\n";
+sleep(1);print "CHOOSE LEVEL OF SIGNIFICANCE FOR CONSERVED CAN CORR (default = 0.01)\n\n";
 my $cancor_threshold = <STDIN>;
 chop($cancor_threshold);
 if ($cancor_threshold eq ''){$cancor_threshold = 0.01};
@@ -2958,6 +2959,7 @@ print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada+$startN, Y1val=$
 
 } #end for loop
 
+$varcount = scalar(@variants);
 # canonical correlations
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
@@ -2982,11 +2984,16 @@ print Rinput "cat('1 = KNN, 2 = naive Bayes, 3 = LDA, 4 = QDA, 5 = SVM, 6 = rand
 
 print Rinput "my_impact_IDs <- c()\n";
 print Rinput "my_impact_sums <- c()\n";
+print Rinput "my_impact_sd <- c()\n";
+print Rinput "my_impact_n <- c()\n";
 print Rinput "my_impact_sums_upperSE <- c()\n";
 print Rinput "my_impact_sums_lowerSE <- c()\n";
 print Rinput "my_impact_cons_sums <- c()\n";
 print Rinput "my_impact_cons_sums_upperSE <- c()\n";
 print Rinput "my_impact_cons_sums_lowerSE <- c()\n";
+print Rinput "my_impact_cons_sums <- c()\n";
+print Rinput "my_impact_cons_sd <- c()\n";
+print Rinput "my_impact_cons_n <- c()\n";
 
 for (my $v = 0; $v < scalar(@variants); $v++){
      $variantID = $variants[$v];
@@ -3009,6 +3016,9 @@ print Rinput "my_ccpos_$variantID <- c()\n";
 print Rinput "my_impact_$variantID <- c()\n";
 print Rinput "my_impact_sum_$variantID = 0\n";
 print Rinput "my_impact_cons_sum_$variantID = 0\n";
+print Rinput "my_impact_sd_$variantID = 0\n";
+print Rinput "my_impact_cons_sd_$variantID = 0\n";
+print Rinput "my_impact_n_$variantID = 0\n";
 print Rinput "my_impact_length_$variantID = 0\n";
 print Rinput "my_impact_cons_length_$variantID = 0\n";
 print Rinput "my_bars_$variantID <- c()\n";
@@ -3070,9 +3080,11 @@ print Rinput "custom.bootCONS <- function(times, data=my_impact_$variantID, leng
 }\n";
 print Rinput "mySE <- sum(custom.bootTTL(times=1000))\n"; # bootstrap standard error of sum
 print Rinput "print(mySE)\n";
-print Rinput "myUpperSE <- (my_impact_sum_$variantID + 2*mySE)\n";
-print Rinput "myLowerSE <- (my_impact_sum_$variantID - 2*mySE)\n";
-print Rinput "print(mySE)\n";
+print Rinput "myUpperSE <- (my_impact_sum_$variantID + mySE)\n";
+print Rinput "myLowerSE <- (my_impact_sum_$variantID - mySE)\n";
+print Rinput "myN = $varcount\n";
+print Rinput "mySD = mySE\n";
+print Rinput "print(mySD)\n";
 print Rinput "print(my_impact_sum_$variantID)\n";
 print Rinput "print(myUpperSE)\n";
 print Rinput "print(myLowerSE)\n";
@@ -3080,6 +3092,7 @@ print Rinput "mySE_cons <- sum(custom.bootCONS(times=1000))\n"; # bootstrap stan
 print Rinput "print(mySE_cons)\n";
 print Rinput "myUpperSE_cons <- (my_impact_cons_sum_$variantID + mySE_cons)\n";
 print Rinput "myLowerSE_cons <- (my_impact_cons_sum_$variantID - mySE_cons)\n";
+print Rinput "mySD_cons = mySE_cons\n";
 print Rinput "print(my_impact_cons_sum_$variantID)\n";
 print Rinput "print(myUpperSE_cons)\n";
 print Rinput "print(myLowerSE_cons)\n";
@@ -3087,9 +3100,12 @@ print Rinput "my_impact_IDs <- c('$variantID_label', my_impact_IDs)\n";
 print Rinput "my_impact_sums <- c(my_impact_sum_$variantID, my_impact_sums)\n";
 print Rinput "my_impact_sums_upperSE <- c(my_impact_sum_$variantID+mySE, my_impact_sums_upperSE)\n";
 print Rinput "my_impact_sums_lowerSE <- c(my_impact_sum_$variantID-mySE, my_impact_sums_lowerSE)\n";
+print Rinput "my_impact_sd <- c(mySD, my_impact_sd)\n";
+print Rinput "my_impact_n <- c(myN, my_impact_n)\n";
 print Rinput "my_impact_cons_sums <- c(my_impact_cons_sum_$variantID, my_impact_cons_sums)\n";
 print Rinput "my_impact_cons_sums_upperSE <- c(my_impact_cons_sum_$variantID+mySE_cons, my_impact_cons_sums_upperSE)\n";
 print Rinput "my_impact_cons_sums_lowerSE <- c(my_impact_cons_sum_$variantID-mySE_cons, my_impact_cons_sums_lowerSE)\n";
+print Rinput "my_impact_cons_sd <- c(mySD_cons, my_impact_cons_sd)\n";
 print Rinput "print(my_bars_$queryID)\n";
 print Rinput "my_adjbars_$queryID <- c()\n";
 print Rinput "print(my_adjpvals_$variantID\[i])\n";
@@ -3144,7 +3160,10 @@ print Rinput "myplot3final <- myplot3 + mylist3 + scale_color_brewer(palette='Se
 
 print Rinput "print(my_impact_IDs)\n";
 print Rinput "print(my_impact_sums)\n";
-
+print Rinput "print(my_impact_cons_sums)\n";
+print Rinput "print(my_impact_sd)\n";
+print Rinput "print(my_impact_cons_sd)\n";
+print Rinput "print(my_impact_n)\n";
 
 # create plot 4 
 if ($bartype eq "total"){
@@ -3160,6 +3179,70 @@ print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y =
 print Rinput "myplot4final <- myplot4\n"; 
 }
 
+if ($bartype eq "total"){ # ANOVA table from summary data
+print Rinput "library(rpsychi)\n";     
+print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_sums, sd = mySE, n = my_impact_n)\n";
+print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
+print Rinput "print(myANOVA)\n";
+print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
+print Rinput "print(fval)\n";
+print Rinput "numDF <- myANOVA\$anova.table[1,2]\n";
+print Rinput "print(numDF)\n";
+print Rinput "denomDF <- myANOVA\$anova.table[2,2]\n";
+print Rinput "print(denomDF)\n";
+print Rinput "pval <- pf(q=fval, df1=numDF, df2=denomDF, lower.tail=FALSE)\n";
+print Rinput "print(pval)\n";
+print Rinput "sink('./maxDemon_results/ANOVAresult.txt')\n";
+print Rinput "library(rpsychi)\n";     
+print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_sums, sd = mySE, n = my_impact_n)\n";
+print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
+print Rinput "print(myANOVA)\n";
+print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
+print Rinput "print('Fval')\n";
+print Rinput "print(fval)\n";
+print Rinput "numDF <- myANOVA\$anova.table[1,2]\n";
+print Rinput "print('numerator DF')\n";
+print Rinput "print(numDF)\n";
+print Rinput "denomDF <- myANOVA\$anova.table[2,2]\n";
+print Rinput "print('denominator DF')\n";
+print Rinput "print(denomDF)\n";
+print Rinput "pval <- pf(q=fval, df1=numDF, df2=denomDF, lower.tail=FALSE)\n";
+print Rinput "print('pval')\n";
+print Rinput "print(pval)\n";
+print Rinput "sink()\n"; 
+}
+if ($bartype eq "conserved"){ # ANOVA table from summary data
+print Rinput "library(rpsychi)\n";     
+print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, sd = mySE_cons, n = my_impact_n)\n";
+print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
+print Rinput "print(myANOVA)\n";
+print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
+print Rinput "print(fval)\n";
+print Rinput "numDF <- myANOVA\$anova.table[1,2]\n";
+print Rinput "print(numDF)\n";
+print Rinput "denomDF <- myANOVA\$anova.table[2,2]\n";
+print Rinput "print(denomDF)\n";
+print Rinput "pval <- pf(q=fval, df1=numDF, df2=denomDF, lower.tail=FALSE)\n";
+print Rinput "print(pval)\n";
+print Rinput "sink('./maxDemon_results/ANOVAresult.txt')\n";
+print Rinput "library(rpsychi)\n";     
+print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, sd = mySE_cons, n = my_impact_n)\n";
+print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
+print Rinput "print(myANOVA)\n";
+print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
+print Rinput "print('Fval')\n";
+print Rinput "print(fval)\n";
+print Rinput "numDF <- myANOVA\$anova.table[1,2]\n";
+print Rinput "print('numerator DF')\n";
+print Rinput "print(numDF)\n";
+print Rinput "denomDF <- myANOVA\$anova.table[2,2]\n";
+print Rinput "print('denominator DF')\n";
+print Rinput "print(denomDF)\n";
+print Rinput "pval <- pf(q=fval, df1=numDF, df2=denomDF, lower.tail=FALSE)\n";
+print Rinput "print('pval')\n";
+print Rinput "print(pval)\n";
+print Rinput "sink()\n";
+}
 #####################################
 
 print Rinput "library(grid)\n";
@@ -3199,7 +3282,7 @@ for (my $v = 0; $v < scalar(@variants); $v++){
      my $newfilename4 = "./maxDemon_results/cancor_stats_$variantID.txt";
      copy($oldfilename4, $newfilename4);
 } # end for loop
-
+system "gedit ./maxDemon_results/ANOVAresult.txt\n";
 }
 ###########################################################################################################
 ###########################################################################################################
