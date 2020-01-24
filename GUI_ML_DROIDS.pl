@@ -3180,7 +3180,7 @@ print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y =
 print Rinput "myplot4final <- myplot4\n"; 
 }
 
-if ($bartype eq "total"){ # ANOVA table from summary data
+if ($bartype eq "total" && scalar(@variants) >= 4){ # ANOVA table from summary data
 print Rinput "library(rpsychi)\n";     
 print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_sums, sd = mySE, n = my_impact_n)\n";
 print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
@@ -3212,7 +3212,7 @@ print Rinput "print('pval')\n";
 print Rinput "print(pval)\n";
 print Rinput "sink()\n"; 
 }
-if ($bartype eq "conserved"){ # ANOVA table from summary data
+if ($bartype eq "conserved" && scalar(@variants) >= 4){ # ANOVA table from summary data
 print Rinput "library(rpsychi)\n";     
 print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, sd = mySE_cons, n = my_impact_n)\n";
 print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
@@ -3283,7 +3283,7 @@ for (my $v = 0; $v < scalar(@variants); $v++){
      my $newfilename4 = "./maxDemon_results/cancor_stats_$variantID.txt";
      copy($oldfilename4, $newfilename4);
 } # end for loop
-system "gedit ./maxDemon_results/ANOVAresult.txt\n";
+if(scalar(@variants) >= 4){system "gedit ./maxDemon_results/ANOVAresult.txt\n";}
 }
 ###########################################################################################################
 ###########################################################################################################
