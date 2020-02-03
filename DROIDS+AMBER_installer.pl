@@ -66,6 +66,7 @@ sleep(1); print "\ninstalling grace\n\n"; sleep(1); system('sudo apt-get install
 sleep(1); print "\ninstalling perl-tk\n\n"; sleep(1); system('sudo apt-get install perl-tk'); sleep(1);
 sleep(1); print "\ninstalling python-tk\n\n"; sleep(1); system('sudo apt-get install python-tk'); sleep(1);
 sleep(1); print "\ninstalling python-gi\n\n"; sleep(1); system('sudo apt-get install python-gi'); sleep(1);
+sleep(1); print "\ninstalling python-kivy\n\n"; sleep(1); system('sudo apt-get install python-kivy'); sleep(1);
 sleep(1); print "\ninstalling gstreamer\n\n"; sleep(1); system('sudo apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio'); sleep(1);
 sleep(1); print "\ninstalling steam and VR dependencies\n\n"; sleep(1); system('sudo apt-get install steam steam-devices libvulkan1'); sleep(1);
 sleep(1); print "\ninstalling Amber dependencies\n\n"; sleep(1); system('sudo apt-get install csh flex patch gfortran g++ make xorg-dev bison libbz2-dev'); sleep(1);
@@ -119,7 +120,7 @@ if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 #if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 
 # install CUDA
-print "\nIs CUDA and cuda toolkit already installed? (y/n) (can probably skip if GCP cloud VM) \n\n";
+print "\nIs CUDA and cuda toolkit already installed? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){print "\n CUDA installation skipped\n\n"; goto CDskip;}
@@ -241,7 +242,7 @@ sleep(1); print "\ninstalling R\n\n"; sleep(1); system('sudo apt-get install r-b
 sleep(1); print "\ninstalling R and R packages\n\n";
 
 sleep(1); print "\ninstalling some R packages  (type 'y' if this hangs)\n\n";
-print "\nIf script fails here, open terminal and install R (sudo apt-get install r-base-core r-base r-base-dev) then type 'R' at command line, then 'install.packages('package name') ...names = ggplot2 gridExtra dply caret FNN e1071 kernlab class MASS ada randomForest CCA CCP doParallel foreach...then 'q()'\n\n";
+print "\nIf script fails here, open terminal and install R (sudo apt-get install r-base-core r-base r-base-dev) then type 'R' at command line, then 'install.packages('package name') ...names = ggplot2 gridExtra dplyr caret FNN e1071 kernlab class MASS ada randomForest CCA CCP doParallel foreach rpsychi...then 'q()'\n\n";
 
 #install R and R packages
 open (Rinput, "| R --vanilla")||die "could not start R command line\n";
