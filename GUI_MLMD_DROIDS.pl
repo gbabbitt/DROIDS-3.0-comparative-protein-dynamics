@@ -1296,7 +1296,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               if ($header eq "[1]"){$KL = $value;}
                               }
                               if ($delta_flux <= 0){$KL = -$KL;} # make KL value negative if dFLUX is negative
-                              print "my KL is "."$KL\n";
+                              #print "my KL is "."$KL\n";
                               close TMP3;
                               print OUT2 "$pos_ref\t"."$res_ref\t"."$res_query\t"."$flux_ref_avg\t"."$flux_query_avg\t"."$delta_flux\t"."$abs_delta_flux\t"."$KL\n";
 					     @REFfluxAvg = ();
@@ -1353,7 +1353,7 @@ for (my $j = 0; $j < scalar @IN; $j++){ # scan atom type
                               if ($header eq "[1]"){$KL = $value;}
                               }
                               if ($delta_flux <= 0){$KL = -$KL;} # make KL value negative if dFLUX is negative
-                              print "my KL is "."$KL\n";
+                              #print "my KL is "."$KL\n";
                               close TMP3;
                               print OUT2 "$pos_ref\t"."$res_ref\t"."$res_query\t"."$flux_ref_avg\t"."$flux_query_avg\t"."$delta_flux\t"."$abs_delta_flux\t"."$KL\n";
 					     @REFfluxAvg = ();
