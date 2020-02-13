@@ -2,7 +2,7 @@
 
 DROIDS v3.0 starts with the command line call
 
-perl DROIDS.pl
+python DROIDS.py for basic program or perl DROIDS.pl for more extensive options
 
 a GUI based script PATHS.pl will prompt paths to working directories for UCSF Chimera, Amber forcefields, and Amber Home directory and write a .ctl file. Then the main DROIDS menu will pop up. Requires Amber 16/18 license and some dependencies in R, python and perl (see user doc with download)
 
