@@ -16,6 +16,10 @@ Our main goal is to try to visualize the impact of one of the longest time scale
 
 please cite
 
-Babbitt, Gregory & Fokoue, Ernest & Evans, Joshua & Diller, Kyle & Adams, Lily. (2019). DROIDS 3.0-Detecting Genetic and Drug Class Variant Impact on Conserved Protein Binding Dynamics. Biophysical Journal. 118. 10.1016/j.bpj.2019.12.008. 
+DROIDS 1.20: A GUI-Based Pipeline for GPU-Accelerated Comparative Protein Dynamics
+Babbitt, Gregory A. et al. 2020
+Biophysical Journal, Volume 114, Issue 5, 1009 - 1017
 
-
+DROIDS 3.0—Detecting Genetic and Drug Class Variant Impact on Conserved Protein Binding Dynamics
+Babbitt, Gregory A. et al. 2018
+Biophysical Journal, Volume 118, Issue 3, 541 - 55
