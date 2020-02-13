@@ -21,7 +21,17 @@ for (my $p = 0; $p < scalar @MUT; $p++){
       #############
       
 print "control file inputs\n\n";
-
+# specify the path to working directory for Chimera here
+open(IN, "<"."paths.ctl") or die "could not find paths.txt file\n";
+my @IN = <IN>;
+for (my $i = 0; $i < scalar @IN; $i++){
+	 my $INrow = $IN[$i];
+	 my @INrow = split (/\s+/, $INrow);
+	 my $header = @INrow[0];
+	 my $path = @INrow[1];
+	 if ($header eq "chimera_path"){$chimera_path = $path;}
+}
+close IN;
 open(IN, "<"."MDq_deploy_$fileIDq.ctl") or die "could not find MD.ctl control file\n";
 @IN = <IN>;
 for (my $c = 0; $c <= scalar @IN; $c++){
@@ -40,6 +50,7 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     if ($header eq "Salt_Conc") { $Salt_Conc = $value;}
     if ($header eq "Temperature_Query") { $Temp_Query = $value;}
 }
+close IN;
 if($Temp_Query !~ m/\d/){$Temp_Query = 300.0;}
 
 #my $protein_label = $ARGV[0];
@@ -54,7 +65,7 @@ my $cut;
 if ($method eq "explicit") {
 	$prmtop = "wat"; # "vac" or "wat"
 	$igb = 0;
-	$ntb = 1;
+	$ntb = 2;
 	$cut = 8.5;
 }
 
@@ -122,7 +133,8 @@ open(SANDER_MIN_AA, ">"."$protein_label"."_min.in") or die "could not open SANDE
 	#print SANDER_MIN_AA "ntwx=100,\n";
 	print SANDER_MIN_AA "cut=$cut,\n";
 	print SANDER_MIN_AA "igb=$igb,\n";
-	print SANDER_MIN_AA "ntb=$ntb,\n";
+	if($method eq "explicit"){print SANDER_MIN_AA "ntb=1,\n";}
+     if($method eq "implicit"){print SANDER_MIN_AA "ntb=$ntb,\n";}
 	print SANDER_MIN_AA "restraint_wt = 1,\n";
 	print SANDER_MIN_AA "restraintmask = 1-23',\n";
 	if($method eq "implicit"){print SANDER_MIN_AA "saltcon = $Salt_Conc,\n";}
@@ -145,7 +157,8 @@ open(SANDER_HEAT_AA, ">"."$protein_label"."_heat.in") or die "could not open SAN
 	print SANDER_HEAT_AA "ntpr=100,\n"; 
 	print SANDER_HEAT_AA "ntwx=100,\n"; 
 	print SANDER_HEAT_AA "cut=$cut,\n"; 
-	print SANDER_HEAT_AA "ntb=$ntb,\n"; 
+	if($method eq "explicit"){print SANDER_HEAT_AA "ntb=1,\n";}
+     if($method eq "implicit"){print SANDER_HEAT_AA "ntb=$ntb,\n";} 
 	print SANDER_HEAT_AA "ntp=0,\n"; 
 	print SANDER_HEAT_AA "ntt=3,\n"; 
 	print SANDER_HEAT_AA "gamma_ln=1,\n"; 
@@ -178,9 +191,11 @@ open(SANDER_EQ_AA, ">"."$protein_label"."_eq.in") or die "could not open SANDER_
 	print SANDER_EQ_AA "ntwx=100,\n"; 
 	print SANDER_EQ_AA "cut=$cut,\n"; 
 	print SANDER_EQ_AA "ntb=$ntb,\n"; 
-	print SANDER_EQ_AA "ntp=0,\n"; 
+	if($method eq "explicit"){print SANDER_EQ_AA "ntp=1,\n";} 
+	if($method eq "implicit"){print SANDER_EQ_AA "ntp=0,\n";} 
 	print SANDER_EQ_AA "ntt=3,\n"; 
-	print SANDER_EQ_AA "gamma_ln=1,\n"; 
+	print SANDER_EQ_AA "gamma_ln=2.0,\n"; 
+	if($method eq "explicit"){print SANDER_EQ_AA "iwrap=1,\n";}
 	#print SANDER_EQ_AA "nmropt=1,\n"; 
 	print SANDER_EQ_AA "ig=-1,\n"; 
 	print SANDER_EQ_AA "igb=$igb,\n";
@@ -212,9 +227,10 @@ open(SANDER_EQ_AA, ">"."$protein_label"."_randdeploy.in") or die "could not open
 	print SANDER_EQ_AA "ntwx=100,\n"; 
 	print SANDER_EQ_AA "cut=$cut,\n"; 
 	print SANDER_EQ_AA "ntb=$ntb,\n"; 
-	print SANDER_EQ_AA "ntp=0,\n"; 
+	if($method eq "explicit"){print SANDER_EQ_AA "ntp=1,\n";} 
+	if($method eq "implicit"){print SANDER_EQ_AA "ntp=0,\n";} 
 	print SANDER_EQ_AA "ntt=3,\n"; 
-	print SANDER_EQ_AA "gamma_ln=1,\n"; 
+	print SANDER_EQ_AA "gamma_ln=2.0,\n"; 
 	#print SANDER_EQ_AA "nmropt=1,\n"; 
 	print SANDER_EQ_AA "ig=-1,\n"; 
 	print SANDER_EQ_AA "igb=$igb,\n";
@@ -242,9 +258,10 @@ open(SANDER_PROD_AA, ">"."$protein_label"."_prod.in") or die "could not open SAN
 	print SANDER_PROD_AA "ntwx=200,\n";
 	print SANDER_PROD_AA "cut=$cut,\n";
 	print SANDER_PROD_AA "ntb=$ntb,\n";
-	print SANDER_PROD_AA "ntp=0,\n";
+	if($method eq "explicit"){print SANDER_PROD_AA "ntp=1,\n";} 
+	if($method eq "implicit"){print SANDER_PROD_AA "ntp=0,\n";}
 	print SANDER_PROD_AA "ntt=3,\n";
-	print SANDER_PROD_AA "gamma_ln=1,\n";
+	print SANDER_PROD_AA "gamma_ln=2.0,\n";
 	print SANDER_PROD_AA "ig=-1,\n";
 	print SANDER_PROD_AA "igb=$igb,\n";
 	if($method eq "implicit"){print SANDER_PROD_AA "saltcon = $Salt_Conc,\n";}
@@ -358,6 +375,17 @@ sleep(1);
 # open RMS trajectory for equilibration in second window
 ############################################################
 print "\n\nPLOTTING RMSD OVER FRAMES FOR EQUILIBRATION RUN\n\n";
+if ($Solvation_Method eq 'implicit'){
+open(RMS, ">"."eq_RMS_$protein_label".".ctl");
+print RMS "parm vac_$protein_label".".prmtop\n";
+print RMS "trajin eq_$protein_label".".nc\n";
+print RMS "rms ToFirst @"."CA,C,O,N,H&!(:WAT) first out eqRMS$protein_label.txt\n";
+print RMS "run\n";
+print RMS "xmgrace eqRMS$protein_label.txt\n";
+close RMS;
+system("x-terminal-emulator -e cpptraj "."-i ./eq_RMS_$protein_label".".ctl | tee eq_RMS_$protein_label".".txt");
+}
+if ($Solvation_Method eq 'explicit'){
 open(RMS, ">"."eq_RMS_$protein_label".".ctl");
 print RMS "parm wat_$protein_label".".prmtop\n";
 print RMS "trajin eq_$protein_label".".nc\n";
@@ -366,7 +394,23 @@ print RMS "run\n";
 print RMS "xmgrace eqRMS$protein_label.txt\n";
 close RMS;
 system("x-terminal-emulator -e cpptraj "."-i ./eq_RMS_$protein_label".".ctl | tee eq_RMS_$protein_label".".txt");
-
+}
+if ($Solvation_Method eq 'explicit'){
+open(MD, ">"."openMD_$protein_label".".ctl");
+print MD "amber\n";
+print MD "wat_$protein_label".".prmtop\n";
+print MD "eq_$protein_label".".nc\n";
+close MD;
+system("x-terminal-emulator -e "."$chimera_path"."chimera md:openMD_$protein_label.ctl\n");
+}
+if ($Solvation_Method eq 'implicit'){
+open(MD, ">"."openMD_$protein_label".".ctl");
+print MD "amber\n";
+print MD "vac_$protein_label".".prmtop\n";
+print MD "eq_$protein_label".".nc\n";
+close MD;
+system("x-terminal-emulator -e "."$chimera_path"."chimera md:openMD_$protein_label.ctl\n");
+}
 sleep(1);
 
 ######################################################################
