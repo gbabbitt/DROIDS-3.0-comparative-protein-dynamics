@@ -1,0 +1,59 @@
+<MyLayout>
+    GridLayout:
+        cols:1
+        size: root.width-200, root.height-200
+        pos: 100, 100
+        Label:
+            text: 'DROIDS - Mutant Model Comparative Analyses of Protein Dynamics'
+            font_size: 22
+            size_hint: 0.5, 0.2
+            bold: True
+            color: 0.8, 0.8, 0.1, 1
+        Label:
+            text: 'GPL3 license - GA Babbitt Lab at Rochester Institute of Technology'
+            font_size: 16
+            size_hint: 0.3, 0.1    
+        GridLayout:
+            cols:1
+            Image:
+                source: 'droid.png'
+            GridLayout:
+                cols:1
+                ToggleButton:
+                    id: btn00
+                    text: "single GPU mode - (run MD query and reference on same GPU card)"
+                    bold: True
+                    state: 'normal'
+                    on_state: root.btn00()
+                    off_state: root.btn00()
+                    size_hint: 0.5, 0.3
+                    color: 0.9, 0.7, 0.1, 1
+                    
+                ToggleButton:
+                    id: btn0
+                    text: "dual GPU mode - (run MD query and reference on 2 independent GPU cards)"
+                    bold: True
+                    state: 'normal'
+                    on_state: root.btn0()
+                    off_state: root.btn00()
+                    size_hint: 0.5, 0.3
+                    color: 0.9, 0.7, 0.1, 1
+                Label:
+                    text: ''
+                    font_size: 16
+                    size_hint: 0.3, 0.1    
+                GridLayout:
+                    cols:1 
+                    Button:
+                        id: btn1
+                        text: "compare wildtype vs. mutant for single protein"
+                        on_press: root.btn1()
+                    Button:
+                        id: btn2
+                        text: "compare wildtype vs. mutant for DNA-protein interaction"   
+                        on_press: root.btn2()
+                    Button:
+                        id: btn3
+                        text: "compare wildtype vs. mutant for protein-ligand interaction"   
+                        on_press: root.btn3()
+                    

@@ -4,13 +4,13 @@
         size: root.width-200, root.height-200
         pos: 100, 100
         Label:
-            text: 'DROIDS + maxDemon - Machine Learning for Comparative Protein Dynamics'
-            font_size: 22
+            text: 'Machine Learning Assisted Comparative Protein Dynamics'
+            font_size: 26
             size_hint: 0.5, 0.2
             bold: True
             color: 0.1, 0.8, 0.1, 1
         Label:
-            text: 'GPL3 license - GA Babbitt Lab at Rochester institute of Technology'
+            text: 'GPL3 license - GA Babbitt Lab at Rochester Institute of Technology'
             font_size: 16
             size_hint: 0.3, 0.1    
         GridLayout:
@@ -18,42 +18,29 @@
             Image:
                 source: 'droid.png'
             GridLayout:
-                cols:1
-                ToggleButton:
-                    id: btn00
-                    text: "single GPU mode - (run MD query and reference on same GPU card)"
+                cols:1 
+                Button:
+                    id: btn1
+                    text: "DROIDS - direct pairwise comparative analyses"
+                    on_press: root.btn1()
                     bold: True
-                    state: 'normal'
-                    on_state: root.btn00()
-                    off_state: root.btn00()
+                    font_size: 20
                     size_hint: 0.5, 0.3
-                    color: 0.9, 0.7, 0.1, 1
-                    
-                ToggleButton:
-                    id: btn0
-                    text: "dual GPU mode - (run MD query and reference on 2 independent GPU cards)"
+                    color: 1, 0.1, 1, 1
+                Button:
+                    id: btn2
+                    text: "DROIDS - mutant model comparative analyses"   
+                    on_press: root.btn2()
                     bold: True
-                    state: 'normal'
-                    on_state: root.btn0()
-                    off_state: root.btn00()
+                    font_size: 20
                     size_hint: 0.5, 0.3
-                    color: 0.9, 0.7, 0.1, 1
-                    
-                GridLayout:
-                    cols:2 
-                    Button:
-                        id: btn1
-                        text: "single protein temperature analysis"
-                        on_press: root.btn1()
-                    Button:
-                        id: btn2
-                        text: "protein-DNA binding analysis"   
-                        on_press: root.btn2()
-                    Button:
-                        id: btn3
-                        text: "protein-ligand binding analysis"   
-                        on_press: root.btn3()
-                    Button:
-                        id: btn4
-                        text: "protein-protein binding analysis"   
-                        on_press: root.btn4()
+                    color: 0.9, 0.9, 0.1, 1
+                Button:
+                    id: btn3
+                    text: "DROIDS + maxDemon - functional variant analyses"   
+                    on_press: root.btn3()
+                    bold: True
+                    font_size: 20
+                    size_hint: 0.5, 0.3
+                    color: 0.1, 0.95, 0.95, 1
+                

@@ -21,50 +21,19 @@ class MyLayout(Widget):
     
       
     # define buttons and actions
-    def btn0(self):
-            print("dual GPU mode selected")
-            self.gpu = 2
-            return self.gpu
-    def btn00(self):
-            print("single GPU mode selected")
-            self.gpu = 1
-            return self.gpu    
     def btn1(self):
-        if self.gpu == 1:
-            print("running DROIDS on single GPU - single protein analysis") 
-            cmd = 'perl GUI_START_DROIDSss.pl'
-            os.system(cmd)
-        if self.gpu == 2:
-            print("running DROIDS on dual GPU - single protein analysis") 
-            cmd = 'perl GUI_START_DROIDSss_dualGPU.pl'
-            os.system(cmd)
+        print("running DROIDS - direct comparative analysis") 
+        cmd = 'python DROIDS1.py'
+        os.system(cmd)
     def btn2(self):
-        if self.gpu == 1:
-            print("running DROIDS on single GPU - protein-DNA analysis") 
-            cmd = 'perl GUI_START_DROIDSdp1.pl'
-            os.system(cmd)
-        if self.gpu == 2:
-            print("running DROIDS on dual GPU - protein-DNA analysis") 
-            cmd = 'perl GUI_START_DROIDSdp1_dualGPU.pl'
-            os.system(cmd)
+        print("running DROIDS - mutant model comparison") 
+        cmd = 'python DROIDS2.py'
+        os.system(cmd)
     def btn3(self):
-        if self.gpu == 1:
-            print("running DROIDS on single GPU - protein-ligand analysis") 
-            cmd = 'perl GUI_START_DROIDSlp1.pl'
-            os.system(cmd)
-        if self.gpu == 2:
-            print("running DROIDS on dual GPU - protein-ligand analysis") 
-            cmd = 'perl GUI_START_DROIDSlp1_dualGPU.pl'
-            os.system(cmd)
-    def btn4(self):
-        if self.gpu == 1:
-            print("running DROIDS on single GPU - protein-protein analysis") 
-            cmd = 'perl GUI_START_DROIDSpp.pl'
-            os.system(cmd)
-        if self.gpu == 2:
-            print("running DROIDS on dual GPU - protein-protein analysis") 
-            cmd = 'perl GUI_START_DROIDSpp_dualGPU.pl'
-            os.system(cmd)
+        print("running DROIDS + maxDemon - functional variant analysis") 
+        cmd = 'python DROIDS3.py'
+        os.system(cmd)
+       
 
 
 if __name__ == '__main__':
