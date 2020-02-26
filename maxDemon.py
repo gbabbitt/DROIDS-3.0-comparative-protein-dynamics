@@ -13,28 +13,32 @@ class MyLayout(Widget):
     
     fileML = open("MLmethods.txt","w")
     fileML.write("MLmethods\n")
+    fileML.write("bnp\n")
+    fileML.write("dist\n")
+    fileML.write("kern\n")
+    fileML.write("ens\n")
     fileML.close()
     
     # define buttons and actions
     def ml1(self):
-            print("KNN selected")
+            print("KNN ML deselected")
             fileML = open("MLmethods.txt","a+")
-            fileML.writelines("bnp\n")
+            fileML.writelines("no_bnp\n")
             fileML.close()
     def ml2(self):
-            print("probablistic selected")
+            print("probablistic ML deselected")
             fileML = open("MLmethods.txt","a+")
-            fileML.writelines("dist\n")
+            fileML.writelines("no_dist\n")
             fileML.close()
     def ml3(self):
-            print("SVM selected")
+            print("SVM ML deselected")
             fileML = open("MLmethods.txt","a+")
-            fileML.writelines("kern\n")
+            fileML.writelines("no_kern\n")
             fileML.close()
     def ml4(self):
-            print("ensemble selected")
+            print("ensemble ML deselected")
             fileML = open("MLmethods.txt","a+")
-            fileML.writelines("ens\n")
+            fileML.writelines("no_ens\n")
             fileML.close()
     def btn1(self):
             print ("Please enter type of structure (1=protein | 2=DNA+protein | 3=protein+ligand)")

@@ -111,6 +111,10 @@ for (my $i = 0; $i < scalar @IN3; $i++){
       if ($method eq "dist"){$method_dist = 1;}
       if ($method eq "kern"){$method_kern = 1;}
       if ($method eq "ens"){$method_ens = 1;}
+      if ($method eq "no_bnp"){$method_bnp = 0;}
+      if ($method eq "no_dist"){$method_dist = 0;}
+      if ($method eq "no_kern"){$method_kern = 0;}
+      if ($method eq "no_ens"){$method_ens = 0;}
 }
 close IN3;
 
