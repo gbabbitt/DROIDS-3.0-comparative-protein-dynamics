@@ -97,11 +97,11 @@ close IN2;
 
 
 # prompt user - choose best learning model to display
-sleep(1);print "SELECT MOVIE VIEWER TYPE (type 'fix' or 'roll')\n\n";
+sleep(1);print "\nSELECT MOVIE VIEWER TYPE (type 'fix' or 'roll')\n\n";
 my $view = <STDIN>;
 chop($view);
 
-sleep(1);print "SELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
+sleep(1);print "\nSELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
 my $stype_number = <STDIN>;
 chop($stype_number);
 

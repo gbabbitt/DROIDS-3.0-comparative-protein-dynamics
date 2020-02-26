@@ -26,6 +26,11 @@
                 color: 1, 0, 0, 1
                 font_size: 20
             Label:
+                text: "(recommended - leave all methods checked)"
+                bold: False
+                size_hint: 0.3, 0.1
+                font_size: 16
+            Label:
                 text: ''
                 font_size: 16
                 size_hint: 0.3, 0.1             
@@ -90,11 +95,13 @@
                     text: "(1) run new MD sims for deployment"
                     on_press: root.btn1()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn1.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn2
                     text: "(2) process DROIDS training set"   
                     on_press: root.btn2()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn2.background_color=(0.9, 0.1, 0.1, 1)
                 Label:
                     text: ''
                     font_size: 16
@@ -108,11 +115,13 @@
                     text: "(3) deploy machine learning"   
                     on_press: root.btn3()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn3.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn4
                     text: "(4) plot conserved dynamics and impacts"   
                     on_press: root.btn4()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn4.background_color=(0.9, 0.1, 0.1, 1)
                 Label:
                     text: ''
                     font_size: 16
@@ -126,11 +135,13 @@
                     text: "(5) show image of conserved dynamics"
                     on_press: root.btn5()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn5.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn6
                     text: "(6) render movies of learning process"   
                     on_press: root.btn6()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn6.background_color=(0.9, 0.1, 0.1, 1)
                 Label:
                     text: ''
                     font_size: 16
@@ -144,10 +155,12 @@
                     text: "(7) show image(s) of variant impacts"   
                     on_press: root.btn7()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn7.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn8
                     text: "(8) play movies of learners"   
                     on_press: root.btn8()
                     background_color: 0.1, 0.9, 0.9, 1
+                    on_release: btn8.background_color=(0.9, 0.1, 0.1, 1)
                 
                 

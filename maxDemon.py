@@ -20,6 +20,7 @@ class MyLayout(Widget):
     fileML.close()
     
     # define buttons and actions
+     
     def ml1(self):
             print("KNN ML deselected")
             fileML = open("MLmethods.txt","a+")
@@ -52,7 +53,7 @@ class MyLayout(Widget):
                 os.system(cmd)
             if structure == 3:
                 cmd = 'perl GUI_MLMD_DROIDSlp.pl'
-                os.system(cmd)    
+                os.system(cmd)
     def btn2(self):
             print("making control file and processing training data sets") 
             cmd = 'perl GUI_ML_DROIDSbtn2.pl'

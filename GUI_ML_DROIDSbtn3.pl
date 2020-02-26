@@ -120,9 +120,13 @@ close IN3;
 
 print ("\nMLmethods\n\n");
 if ($method_bnp == 1){print"KNN activated\n";}
+if ($method_bnp == 0){print"KNN deactivated\n";}
 if ($method_dist == 1){print"NB/LDA/QDA activated\n";}
+if ($method_dist == 0){print"NB/LDA/QDA deactivated\n";}
 if ($method_kern == 1){print"SVM activated\n";}
+if ($method_kern == 0){print"SVM deactivated\n";}
 if ($method_ens == 1){print"random forest/adaboost activated\n";}
+if ($method_ens == 0){print"random forest/adaboost deactivated\n";}
 print ("\n\n\n");
 
 ###########################################################################################################

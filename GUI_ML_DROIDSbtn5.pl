@@ -28,6 +28,8 @@ for (my $i = 0; $i < scalar @IN; $i++){
 }
 close IN;
 
+$frameCount = $framenumber;
+
 # specify the path to working directory for Chimera here
 open(IN, "<"."paths.ctl") or die "could not find paths.txt file\n";
 my @IN = <IN>;
@@ -81,8 +83,12 @@ for (my $i = 0; $i < scalar @IN; $i++){
       if ($header eq "representations"){$repStr = $value;}
       if ($header eq "homology"){$homology = $value;}
       if ($header eq "num_chains"){$chainN = $value;}
+      #if ($header eq "color_scheme"){$colorType = $value;}
 }
 close IN;
+
+
+$colorScheme = "c1";
 
 open(IN2, "<"."MDr.ctl") or die "could not find MDr.ctl file\n";
 my @IN2 = <IN2>;
@@ -96,7 +102,7 @@ for (my $i = 0; $i < scalar @IN2; $i++){
 close IN2;
 
 
-sleep(1);print "SELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
+sleep(1);print "\nSELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
 my $stype_number = <STDIN>;
 chop($stype_number);
 

@@ -28,6 +28,8 @@ for (my $i = 0; $i < scalar @IN; $i++){
 }
 close IN;
 
+$frameCount = $framenumber;
+
 # specify the path to working directory for Chimera here
 open(IN, "<"."paths.ctl") or die "could not find paths.txt file\n";
 my @IN = <IN>;
@@ -81,8 +83,11 @@ for (my $i = 0; $i < scalar @IN; $i++){
       if ($header eq "representations"){$repStr = $value;}
       if ($header eq "homology"){$homology = $value;}
       if ($header eq "num_chains"){$chainN = $value;}
+      #if ($header eq "color_scheme"){$colorType = $value;}
 }
 close IN;
+
+$colorScheme = "c1";
 
 open(IN2, "<"."MDr.ctl") or die "could not find MDr.ctl file\n";
 my @IN2 = <IN2>;
@@ -173,7 +178,7 @@ chop($varselect);
 
 $variantID = $varselect;
 
-sleep(1);print "SELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
+sleep(1);print "\nSELECT INTERACTION TYPE (1=protein only | 2=protein-protein | 3=DNA-protein | 4=protein-ligand)\n\n";
 my $stype_number = <STDIN>;
 chop($stype_number);
 
@@ -238,15 +243,17 @@ if ($homology eq "strict"){$mutType = "tan";}
 if ($colorScheme eq "c1" ){$colorType = "wr";}
 if ($colorScheme eq "c2" ){$colorType = "wr";}
 $attr = "dRMSF";
+
 $statSCORE = new Statistics::Descriptive::Full; # impact map
 $statSCORE->add_data (@impacts);
 $min_impact = $statSCORE->min();
 $max_impact = $statSCORE->max();
 $min_val = $min_impact;
 $max_val = $max_impact;
-
-
-
+if($min_val eq ''){$min_val = 0;}
+#print(@impacts);
+print "\n";
+print "min="."$min_val\t"."max="."$max_val\n";
 
 sleep(1);
 if ($stype eq "protein"){
