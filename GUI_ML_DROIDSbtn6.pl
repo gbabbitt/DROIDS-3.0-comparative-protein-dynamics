@@ -110,14 +110,7 @@ close IN2;
 
 #sub movie1 {
 
-# enforce orig $queryID from training set
-print "queryID label is "."$queryID\n";
-if($queryID =~ m/_1_1/){$queryID = substr($queryID, 0, length($queryID)-4);}
-if($queryID =~ m/_1/){$queryID = substr($queryID, 0, length($queryID)-2);}
-print "queryID label is adjusted to "."$queryID\n";
-my $orig_queryID = $queryID;  # create tag for original query in training set
-my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
-print "queryID label is adjusted to "."$queryID\n\n\n";
+
 
 print "number of frames to render = "."$frameCount\n\n";
 
@@ -147,7 +140,17 @@ if($stype_number == 2){$stype = "protprot";}
 if($stype_number == 3){$stype = "dna";}
 if($stype_number == 4){$stype = "ligand";}
 
+if($stype eq "dna"){$orig_queryID = $queryID; $queryID = $refID;}
 
+
+# enforce orig $queryID from training set
+print "queryID label is "."$queryID\n";
+if($queryID =~ m/_1_1/){$queryID = substr($queryID, 0, length($queryID)-4);}
+if($queryID =~ m/_1/){$queryID = substr($queryID, 0, length($queryID)-2);}
+print "queryID label is adjusted to "."$queryID\n";
+my $orig_queryID = $queryID;  # create tag for original query in training set
+my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
+print "queryID label is adjusted to "."$queryID\n\n\n";
 
 if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
    
