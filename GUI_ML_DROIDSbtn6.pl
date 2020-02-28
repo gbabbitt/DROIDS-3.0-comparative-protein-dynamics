@@ -140,7 +140,7 @@ if($stype_number == 2){$stype = "protprot";}
 if($stype_number == 3){$stype = "dna";}
 if($stype_number == 4){$stype = "ligand";}
 
-if($stype eq "dna"){$orig_queryID = $queryID; $queryID = $refID;}
+if($stype eq "dna" || $stype eq "ligand"){$orig_queryID = $queryID; $queryID = $refID;}
 
 
 # enforce orig $queryID from training set
