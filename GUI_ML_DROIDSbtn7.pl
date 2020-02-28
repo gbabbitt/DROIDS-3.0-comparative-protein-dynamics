@@ -267,8 +267,8 @@ print("\n\n Display complete\n\n");
 }
 
 if ($stype eq "protprot"){
-if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_tan.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
-if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnclass_gray.py	--rep=$repStr --test=$testStr --qID=$refID --rID=$orig_queryID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "tan"){system("$chimera_path"."chimera --script \"color_by_attr_learnrmsf_tan.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
+if ($mutType eq "gray50"){system("$chimera_path"."chimera --script \"color_by_attr_learnrmsf_gray.py	--rep=$repStr --test=$testStr --qID=$queryID --rID=$refID --lengthID=$lengthID --cutoff=$cutoffValue --colorType=$colorType --testType=$testStr --attr=$attr --minVal=$min_val --maxVal=$max_val --frameCount=$frameCount\"\n");}
 print("\n\n Display complete\n\n");
 }
 
