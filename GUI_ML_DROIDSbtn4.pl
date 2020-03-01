@@ -368,8 +368,9 @@ for (my $v = 0; $v < scalar(@copies); $v++){
      print Rinput "myline_$v <- geom_line(data = dataframe4_$copyID, mapping = aes(x = pos, y = cc, color = '$variantID_label', ymin = 0, ymax = 1))\n"; 
      print Rinput "mylist2 <- list(mylist2, myline_$v)\n";
 } # end for loop
-print Rinput "myplot2final <- myplot2 + mylist2 + scale_color_brewer(palette='Set2')\n"; 
 
+if (scalar(@variants) <= 8){print Rinput "myplot2final <- myplot2 + mylist2 + scale_color_brewer(palette='Set2')\n";} 
+if (scalar(@variants) > 8){print Rinput "myplot2final <- myplot2 + mylist2\n";} 
 
 # exit if no variant list to analyze
 
@@ -655,8 +656,8 @@ for (my $v = 0; $v < scalar(@variants); $v++){
      print Rinput "myline_$v <- geom_line(data = dataframe5_$variantID, mapping = aes(x = pos, y = cc, color = '$variantID_label'))\n"; 
      print Rinput "mylist3 <- list(mylist3, myline_$v)\n";
 } # end for loop
-print Rinput "myplot3final <- myplot3 + mylist3 + scale_color_brewer(palette='Set2')\n"; 
-
+if(scalar(@variants) <= 8){print Rinput "myplot3final <- myplot3 + mylist3 + scale_color_brewer(palette='Set2')\n";} 
+if(scalar(@variants) > 8){print Rinput "myplot3final <- myplot3 + mylist3\n";} 
 
 print Rinput "print(my_impact_IDs)\n";
 print Rinput "print(my_impact_sums)\n";
@@ -666,16 +667,28 @@ print Rinput "print(my_impact_cons_sd)\n";
 print Rinput "print(my_impact_n)\n";
 
 # create plot 4 
-if ($bartype eq "total"){
+if ($bartype eq "total" && scalar(@variants) <= 8){
 print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_sums, upperSE = my_impact_sums_upperSE, lowerSE = my_impact_sums_lowerSE)\n";
 print Rinput "print(dataframe6)\n";
 print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, y = sum, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + scale_fill_brewer(palette = 'Set2') + ggtitle('total mutational impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
 print Rinput "myplot4final <- myplot4\n"; 
 }
-if ($bartype eq "conserved"){
+if ($bartype eq "conserved" && scalar(@variants) <= 8){
 print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, upperSE = my_impact_cons_sums_upperSE, lowerSE = my_impact_cons_sums_lowerSE)\n";
 print Rinput "print(dataframe6)\n";
 print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + scale_fill_brewer(palette = 'Set2') + ggtitle('conserved region impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4final <- myplot4\n"; 
+}
+if ($bartype eq "total" && scalar(@variants) > 8){
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_sums, upperSE = my_impact_sums_upperSE, lowerSE = my_impact_sums_lowerSE)\n";
+print Rinput "print(dataframe6)\n";
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, y = sum, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + ggtitle('total mutational impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
+print Rinput "myplot4final <- myplot4\n"; 
+}
+if ($bartype eq "conserved" && scalar(@variants) > 8){
+print Rinput "dataframe6 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, upperSE = my_impact_cons_sums_upperSE, lowerSE = my_impact_cons_sums_lowerSE)\n";
+print Rinput "print(dataframe6)\n";
+print Rinput "myplot4 <- ggplot() + geom_col(data = dataframe6, aes(x = var, y = sum, fill = var)) + geom_errorbar(data = dataframe6, aes(x=var, ymin=lowerSE, ymax=upperSE), width=0.5, colour='gray', alpha=1, size=1) + ggtitle('conserved region impact (signif + ns)') + labs(x = 'variant', y = 'sum impact') + theme(legend.position = 'none', axis.text.x = element_text(angle = 30))\n"; 
 print Rinput "myplot4final <- myplot4\n"; 
 }
 
