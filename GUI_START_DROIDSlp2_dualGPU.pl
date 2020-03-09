@@ -45,7 +45,7 @@ my @chainlen2;
 
 #### Create GUI ####
 my $mw = MainWindow -> new; # Creates a new main window
-$mw -> title("AMBER MD control settings"); # Titles the main window
+$mw -> title("MD control settings"); # Titles the main window
 $mw->setPalette("gray");
 
 my $MDheatScale = $mw->Scale(-label=>"Length of MD heating run (ps) :",
@@ -106,7 +106,20 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 						-variable=>\$solvType
 						);
 
-
+# Simulation Frame
+my $simFrame = $mw->Frame(	-label => "MD SIMULATION ENGINE",
+				-relief => "groove",
+				-borderwidth => 2
+				);
+	my $amberCheck = $simFrame->Radiobutton( -text => "pmemd.cuda (amber) - licensed",
+						-value=>"amber",
+						-variable=>\$simType
+						);
+	my $openCheck = $simFrame->Radiobutton( -text => "OpenMM - open source",
+						-value=>"open",
+						-variable=>\$simType
+						);
+     
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
 	my $QfileFrame = $pdbFrame->Frame();
@@ -166,13 +179,13 @@ my $controlButton = $mw -> Button(-text => "make MD, cpptraj, and DROIDS control
 my $mutlistButton = $mw -> Button(-text => "create list of amino acid substitutions in .txt file", 
 				-command => \&mutlist
 				); # Creates a txt file button
-my $launchButton = $mw -> Button(-text => "launch MD run (pmemd.cuda) - may take many hours", 
+my $launchButton = $mw -> Button(-text => "launch MD run - may take many hours", 
 				-command => \&launch,
 				-background => 'gray45',
 				-foreground => 'white'
 				); # Creates a launch button
 
-my $killButton = $mw -> Button(-text => "kill MD run (pmemd.cuda) on GPU", 
+my $killButton = $mw -> Button(-text => "kill MD run on GPU", 
 				-command => \&kill
 				); # Creates a kill button
 
@@ -294,6 +307,11 @@ $pdbFrame->pack(-side=>"top",
 $implicitCheck->pack();
 $explicitCheck->pack();
 $solnFrame->pack(-side=>"top",
+		-anchor=>"n"
+		);
+$amberCheck->pack();
+$openCheck->pack();
+$simFrame->pack(-side=>"top",
 		-anchor=>"n"
 		);
 $MDheatScale->pack(-side=>"top");
@@ -731,11 +749,28 @@ print "\n\nparmchk is completed\n\n";
 ######################################################################################################
 
 sub launch { # launch MD run
-system "x-terminal-emulator -e perl MD_proteinQuery_dualGPU.pl\n";
-sleep(2);
-system "x-terminal-emulator -e perl MD_proteinReference_dualGPU.pl\n";
-print "\n\n";
-print "MD SIMULATIONS ARE COMPLETED WHEN TERMINALS CLOSE\n\n";
+if($simType eq "amber"){
+    system "x-terminal-emulator -e perl MD_proteinQuery_dualGPU.pl\n";
+    sleep(2);
+    system "x-terminal-emulator -e perl MD_proteinReference_dualGPU.pl\n";
+    print "\n\n";
+    print "MD SIMULATIONS ARE COMPLETED WHEN TERMINALS CLOSE\n\n";
+    }
+if($simType eq "open" && $solvType eq "ex"){
+    system "conda config --set auto_activate_base true\n";
+    system "x-terminal-emulator\n";
+    system "x-terminal-emulator\n";
+    print "\nRUN THE FOLLOWING SCRIPTS SIMULTANEOUSLY IN THE NEW TERMINALS\n";
+    print "python MD_proteinQuery_dualGPU_openMM.py\n";
+    print "python MD_proteinReference_dualGPU_openMM.py\n";
+    sleep(2);
+    print "\n\n";
+    system "conda config --set auto_activate_base false\n";
+    print "CLOSE TERMINALS WHEN BOTH MD SIMULATIONS ARE COMPLETED\n\n";
+    }
+if($simType eq "open" && $solvType eq "im"){
+    print "Implicit solvent is not supported in OpenMM. Use explicit solvent\n\n";
+    }
 }
 
 ######################################################################################################

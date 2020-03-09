@@ -118,7 +118,7 @@ my @chainlen2;
 
 #### Create GUI ####
 my $mw = MainWindow -> new; # Creates a new main window
-$mw -> title("AMBER 16 MD control settings for ML deployment"); # Titles the main window
+$mw -> title("MD control settings for ML deployment"); # Titles the main window
 $mw->setPalette("gray");
 
 my $MDheatScale = $mw->Scale(-label=>"Length of MD heating run (ps) :",
@@ -178,6 +178,20 @@ my $solnFrame = $mw->Frame(	-label => "METHOD OF SOLVATION",
 						-value=>"ex",
 						-variable=>\$solvType
 						);
+     
+ # Simulation Frame
+my $simFrame = $mw->Frame(	-label => "MD SIMULATION ENGINE",
+				-relief => "groove",
+				-borderwidth => 2
+				);
+	my $amberCheck = $simFrame->Radiobutton( -text => "pmemd.cuda (amber) - licensed",
+						-value=>"amber",
+						-variable=>\$simType
+						);
+	my $openCheck = $simFrame->Radiobutton( -text => "OpenMM - open source",
+						-value=>"open",
+						-variable=>\$simType
+						);    
 
 # MD production length Frame
 my $mdprodFrame = $mw->Frame(	-label => "LENGTH OF PRODUCTION",
@@ -371,6 +385,11 @@ $pdbFrame->pack(-side=>"top",
 $implicitCheck->pack();
 $explicitCheck->pack();
 $solnFrame->pack(-side=>"top",
+		-anchor=>"n"
+		);
+$amberCheck->pack();
+$openCheck->pack();
+$simFrame->pack(-side=>"top",
 		-anchor=>"n"
 		);
 $MDheatScale->pack(-side=>"top");
@@ -772,10 +791,25 @@ close MUT;
 ######################################################################################################
 
 sub launch { # launch MD run
-system "perl MD_proteinQuery_deploy.pl\n";
-sleep(2);
-print "\n\n";
-print "MD SIMULATION IS COMPLETED\n\n";
+if($simType eq "amber"){
+    system "perl MD_proteinQuery_deploy.pl\n";
+    sleep(2);
+    print "\n\n";
+    print "MD SIMULATIONS ARE COMPLETED\n\n";
+    }
+if($simType eq "open" && $solvType eq "ex"){
+    system "conda config --set auto_activate_base true\n";
+    system "x-terminal-emulator\n";
+    print "\nRUN THE FOLLOWING SCRIPTS SEQUENTIALLY IN THE NEW TERMINAL\n";
+    print "python MD_proteinQuery_deploy_openMM.py\n";
+    sleep(2);
+    print "\n\n";
+    system "conda config --set auto_activate_base false\n";
+    print "CLOSE TERMINAL WHEN BOTH MD SIMULATIONS ARE COMPLETED\n\n";
+    }
+if($simType eq "open" && $solvType eq "im"){
+    print "Implicit solvent is not supported in OpenMM. Use explicit solvent\n\n";
+    }
 }
 
 ######################################################################################################
