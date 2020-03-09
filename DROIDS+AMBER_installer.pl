@@ -13,6 +13,7 @@ print "You will need the following file\n";
 print "DROIDS-3.0.tar.gz (free from our website or GitHub repo)\n";
 print "You may need the following files as well for fresh system install\n";
 print "Amber18.tar.gz (licensed from https://ambermd.org/)\n";
+print "openMM can be used as alternative (free from https://openmm.org/)\n";
 print "AmberTools18.tar.gz or AmberTools19.tar.gz (free from https://ambermd.org/)\n";
 print "chimera-1.14-linux_x86_64 or preferred version (free from https://www.cgl.ucsf.edu/chimera/)\n";
 print "Modeller .deb folder (e.g. modeller_9.20-1_amd64.deb from https://salilab.org/modeller/)";
@@ -31,7 +32,7 @@ sleep(1);
 print "Please answer the following questions about your VM instance or Linux system\n";
 sleep(1);
 
-print "\nIs amber and UCSF Chimera already installed on your system? (e.g. 'yes','y' or 'n','no')\n\n";
+print "\nIs MD software and UCSF Chimera already installed on your system? (e.g. 'yes','y' or 'n','no')\n\n";
   $skipping = <STDIN>; 
   chop($skipping);
   
@@ -51,7 +52,7 @@ sleep(1); print "\ninstalling perl modules\n\n"; sleep(1);system('sudo cpan App:
 
 # install and update Debian packages
 sleep(1); print "\nchecking Debian packages\n\n"; sleep(1);
-print "\nDo you need to install the xfce4 desktop, xrdp, and VNC? (y/n) (this is needed for GCP VM instance)?\n\n";
+print "\nDo you need to install the xfce4 desktop, xrdp, and VNC? (y/n) (this is only needed for Google Cloud VM instance)?\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "y" || $yn eq "Y" || $yn eq "yes"){sleep(1); print "\ninstalling xrdp and xfce4 desktop\n\n"; sleep(1); system('sudo apt-get install xrdp xfce4'); sleep(1);}
@@ -161,7 +162,11 @@ print "\nAre you ready to continue? (y/n)\n\n";
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
 
-
+print "\nDo you want to skip installing licensed version of Amber16/18 (i.e. pmemd.cuda) on your system? (e.g. 'yes','y' or 'n','no')\n\n";
+  $skipping_amber = <STDIN>; 
+  chop($skipping_amber);
+# skip Amber install option
+if($skipping_amber eq "y" || $skipping_amber eq "Y" || $skipping_amber eq "yes"){print "\n amber installation skipped\n\n"; goto Askip;}
 # install Amber18
 sleep(1); print "\ninstalling Amber18 (pmemd.cuda)\n\n";
 sleep(1); print "\nchecking nvcc and c compilers\n\n"; sleep(1);
@@ -200,6 +205,23 @@ system('chmod +x ./amber18/bin/pmemd0.cuda_DPFP');
 system('chmod +x ./amber18/bin/pmemd1.cuda_DPFP');
 Askip: # skip Amber install option
 
+print "\nDo you want to install OpenMM on your system? (e.g. 'yes','y' or 'n','no')\n\n";
+  $skipping_openmm = <STDIN>; 
+  chop($skipping_openmm);
+if($skipping_openmm eq "y" || $skipping_openmm eq "Y" || $skipping_openmm eq 'yes'){print "\n OpenMM installations skipped\n\n"; goto Oskip;}
+sleep(1); print "\ninstalling OpenMM\n\n"; sleep(1); 
+system('gnome-terminal');
+sleep(1); print "\nmake sure miniconda is installed first (https://docs.conda.io/en/latest/miniconda.html)\n\n"; sleep(1);
+sleep(1); print "\nin the new terminal run the following commands\n\n"; sleep(1);
+print "conda install -c omnia/label/cuda90 -c conda-forge openmm\n";
+print "python -m simtk.testInstallation\n";
+print "conda config --set auto_activate_base false\n";
+sleep(1); print "\nWhen OpenMM is installed, close secondary terminal\n\n"; sleep(1);
+print "\nAre you ready to continue? (y/n)\n\n";
+  $yn = <STDIN>; 
+  chop($yn);
+if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
+Oskip: # skip OpenMM install option
 
 if($skipping eq "y" || $skipping eq "Y" || $skipping eq 'yes'){print "\n Chimera installations skipped\n\n"; goto Cskip;}
 
@@ -234,8 +256,7 @@ print "\nAre you ready to continue? (y/n)\n\n";
   $yn = <STDIN>; 
   chop($yn);
 if($yn eq "n" || $yn eq "N"){print "\ninstallation interrupted\n\n"; exit;}
-
-Cskip:
+Cskip: # skip Chimera install
 
 # check R installation
 sleep(1); print "\ninstalling R\n\n"; sleep(1); system('sudo apt-get install r-base-core r-base r-base-dev'); sleep(1);
