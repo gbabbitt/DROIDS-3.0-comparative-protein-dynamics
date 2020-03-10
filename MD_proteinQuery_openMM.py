@@ -8,6 +8,7 @@ from sys import stdout
 # read MD ctl file
 infile = open("MDq.ctl", "r")
 infile_lines = infile.readlines()
+TEMPid = 300
 for x in range(len(infile_lines)):
     infile_line = infile_lines[x]
     #print(infile_line)
@@ -36,9 +37,12 @@ for x in range(len(infile_lines)):
         print("my Production Run Time is",TIMEid)
     if(header == "Temperature_Query"):
         TEMPid = value
-        TEMPid = int(TEMPid)
-        print("my Production Run Temperature is",TEMPid)
-
+        if TEMPid is '':
+            TEMPid = 300
+        else:
+            TEMPid = int(TEMPid)
+print("my Production Run Temperature is",TEMPid)
+    
 # load in Amber input files
 prmtop = app.AmberPrmtopFile('wat_'+PDBid+'.prmtop')
 inpcrd = app.AmberInpcrdFile('wat_'+PDBid+'.inpcrd')

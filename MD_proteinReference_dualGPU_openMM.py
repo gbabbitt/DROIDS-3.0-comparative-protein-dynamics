@@ -34,8 +34,9 @@ for x in range(len(infile_lines)):
         TIMEid = value
         TIMEid = int(TIMEid)
         print("my Production Run Time is",TIMEid)
-    TEMPid = 300
-    print("my Production Run Temperature is",TEMPid)
+
+TEMPid = 300
+print("my Production Run Temperature is",TEMPid)
 
 # load in Amber input files
 prmtop = app.AmberPrmtopFile('wat_'+PDBid+'.prmtop')
