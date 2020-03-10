@@ -132,13 +132,6 @@ print ("\n\n\n");
 ###########################################################################################################
 ###########################################################################################################
 
-sleep(1);
-print "BUG NOTE: if following error is encountered\n";
-print "'cant open temp test file'\n";
-print "then simply close the maxDemon GUI and reopen it\n";
-print "at the terminal with 'perl GUI_ML_DROIDS.pl' and continue\n\n";
-sleep(1);
-
 if ($method_kern == 1 || $method_other == 1){
 # prompt user - choose best learning model to display
 sleep(1);print "CHOOSE KERNEL TYPE FOR SVM (type 'linear', 'polynomial', 'laplace' or 'RBF')\n\n";
