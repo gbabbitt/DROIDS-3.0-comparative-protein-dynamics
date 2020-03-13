@@ -133,6 +133,11 @@ my $attrFrame = $mw->Frame(	-label => "ATTRIBUTE TO COLOR BY",
                               -value=>"deltaKL",
 						-variable=>\$attr
 						);
+     my $rmsfRadio = $attrFrame->Radiobutton( -text => " deviation from avg RMSF (reference MD run only)",
+						-foreground => 'navy',
+                              -value=>"rmsf",
+						-variable=>\$attr
+						);
 	my $pValueRadio = $attrFrame->Radiobutton( -text => "p-value",
 						-foreground => 'navy',
                               -value=>"pval",
@@ -335,6 +340,7 @@ $col1Radio->pack(-anchor=>"w");
 $col2Radio->pack(-anchor=>"w");
 $deltaRadio->pack(-anchor=>"w");
 $klRadio->pack(-anchor=>"w");
+$rmsfRadio->pack(-anchor=>"w");
 $pValueRadio->pack(-anchor=>"w");
 $statRadio->pack(-anchor=>"w");
 $gdistRadio->pack(-anchor=>"w");
@@ -371,9 +377,11 @@ sub ctl {
      if ($attr eq "gdist"){$colorType = "wo";}
      if ($attr eq "delta" && $colorScheme eq "c1" ){$colorType = "rg";}
      if ($attr eq "deltaKL" && $colorScheme eq "c1" ){$colorType = "rg";}
+     if ($attr eq "rmsf" && $colorScheme eq "c1" ){$colorType = "rg";}
      if ($attr eq "pval" && $colorScheme eq "c1" ){$colorType = "bw";}
      if ($attr eq "delta" && $colorScheme eq "c2" ){$colorType = "br";}
      if ($attr eq "deltaKL" && $colorScheme eq "c2" ){$colorType = "br";}
+     if ($attr eq "rmsf" && $colorScheme eq "c2" ){$colorType = "br";}
      if ($attr eq "pval" && $colorScheme eq "c2" ){$colorType = "rw";}
      if ($homology eq "loose"){$mutType = "gray50";}
      if ($homology eq "strict"){$mutType = "tan";}
@@ -426,6 +434,10 @@ if($attr eq "deltaKL") {
 	$input_file = "DROIDS$testStrLong"."AVGchain.txt";
 	$relevant_column = 7;
 }
+if($attr eq "rmsf") {
+	$input_file = "DROIDS$testStrLong"."AVGchain.txt";
+	$relevant_column = 4;
+}
 if($attr eq "gdist") {
 	$input_file = "myGranthamDistances.txt";
 	$relevant_column = 1;
@@ -460,16 +472,56 @@ open(INPUT, "<"."$input_folder/$input_file") or die "Could not find $input_file"
  }
 close(INPUT);
 #print("@valuesList\n");
-my $min = min(@valuesList);
-my $max = max(@valuesList);
-#$statSCORE = new Statistics::Descriptive::Full; # calc min and max value
-#$statSCORE->add_data (@valuesList);
-#$min = $statSCORE->min();
-#$max = $statSCORE->max();
-#print("max is $max\n");
-#print("min is $min\n");
-my $max_abs_val = abs(max($max,-$min));
-#print("abs max is $max_abs_val\n");
+$min = min(@valuesList);
+$max = max(@valuesList);
+
+$statSCORE = new Statistics::Descriptive::Full; # calc min and max value
+$statSCORE->add_data (@valuesList);
+$mean = $statSCORE->mean();
+print("mean is $mean\n");
+
+$max_abs_val = abs(max($max,-$min));
+if ($attr ne "rmsf") {print("abs max is $max_abs_val\n");}
+
+# create rmsf attr file scaled to mean rmsf
+
+if ($attr eq "rmsf"){  # exception to rescale rmsf values to mean rmsf
+ #print("$relevant_column\n");
+#print "$input_folder\n";
+#print "$input_file\n";
+$output_file = "attr_$queryID"."_$refID"."_$attr"."_$testStr"."_$cutoffValue.dat";
+$unit = "residues";
+$symbol;
+if ($unit eq "residues") { $symbol = "\:"; } 
+if ($unit eq "atoms") { $symbol = "\@"; }
+@valuesList = "";
+open(INPUT, "<"."$input_folder/$input_file") or die "Could not find $input_file";
+ @IN = <INPUT>;
+ @OUTrows;
+ for (my $a = 1; $a < scalar @IN; $a++) {
+	
+    $INrow = $IN[$a];
+    @INrow = split (/\s+/, $INrow);
+    $index = $INrow[0] - ($startN - 1);
+    $value = $INrow[$relevant_column];
+    $value = $value-$mean;  # make value of rmsf relative to mean rmsf
+    #print $value;
+	$valuesList[$a] = $value;
+	$index = int $index;
+#	if ($attr eq "pval" and $value > $cutoffValue) {
+#		$OUTrows[$a] = "\t$symbol"."$index\tns\n";
+#	} else { 
+		$OUTrows[$a] = "\t$symbol"."$index\t$value\n";
+#	}
+ }    
+close(INPUT);    
+$min = min(@valuesList);  
+$max = max(@valuesList);     
+$max_abs_val = abs(max($max,-$min));
+if ($attr eq "rmsf") {print("abs max is $max_abs_val\n");}
+}
+
+
 if($attr eq "gdist") {$max_val = 215; $min_val = 0;}
 if($attr eq "dval") {$max_val = $max; $min_val = 0;}
 if($attr eq "pval") {$max_val = $cutoffValue; $min_val = 0;}
@@ -477,6 +529,8 @@ if($attr eq "delta" & $scaleType eq "auto") {$max_val = $max_abs_val; $min_val =
 if($attr eq "delta" & $scaleType eq "fixed") {$max_val = $max_user; $min_val = $min_user;}
 if($attr eq "deltaKL" & $scaleType eq "auto") {$max_val = $max_abs_val; $min_val = -1*$max_abs_val;}
 if($attr eq "deltaKL" & $scaleType eq "fixed") {$max_val = $max_user; $min_val = $min_user;}
+if($attr eq "rmsf" & $scaleType eq "auto") {$max_val = $max_abs_val; $min_val = -1*$max_abs_val;}
+if($attr eq "rmsf" & $scaleType eq "fixed") {$max_val = $max_user; $min_val = $min_user;}
 
 sleep(1);
 if (! -e "attribute_files") {mkdir "attribute_files";}

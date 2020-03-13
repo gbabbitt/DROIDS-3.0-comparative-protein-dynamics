@@ -94,7 +94,7 @@ if colorType == "wo":
 
 mid_color = ""
 mid_value = ""
-if attr == "delta" or attr == "deltaKL":
+if attr == "delta" or attr == "deltaKL" or attr == "rmsf":
  mid_color = "white"
  mid_value = (float(min_value) + float(max_value))/2
 rep_key = ""
