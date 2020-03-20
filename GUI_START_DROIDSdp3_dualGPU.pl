@@ -121,13 +121,13 @@ my $simFrame = $mw->Frame(	-label => "MD SIMULATION ENGINE",
 # PDB ID Frame				
 my $pdbFrame = $mw->Frame();
 	my $QfileFrame = $pdbFrame->Frame();
-		my $QfileLabel = $QfileFrame->Label(-text=>"query pdb ID with DNA (e.g. 1ytb_ortholog) : ");
+		my $QfileLabel = $QfileFrame->Label(-text=>"query pdb ID with DNA/RNA/lipid (e.g. 1cdw_ortholog) : ");
 		my $QfileEntry = $QfileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDq
 					);
 	my $RfileFrame = $pdbFrame->Frame();
-		my $RfileLabel = $RfileFrame->Label(-text=>"reference pdb ID with DNA (e.g. 1ytb) : ");
+		my $RfileLabel = $RfileFrame->Label(-text=>"reference pdb ID with DNA/RNA/lipid (e.g. 1cdw) : ");
 		my $RfileEntry = $RfileFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$fileIDr
@@ -140,7 +140,7 @@ my $pdbFrame = $mw->Frame();
 					-textvariable=>\$forceID
 					);
       my $dforceFrame = $pdbFrame->Frame();
-		my $dforceLabel = $dforceFrame->Label(-text=>"DNA force field (e.g. leaprc.DNA.OL15): ");
+		my $dforceLabel = $dforceFrame->Label(-text=>"DNA/RNA/lipid force field (e.g. leaprc.DNA.OL15): ");
 		my $dforceEntry = $dforceFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$dforceID
