@@ -206,36 +206,43 @@ print Rinput "datatableKNN = read.table('./testingData_$copyID/classpositionHIST
 $AAposition_knn = "datatableKNN\$position"; # AA position
 $sum_classifiers_knn = "datatableKNN\$sum"; # sum of classifiers
 print Rinput "dataframeKNN_$v = data.frame(pos1=$AAposition_knn+$startN, Y1val=$sum_classifiers_knn)\n";
+#print Rinput "print(dataframeKNN_$v)\n";
 # naive Bayes
 print Rinput "datatableNB = read.table('./testingData_$copyID/classpositionHISTOnb.txt', header = TRUE)\n"; 
 $AAposition_nb = "datatableNB\$position"; # AA position
 $sum_classifiers_nb = "datatableNB\$sum"; # sum of classifiers
 print Rinput "dataframeNB_$v = data.frame(pos1=$AAposition_nb+$startN, Y1val=$sum_classifiers_nb)\n";
+#print Rinput "print(dataframeNB_$v)\n";
 # LDA
 print Rinput "datatableLDA = read.table('./testingData_$copyID/classpositionHISTOlda.txt', header = TRUE)\n"; 
 $AAposition_lda = "datatableLDA\$position"; # AA position
 $sum_classifiers_lda = "datatableLDA\$sum"; # sum of classifiers
 print Rinput "dataframeLDA_$v = data.frame(pos1=$AAposition_lda+$startN, Y1val=$sum_classifiers_lda)\n";
+#print Rinput "print(dataframeLDA_$v)\n";
 # QDA
 print Rinput "datatableQDA = read.table('./testingData_$copyID/classpositionHISTOqda.txt', header = TRUE)\n"; 
 $AAposition_qda = "datatableQDA\$position"; # AA position
 $sum_classifiers_qda = "datatableQDA\$sum"; # sum of classifiers
 print Rinput "dataframeQDA_$v = data.frame(pos1=$AAposition_qda+$startN, Y1val=$sum_classifiers_qda)\n";
+#print Rinput "print(dataframeQDA_$v)\n";
 # SVM
 print Rinput "datatableSVM = read.table('./testingData_$copyID/classpositionHISTOsvm.txt', header = TRUE)\n"; 
 $AAposition_svm = "datatableSVM\$position"; # AA position
 $sum_classifiers_svm = "datatableSVM\$sum"; # sum of classifiers
 print Rinput "dataframeSVM_$v = data.frame(pos1=$AAposition_svm+$startN, Y1val=$sum_classifiers_svm)\n";
+#print Rinput "print(dataframeSVM_$v)\n";
 # random forest
 print Rinput "datatableRFOR = read.table('./testingData_$copyID/classpositionHISTOrfor.txt', header = TRUE)\n"; 
 $AAposition_rfor = "datatableRFOR\$position"; # AA position
 $sum_classifiers_rfor = "datatableRFOR\$sum"; # sum of classifiers
 print Rinput "dataframeRFOR_$v = data.frame(pos1=$AAposition_rfor+$startN, Y1val=$sum_classifiers_rfor)\n";
+#print Rinput "print(dataframeRFOR_$v)\n";
 # adaboost
 print Rinput "datatableADA = read.table('./testingData_$copyID/classpositionHISTOada.txt', header = TRUE)\n"; 
 $AAposition_ada = "datatableADA\$position"; # AA position
 $sum_classifiers_ada = "datatableADA\$sum"; # sum of classifiers
 print Rinput "dataframeADA_$v = data.frame(pos1=$AAposition_ada+$startN, Y1val=$sum_classifiers_ada)\n";
+#print Rinput "print(dataframeADA_$v)\n";
 
 } #end for loop
 
@@ -247,6 +254,7 @@ $trainingflux_ref = "datatable2\$flux_ref_avg"; # flux profile ref training
 $trainingflux_query = "datatable2\$flux_query_avg"; # flux profile query training
 print Rinput "dataframe2 = data.frame(pos2=$AAposition2+$startN, Y2val=$trainingflux_ref)\n";
 print Rinput "dataframe3 = data.frame(pos3=$AAposition2+$startN, Y3val=$trainingflux_query)\n";
+
 
 # canonical correlations
 for (my $v = 0; $v < scalar(@copies); $v++){
@@ -797,6 +805,160 @@ for (my $v = 0; $v < scalar(@variants); $v++){
 } # end for loop
 if(scalar(@variants) >= 4){system "gedit ./maxDemon_results/ANOVAresult.txt\n";}
 #}
+
+
+
+###########################################
+###########################################
+
+# prompt user - selest machine learner for MI matrix
+sleep(1);print "CHOOSE BEST LEARNER FOR MUTUAL INFORMATION MATRIX (type 'KNN', 'NB', 'LDA', 'QDA', 'SVM', 'RFOR' or 'ADA')\n\n";
+my $learner = <STDIN>;
+chop($learner);
+
+for (my $v = 0; $v < scalar(@variants); $v++){
+     $variantID = $variants[$v];
+     $queryID = $variants[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
+
+# initialize     
+$residue1 = 0;
+$residue2 = 0;
+$MI = 0;
+# open MI matrix files
+open(MI, ">"."./testingData_$variantID/MIcolumn_$learner"."_$variantID.txt") or die "could not open MI matrix file for $variantID \n";    
+print MI "pos1\t"."pos2\t"."MI\n";
+open(MI2, ">"."./testingData_$variantID/MImatrix_$learner"."_$variantID.txt") or die "could not open MI matrix file for $variantID \n";    
+#print MI2 "residue\t";
+#for (my $n = 0; $n < $lengthID; $n++){print MI2 "$n\t";}
+#print MI2 "\n";
+ 
+   
+print "\ncalculating mutual information matrix for $variantID \n";     
+sleep(1);
+
+for (my $i = 0; $i < $lengthID; $i++){
+	 print "calculating MI values for residue\t"."$residue1 for $variantID\n";
+      open(POS1, "<"."./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$i.txt") or die "could not open MI matrix file for ./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$i.txt \n";    
+      my @POS1 = <POS1>;
+      $residue1 = $i;
+      if($i>0){print MI2 "\n";}
+      #if($i==0){print MI2 "$residue1\t";}
+      #if($i>0){print MI2 "\n"; print MI2 "$residue1\t";}
+      for (my $j = 0; $j < $lengthID; $j++){
+	     open(POS2, "<"."./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$j.txt") or die "could not open MI matrix file for ./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$j.txt \n";    
+          my @POS2 = <POS2>;
+          $residue2 = $j;
+          
+          #calculate freq A
+          #print "calculating freq state A\t";
+          $freqA = 0;
+          $sumclassA = 0;
+          $cntA = 0;
+          for (my $ii = 0; $ii < scalar @POS1; $ii++){
+              my $POS1row = $POS1[$ii];
+              my @POS1row = split (/\s+/, $POS1row);
+	         $class1 = $POS1row[0];
+              $time1 = $ii;
+              if($class1 == 0 || $class1 == 0.5 || $class1 == 1) {$sumclassA = $sumclassA+$class1; $cntA = $cntA+1;}
+              #print "Residue1\t"."$residue1\t"."timeslice\t"."$time1\t"."class = "."$class1\n";
+              }
+              $freqA = $sumclassA/($cntA+0.0001);
+              #print "freqA = "."$freqA\n";
+          
+          #calculate freq B
+          #print "calculating freq state B\t";
+          $freqB = 0;
+          $sumclassB = 0;
+          $cntB = 0;
+          for (my $jj = 0; $jj < scalar @POS2; $jj++){
+              my $POS2row = $POS2[$jj];
+              my @POS2row = split (/\s+/, $POS2row);
+	         $class2 = $POS2row[0];
+              $time2 = $jj;
+              if($class2 == 0 || $class2 == 0.5 || $class2 == 1) {$sumclassB = $sumclassB+$class2; $cntB = $cntB+1;}
+              #print "Residue2\t"."$residue2\t"."timeslice\t"."$time2\t"."class = "."$class2\n";
+              }
+              $freqB = $sumclassB/($cntB+0.0001);
+              #print "freqB = "."$freqB\n";
+          
+          #calculate freq A and B
+          #print "calculating freq state A and B\t";
+          $freqAB = 0;
+          $sumclassAB = 0;
+          $cntAB = 0;
+          for (my $ii = 0; $ii < scalar @POS1; $ii++){
+              my $POS1row = $POS1[$ii];
+              my @POS1row = split (/\s+/, $POS1row);
+	         $class1 = $POS1row[0];
+              $time1 = $ii;
+              #if($class1 == 0 || $class1 == 0.5 || $class1 == 1) {$sumclassA = $sumclassA+$class1; $cntA = $cntA+1;}
+              #print "Residue1\t"."$residue1\t"."timeslice\t"."$time1\t"."class = "."$class1\n";
+              for (my $jj = 0; $jj < scalar @POS2; $jj++){
+              my $POS2row = $POS2[$jj];
+              my @POS2row = split (/\s+/, $POS2row);
+	         $class2 = $POS2row[0];
+              $time2 = $jj;
+              if($time1 ==$time2 && $class1 == $class2) {$sumclassAB = $sumclassAB+1; $cntAB = $cntAB+1;}
+              if($time1 ==$time2 && $class1 != $class2) {$cntAB = $cntAB+1;}
+              #print "Residue2\t"."$residue2\t"."timeslice\t"."$time2\t"."class = "."$class2\n";
+              }
+              }
+              $freqAB = $sumclassAB/($cntAB+0.0001);
+              #print "freqAB = "."$freqAB\n";
+                    
+          # calculate MI
+          $MI = $freqAB*log($freqAB/($freqA*$freqB));
+          if ($MI>1){$MI = 1;}
+          #print "MImatrix\t"."$residue1\t"."$residue2\t"."$MI\n";
+          print MI "$residue1\t"."$residue2\t"."$MI\n";
+          print MI2 "$MI\t";
+      }
+}
+
+close MI;
+close MI2;
+
+print "\nheatmapping mutual information matrix for $variantID (close .pdf to continue)\n";     
+sleep(1);
+
+open (Rinput, "| R --vanilla")||die "could not start R command line\n";
+print Rinput "datamatrixMI = read.table('./testingData_$variantID/MImatrix_$learner"."_$variantID.txt', header = FALSE)\n";
+#print Rinput "print(datamatrixMI)\n";
+print Rinput "datamatrixMI<-as.matrix(datamatrixMI)\n";
+#print Rinput "print(datamatrixMI)\n";
+#print Rinput "datamatrixMI <- scale(datamatrixMI)\n";
+#print Rinput "mymap1<-heatmap(datamatrixMI, Colv = 'Rowv', symm = TRUE, keep.dendro = FALSE)\n";
+#print Rinput "print(mymap1)\n";
+print Rinput "x <- (1:nrow(datamatrixMI))\n";
+print Rinput "y <- (1:ncol(datamatrixMI))\n";
+print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = 'MUTUAL INFORMATION (black = 0, white = 1) for $variantID', xlab = 'residue position', ylab = 'residue position')\n";
+print Rinput "print(mymap2)\n";      
+# write to output file and quit R
+print Rinput "q()\n";# quit R 
+print Rinput "n\n";# save workspace image?
+close Rinput;
+print "\n\n";
+print " copying plot\n\n";
+sleep(1);
+my $oldfilename = "Rplots.pdf";
+my $newfilename = "./testingData_$variantID/MImatrix_$learner"."_$variantID.pdf";
+copy($oldfilename, $newfilename);	
+print " mutual information matrix is complete\n\n";
+print " close PDF and txt viewer to continue\n\n";
+
+
+} # end for loop
+
+for (my $v = 0; $v < scalar(@variants); $v++){
+     $variantID = $variants[$v];
+     $queryID = $variants[0];
+     $variantID_label = $variant_labels[$v];
+     $queryID_label = $variant_labels[0];
+     system "evince ./testingData_$variantID/MImatrix_$learner"."_$variantID.pdf\n";
+}
+
 ###########################################################################################################
 ###########################################################################################################
 

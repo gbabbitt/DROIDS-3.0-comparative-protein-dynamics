@@ -302,6 +302,19 @@ MainLoop; # Allows Window to Pop Up
 sub stop {exit;}
 ########################################################################################
 sub control { # Write a control file and then call appropriate scripts that reference control file
+
+
+print "\nDo you want machine learning to later analyze protein shape changes over time in addition to atom fluctuations ? (y or n)\n";
+print "(default = n; ...answer y will slow post processing of dynamics)\n\n";
+$vector_enter = <STDIN>;
+chop($vector_enter);
+if($vector_enter eq ''){$vector_enter = 'n'}
+if($vector_enter eq 'Y'){$vector_enter = 'y'}
+if($vector_enter eq 'YES'){$vector_enter = 'y'}
+if($vector_enter eq 'yes'){$vector_enter = 'y'}
+
+
+
 	if ($solvType eq "im") {$repStr = "implicit";}
 	if ($solvType eq "ex") {$repStr = "explicit";}
 	
@@ -466,6 +479,40 @@ print ctlFile4 "atomicfluct out fluct_$fileIDr"."_$i.txt \@CA,C,O,N,H&!(:WAT)\n"
 print ctlFile4 "run\n";
 close ctlFile4;
 
+if($vector_enter eq 'y'){
+
+mkdir("atomvctl_$fileIDq");
+mkdir("atomvect_$fileIDq");
+mkdir("atomvctl_$fileIDr");
+mkdir("atomvect_$fileIDr");
+
+for(my $j = 0; $j<$allchainlen; $j++){
+open(ctlFile5, '>', "./atomvctl_$fileIDq/atomvector_$fileIDq"."_aa$j"."_$i.ctl") or die "Could not open output file";
+my $parm_label5 = '';
+$jplus = $j+1;
+if ($implicit == 1) {my $parm_label5 = "vac_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+if ($explicit == 1) {my $parm_label5 = "wat_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+my $traj_label5 = "prod_"."$fileIDq"."REDUCED_$i".".nc";
+print ctlFile5 "trajin $traj_label5\n";	
+print ctlFile5 "vector ./atomvect_$fileIDq/vect_$fileIDq"."_aa$j"."_$i out ./atomvect_$fileIDq/vect_$fileIDq"."_aa$j"."_$i.txt :$jplus :$vectref\n";
+print ctlFile5 "run\n";
+close ctlFile5;
+}
+
+
+for(my $j = 0; $j<$allchainlen; $j++){
+open(ctlFile6, '>', "./atomvctl_$fileIDr/atomvector_$fileIDr"."_aa$j"."_$i.ctl") or die "Could not open output file";
+my $parm_label6 = '';
+$jplus = $j+1;
+if ($implicit == 1) {my $parm_label6 = "vac_"."$fileIDr"."REDUCED.prmtop"; print ctlFile6 "parm $parm_label6\n";}
+if ($explicit == 1) {my $parm_label6 = "wat_"."$fileIDr"."REDUCED.prmtop"; print ctlFile6 "parm $parm_label6\n";}
+my $traj_label6 = "prod_"."$fileIDr"."REDUCED_$i".".nc";
+print ctlFile6 "trajin $traj_label6\n";	
+print ctlFile6 "vector ./atomvect_$fileIDr/vect_$fileIDr"."_aa$j"."_$i out ./atomvect_$fileIDr/vect_$fileIDr"."_aa$j"."_$i.txt :$jplus :$vectref\n";
+print ctlFile6 "run\n";
+close ctlFile6;
+}
+}
   } # end per run loop 
 
 my $prefix = "";
@@ -692,6 +739,12 @@ sub flux { # launch atom fluctuation calc
 for (my $i = 0; $i < $runsID; $i++){
 system("cpptraj "."-i ./atomflux_$fileIDq"."_$i.ctl | tee cpptraj_atomflux_$fileIDq.txt");
 system("cpptraj "."-i ./atomflux_$fileIDr"."_$i.ctl | tee cpptraj_atomflux_$fileIDr.txt");
+if($vector_enter eq 'y'){
+for(my $j = 0; $j<$allchainlen; $j++){
+    system("cpptraj "."-i ./atomvctl_$fileIDq/atomvector_$fileIDq"."_aa$j"."_$i.ctl | tee cpptraj_atomvector_$fileIDq.txt");
+    system("cpptraj "."-i ./atomvctl_$fileIDr/atomvector_$fileIDr"."_aa$j"."_$i.ctl | tee cpptraj_atomvector_$fileIDr.txt");
+    }
+   }
   }
 }
 

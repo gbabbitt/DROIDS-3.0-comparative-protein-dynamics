@@ -83,7 +83,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
 	 my $header = @INrow[0];
 	 my $value = @INrow[1];
 	 if ($header eq "PDB_ID"){$fileIDr = $value; $fileIDr = substr($fileIDr, 0, length ($fileIDr)-7);}  # trims 'REDUCED' off end of ref label
-      
+      if ($header eq "Number_Runs"){$number_runs = $value;}
 }
 close IN;
 
@@ -591,12 +591,18 @@ open(my $ctlFile1, '>', "MDq_deploy_$fileIDq.ctl") or die "Could not open output
 print $ctlFile1 
 "PDB_ID\t".$fileIDq."REDUCED\t# Protein Data Bank ID for MD run
 Number_Chains\t$chainN\t# Number of chains on structure\n";
+$allchainlen = 0;
 for(my $ent = 0; $ent < scalar @chainlen; $ent++){
     my $chain = chr($ent + 65);
     print $ctlFile1 "length$chain\t$chainlen[$ent]\t #end of chain designated\n";
     print "MDq.ctl\n";
     print "length$chain\t$chainlen[$ent]\t #end of chain designated\n";
+    $allchainlen = $allchainlen + $chainlen[$ent];
 }
+
+# define vector reference point (...as mid sequence in Chain A)
+$vectref = int(0.5*$allchainlen);
+
 print $ctlFile1
 "LIGAND_ID\t".$fileIDl."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
@@ -630,7 +636,7 @@ print ctlFile1 "resinfo !(:WAT)\n"; # all residues but not water
 print ctlFile1 "atominfo \@CA,C,O,N,H&!(:WAT)\n"; # mask for all protein backbone atoms eliminating water
 close ctlFile1;
 
-for (my $i = 0; $i < $runsID; $i++){
+#for (my $i = 0; $i < $runsID; $i++){
 ### make atom flux control files ###	
 open(ctlFile3, '>', "atomflux_$fileIDq"."_deploy.ctl") or die "Could not open output file";
 my $parm_label3 = '';
@@ -647,7 +653,23 @@ print ctlFile3 "atomicfluct out fluct_$fileIDq"."_deploy.txt \@CA,C,O,N,H&!(:WAT
 print ctlFile3 "run\n";
 close ctlFile3;
 
-  } # end per run loop 
+mkdir("atomvctl_$fileIDq"."_deploy");
+mkdir("atomvect_$fileIDq"."_deploy");
+
+for(my $j = 0; $j<$allchainlen; $j++){
+open(ctlFile5, '>', "./atomvctl_$fileIDq"."_deploy/atomvector_$fileIDq"."_aa$j.ctl") or die "Could not open output file";
+my $parm_label5 = '';
+$jplus = $j+1;
+if ($implicit == 1) {my $parm_label5 = "vac_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+if ($explicit == 1) {my $parm_label5 = "wat_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+my $traj_label5 = "prod_"."$fileIDq"."REDUCED_deploy".".nc";
+print ctlFile5 "trajin $traj_label5\n";	
+print ctlFile5 "vector out ./atomvect_$fileIDq"."_deploy/vect_$fileIDq"."_aa$j.txt :$jplus :$vectref\n";
+print ctlFile5 "run\n";
+close ctlFile5;
+}
+
+#  } # end per run loop 
 
 my $prefix = "";
 open(metafile, '>', "$fileIDr.meta") or die "Could not open output file";
@@ -965,10 +987,13 @@ for (my $p = 0; $p < scalar @MUT; $p++){
       print "\nmaking atom flux file for $fileIDq.pdb\n";
       sleep(2);
       ########
-for (my $i = 0; $i < $runsID; $i++){
-system("cpptraj "."-i ./atomflux_$fileIDq"."_deploy.ctl | tee cpptraj_atomflux_$fileIDq.txt");
-#system("cpptraj "."-i ./atomflux_$fileIDr"."_$i.ctl | tee cpptraj_atomflux_$fileIDr.txt");
-  }
+      #for (my $i = 0; $i < $runsID; $i++){
+      system("cpptraj "."-i ./atomflux_$fileIDq"."_deploy.ctl | tee cpptraj_atomflux_$fileIDq.txt");
+      #system("cpptraj "."-i ./atomflux_$fileIDr"."_$i.ctl | tee cpptraj_atomflux_$fileIDr.txt");
+      for(my $j = 0; $j<$allchainlen; $j++){
+          system("cpptraj "."-i ./atomvctl_$fileIDq"."_deploy/atomvector_$fileIDq"."_aa$j.ctl | tee cpptraj_atomvector_$fileIDq.txt");
+          }
+#  }
 
 close MUT;
 } #end for loop
@@ -1628,8 +1653,57 @@ for (my $t = 0; $t < $lengthID; $t++){
    close IN;
   #}
    close OUT;
- }
+}
 close OUT2;
+
+#############################################################
+mkdir("./testingData_$fileIDq/indAAtest_vector");
+print("\nparsing testing set time series for shape data for each amino acid in $fileIDq...\n");
+sleep(3);
+ for (my $t = 0; $t < $lengthID; $t++){
+  open(OUT, ">"."./testingData_$fileIDq/indAAtest_vector/vecttimeAA_$fileIDq"."_$t".".txt")||die "could not create AA time series file\n";
+  print OUT "X\t"."Y\t"."Z\t"."XO\t"."YO\t"."ZO\n";
+   #for (my $tt = 0; $tt < $number_runs; $tt++){
+    open(IN, "<"."./atomvect_$fileIDq"."_deploy/vect_$fileIDq"."_aa$t".".txt")||die "could not open vector file "."vect_$fileIDq"."_aa$t".".txt\n";
+    my @IN = <IN>;   
+    $framecounter = 0;
+    @frameXavg = (); @frameYavg = (); @frameZavg = (); @frameXOavg = (); @frameYOavg = (); @frameZOavg = ();
+    for (my $a = 0; $a < scalar @IN; $a++) {
+	$framecounter = $framecounter +1;
+     $INrow = $IN[$a];
+     #$DATAseries = substr($INrow, 28, length($INrow) - 28); # to remove atomID and overall avg
+     @INrow = split(/\s+/, $INrow);
+	$frameID = @INrow[1];
+     $Xvector = @INrow[2]; $Yvector = @INrow[3]; $Zvector = @INrow[4];
+     $origXvector = @INrow[5]; $origYvector = @INrow[6]; $origZvector = @INrow[7];
+     #print "AA $t\t"."run $tt\t"."frame $framenumber\t"."X $Xvector\t"."Y $Yvector\t"."Z $Zvector\t"."origX $origXvector\t"."origY $origYvector\t"."origZ $origZvector\n";
+     if ($framecounter < $framestep){push (@frameXavg, $Xvector);push (@frameYavg, $Yvector);push (@frameZavg, $Zvector);push (@frameXOavg, $origXvector);push (@frameYOavg, $origYvector);push (@frameZOavg, $origZvector);}
+     if ($framecounter == $framestep){
+          $statSCORE = new Statistics::Descriptive::Full; # avg X vector
+          $statSCORE->add_data (@frameXavg); $meanX = $statSCORE->mean();
+          $statSCORE = new Statistics::Descriptive::Full; # avg Y vector
+          $statSCORE->add_data (@frameYavg); $meanY = $statSCORE->mean();
+          $statSCORE = new Statistics::Descriptive::Full; # avg Z vector
+          $statSCORE->add_data (@frameZavg); $meanZ = $statSCORE->mean();
+          $statSCORE = new Statistics::Descriptive::Full; # avg X vector origin
+          $statSCORE->add_data (@frameXOavg); $meanXO = $statSCORE->mean();
+          $statSCORE = new Statistics::Descriptive::Full; # avg Y vector origin
+          $statSCORE->add_data (@frameYOavg); $meanYO = $statSCORE->mean();
+          $statSCORE = new Statistics::Descriptive::Full; # avg Z vector origin
+          $statSCORE->add_data (@frameZOavg); $meanZO = $statSCORE->mean();
+          print OUT "$meanX\t"."$meanY\t"."$meanZ\t"."$meanXO\t"."$meanYO\t"."$meanZO\n";
+          @frameXavg = (); @frameYavg = (); @frameZavg = (); @frameXOavg = (); @frameYOavg = (); @frameZOavg = ();
+          }
+     }
+
+     close IN;
+ 
+   #}
+   close OUT; 
+ 
+ }
+#################################
+
 
 open(OUT3, ">"."./testingData_$fileIDq/avgfluxtimeAA_$fileIDq.txt")||die "could not open avg ATOM time series file\n";
 print OUT3 "AA_position\t"."ref_flux\n";
@@ -1660,13 +1734,57 @@ open(IN3, "<"."./testingData_$fileIDq/avgfluxtimeATOM_$fileIDq.txt")||die "could
 
 close IN2;
 close OUT3;
+
+
+
+######################################################################
+mkdir("./testingData_$fileIDq/indAAtest_fluxvector");
+print "\n\ncombining atom fluctuation and protein shape (i.e. vector ) information\n\n";
+sleep(1);
+
+for (my $t = 0; $t < $lengthID; $t++){
+  open(OUT, ">"."./testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$t".".txt")||die "could not create AA time series file\n";
+  print OUT "value\t"."datatype\t"."run\n";
+  for (my $tt = 0; $tt < $prodLen*$framegroups; $tt++){
+        open(IN1, "<"."./testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$t".".txt")||die "could not open flux file "."fluxtimeAA_$fileIDq"."_$t".".txt\n";
+        open(IN2, "<"."./testingData_$fileIDq/indAAtest_vector/vecttimeAA_$fileIDq"."_$t".".txt")||die "could not open vector file "."vecttimeAA_$fileIDq"."_$t".".txt\n";
+        my @IN1 = <IN1>;
+        my @IN2 = <IN2>;
+        for (my $a = 0; $a < scalar @IN1; $a++) {
+	       $IN1row = $IN1[$a];
+            @IN1row = split(/\s+/, $IN1row);
+	       $flux = @IN1row[$tt];
+            #print "AA "."$t"."  run "."$tt"."  class "."$class1"."  flux "."$flux\n";
+            if($flux =~ m/\d/ && $flux != int($flux)){print OUT "$flux\t"."F\t"."$tt\n";}
+            }
+        for (my $aa = 0; $aa < scalar @IN2; $aa++){
+               $IN2row = $IN2[$aa];
+               @IN2row = split(/\s+/, $IN2row);
+	          $x = @IN2row[0];
+               $y = @IN2row[1];
+               $z = @IN2row[2];
+               $xo = @IN2row[3];
+               $yo = @IN2row[4];
+               $zo = @IN2row[5];
+               #$flux = @IN1row[$tt+1];
+               #print "AA "."$t"."  run "."$tt"."  class "."$class2"."  x "."$x"."  y "."$y"."  z "."$z"."  xo "."$xo"."  yo "."$yo"."  zo "."$zo\n";
+               if($x =~ m/\d/){print OUT "$x\t"."X\t"."$tt\n"."$y\t"."Y\t"."$tt\n"."$z\t"."Z\t"."$tt\n";}
+             }
+      close IN1;
+      close IN2;
+      }
+   close OUT;
+   }
+
+
+
 print("\nparsing is done\n");
 
 close MUT;
-} #end for loop
+} # end for loop
 } # end outer for loop
 ###############################################################
-}
+} # end sub
 
 ##################################################################################################
 

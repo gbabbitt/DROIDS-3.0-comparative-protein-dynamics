@@ -322,6 +322,17 @@ sub stop {exit;}
 
 sub control { # Write a control file and then call appropriate scripts that reference control file
 
+
+print "\nDo you want machine learning to later analyze protein shape changes over time in addition to atom fluctuations ? (y or n)\n";
+print "(default = n; ...answer y will slow post processing of dynamics)\n\n";
+$vector_enter = <STDIN>;
+chop($vector_enter);
+if($vector_enter eq ''){$vector_enter = 'n'}
+if($vector_enter eq 'Y'){$vector_enter = 'y'}
+if($vector_enter eq 'YES'){$vector_enter = 'y'}
+if($vector_enter eq 'yes'){$vector_enter = 'y'}
+
+
 	if ($solvType eq "im") {$repStr = "implicit";}
 	if ($solvType eq "ex") {$repStr = "explicit";}
 	
@@ -405,6 +416,7 @@ open(my $ctlFile2, '>', "MDr.ctl") or die "Could not open output file";
 print $ctlFile2 
 "PDB_ID\t".$fileIDr."REDUCED\t# Protein Data Bank ID for MD run
 Number_Chains\t$chainN\t# Number of chains on structure\n";
+$allchainlen = 0;
 for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     my $chain = chr($cnt + 65);
     #print "$cnt";
@@ -413,8 +425,12 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     print $ctlFile2 "length$chain\t$chainlen2[$cnt]\t #end of chain designated\n";
     print "MDr.ctl\n";
     print "length$chain\t$chainlen2[$cnt]\t #end of chain designated\n";
-    
+    $allchainlen = $allchainlen + $chainlen2[$cnt];
 }
+
+# define vector reference point (...as mid sequence in Chain A)
+$vectref = int(0.5*$allchainlen);
+
 print $ctlFile2
 "LIGAND_ID\t".$fileIDl."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
@@ -490,6 +506,40 @@ print ctlFile4 "atomicfluct out fluct_$fileIDr"."_$i.txt \@CA,C,O,N,H&!(:WAT)\n"
 print ctlFile4 "run\n";
 close ctlFile4;
 
+if($vector_enter eq 'y'){
+
+mkdir("atomvctl_$fileIDq");
+mkdir("atomvect_$fileIDq");
+mkdir("atomvctl_$fileIDr");
+mkdir("atomvect_$fileIDr");
+
+for(my $j = 0; $j<$allchainlen; $j++){
+open(ctlFile5, '>', "./atomvctl_$fileIDq/atomvector_$fileIDq"."_aa$j"."_$i.ctl") or die "Could not open output file";
+my $parm_label5 = '';
+$jplus = $j+1;
+if ($implicit == 1) {my $parm_label5 = "vac_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+if ($explicit == 1) {my $parm_label5 = "wat_"."$fileIDq"."REDUCED.prmtop"; print ctlFile5 "parm $parm_label5\n";}
+my $traj_label5 = "prod_"."$fileIDq"."REDUCED_$i".".nc";
+print ctlFile5 "trajin $traj_label5\n";	
+print ctlFile5 "vector ./atomvect_$fileIDq/vect_$fileIDq"."_aa$j"."_$i out ./atomvect_$fileIDq/vect_$fileIDq"."_aa$j"."_$i.txt :$jplus :$vectref\n";
+print ctlFile5 "run\n";
+close ctlFile5;
+}
+
+
+for(my $j = 0; $j<$allchainlen; $j++){
+open(ctlFile6, '>', "./atomvctl_$fileIDr/atomvector_$fileIDr"."_aa$j"."_$i.ctl") or die "Could not open output file";
+my $parm_label6 = '';
+$jplus = $j+1;
+if ($implicit == 1) {my $parm_label6 = "vac_"."$fileIDr"."REDUCED.prmtop"; print ctlFile6 "parm $parm_label6\n";}
+if ($explicit == 1) {my $parm_label6 = "wat_"."$fileIDr"."REDUCED.prmtop"; print ctlFile6 "parm $parm_label6\n";}
+my $traj_label6 = "prod_"."$fileIDr"."REDUCED_$i".".nc";
+print ctlFile6 "trajin $traj_label6\n";	
+print ctlFile6 "vector ./atomvect_$fileIDr/vect_$fileIDr"."_aa$j"."_$i out ./atomvect_$fileIDr/vect_$fileIDr"."_aa$j"."_$i.txt :$jplus :$vectref\n";
+print ctlFile6 "run\n";
+close ctlFile6;
+}
+}
   } # end per run loop 
 
 my $prefix = "";
@@ -529,6 +579,7 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
 }
 print CTL "length\t"."$chainTTL\t # total length of chain\n";
 print CTL "start\t"."$startN\t # number of AA at start of chain\n";
+print CTL "shape\t"."$vector_enter\t # also analyze protein shape change?\n";
 #print CTL "cutoff_value\t"."$cutoffValue\t # p-value under which the KS comparison will be considered significant\n";
 #print CTL "representations\t"."$repStr\t # methods of molecular representation in Chimera (ribbon and/or surface)\n";
 #print CTL "test_type\t"."$testStr\t # test method (sequence = local Grantham dist, structure = RMSD, fluctuation = MD)\n";
@@ -747,6 +798,12 @@ sub flux { # launch atom fluctuation calc
 for (my $i = 0; $i < $runsID; $i++){
 system("cpptraj "."-i ./atomflux_$fileIDq"."_$i.ctl | tee cpptraj_atomflux_$fileIDq.txt");
 system("cpptraj "."-i ./atomflux_$fileIDr"."_$i.ctl | tee cpptraj_atomflux_$fileIDr.txt");
+if($vector_enter eq 'y'){
+for(my $j = 0; $j<$allchainlen; $j++){
+    system("cpptraj "."-i ./atomvctl_$fileIDq/atomvector_$fileIDq"."_aa$j"."_$i.ctl | tee cpptraj_atomvector_$fileIDq.txt");
+    system("cpptraj "."-i ./atomvctl_$fileIDr/atomvector_$fileIDr"."_aa$j"."_$i.ctl | tee cpptraj_atomvector_$fileIDr.txt");
+    }
+   }
   }
 }
 
@@ -1007,37 +1064,37 @@ my @IN4 = <IN4>;
 					 #print "atom+res QUERY"."$atomnumberQ\t"."$atomlabelQ\t"."$resnumberQ\t"."$reslabelQ\n";
 					 # assemble fluctuation data
 			     for (my $ii = 0; $ii < $runsID; $ii++){  #scan flux data
-	            $sample = $ii;
-							open(IN5, "<"."fluct_$fileIDq"."_$ii.txt") or die "could not open fluct file for $fileIDq\n";
-              open(IN6, "<"."fluct_$fileIDr"."_$ii.txt") or die "could not open fluct file for $fileIDr\n";
-	            my @IN5 = <IN5>;
-              my @IN6 = <IN6>;
-			        $flux_query = '';
-							$flux_ref = '';
-							for (my $iii = 0; $iii < scalar @IN5; $iii++){
+	                     $sample = $ii;
+					 open(IN5, "<"."fluct_$fileIDq"."_$ii.txt") or die "could not open fluct file for $fileIDq\n";
+                          open(IN6, "<"."fluct_$fileIDr"."_$ii.txt") or die "could not open fluct file for $fileIDr\n";
+	                     my @IN5 = <IN5>;
+                          my @IN6 = <IN6>;
+			           $flux_query = '';
+					 $flux_ref = '';
+					 for (my $iii = 0; $iii < scalar @IN5; $iii++){
 							    my $IN5row = $IN5[$iii];
-									$IN5row =~ s/^\s+//;# need trim leading whitespace if present 
-	                my @IN5row = split(/\s+/, $IN5row);
-									my $Qtest_atom_decimal = $IN5row[0];
-									my $Qtest_atom = int($Qtest_atom_decimal);
+							    $IN5row =~ s/^\s+//;# need trim leading whitespace if present 
+	                                  my @IN5row = split(/\s+/, $IN5row);
+							    my $Qtest_atom_decimal = $IN5row[0];
+						         my $Qtest_atom = int($Qtest_atom_decimal);
 							    #print "Q "."$Qtest_atom\t"."$atomnumberQ\n";
-									if($atomnumberQ eq $Qtest_atom){$flux_query = $IN5row[1];}
-							  }	
-							for (my $iii = 0; $iii < scalar @IN6; $iii++){
-									my $IN6row = $IN6[$iii];
-									$IN6row =~ s/^\s+//;# need trim leading whitespace if present 
-	                my @IN6row = split(/\s+/, $IN6row);
-			            my $Rtest_atom_decimal = $IN6row[0];
-									my $Rtest_atom = int($Rtest_atom_decimal);
-									#print "R "."$Rtest_atom\t"."$atomnumberR\n";
-									if($atomnumberR eq $Rtest_atom){$flux_ref = $IN6row[1];}
-							  }
+							    if($atomnumberQ eq $Qtest_atom){$flux_query = $IN5row[1];}
+							    }	
+					  for (my $iii = 0; $iii < scalar @IN6; $iii++){
+							    my $IN6row = $IN6[$iii];
+							    $IN6row =~ s/^\s+//;# need trim leading whitespace if present 
+	                                  my @IN6row = split(/\s+/, $IN6row);
+			                        my $Rtest_atom_decimal = $IN6row[0];
+							    my $Rtest_atom = int($Rtest_atom_decimal);
+							    #print "R "."$Rtest_atom\t"."$atomnumberR\n";
+							    if($atomnumberR eq $Rtest_atom){$flux_ref = $IN6row[1];}
+							    }
 							
 					    if($resnumberR =~/\d/ && $flux_query=~/\d/ && $reslabelQ ne "xxx"){
 							    #print "$sample\t"."$resnumberR\t"."$reslabelR\t"."$reslabelQ\t"."$atomnumberR\t"."$atomlabelR\t"."$flux_ref\t"."$flux_query\n";
 							    print OUT1 "$sample\t"."$resnumberR\t"."$reslabelR\t"."$reslabelQ\t"."$atomnumberR\t"."$atomlabelR\t"."$flux_ref\t"."$flux_query\n";
 							    }
-							if($resnumberR =~/\d/ && $reslabelQ eq "xxx"){
+					    if($resnumberR =~/\d/ && $reslabelQ eq "xxx"){
 							    #print "$sample\t"."$resnumberR\t"."$reslabelR\t"."$reslabelQ\t"."$atomnumberR\t"."$atomlabelR\t"."$flux_ref\t"."NA\n";
 							    print OUT1 "$sample\t"."$resnumberR\t"."$reslabelR\t"."$reslabelQ\t"."$atomnumberR\t"."$atomlabelR\t"."NA\t"."NA\n";
 							    }
@@ -1046,7 +1103,7 @@ my @IN4 = <IN4>;
 							} 	
 							
 							close IN5;
-              close IN6;
+                                   close IN6;
 							
 					
 							}

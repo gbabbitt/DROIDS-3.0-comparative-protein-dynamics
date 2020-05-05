@@ -83,6 +83,16 @@
                     color: 0, 0, 0, 1
                     active: True
                 Label:
+                    text: "learn protein shapes as well as fluctuations"
+                    size_hint: 0.3, 0.1
+                    color: 0, 0, 0, 1
+                    bold: True
+                CheckBox:
+                    id: ml5
+                    on_active: root.ml5()
+                    color: 0, 0, 0, 1
+                    active: False
+                Label:
                     text: ''
                     font_size: 16
                     size_hint: 0.3, 0.1     
@@ -112,13 +122,13 @@
                     size_hint: 0.3, 0.1
                 Button:
                     id: btn3
-                    text: "(3) deploy machine learning"   
+                    text: "(3) deploy machine learning stack"   
                     on_press: root.btn3()
                     background_color: 0.1, 0.9, 0.9, 1
                     on_release: btn3.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn4
-                    text: "(4) plot conserved dynamics and impacts"   
+                    text: "(4) conserved/coordinated dynamics+impacts"   
                     on_press: root.btn4()
                     background_color: 0.1, 0.9, 0.9, 1
                     on_release: btn4.background_color=(0.9, 0.1, 0.1, 1)
@@ -132,7 +142,7 @@
                     size_hint: 0.3, 0.1
                 Button:
                     id: btn5
-                    text: "(5) show image of conserved dynamics"
+                    text: "(5) map conserved dynamics to structure"
                     on_press: root.btn5()
                     background_color: 0.1, 0.9, 0.9, 1
                     on_release: btn5.background_color=(0.9, 0.1, 0.1, 1)
@@ -152,13 +162,13 @@
                     size_hint: 0.3, 0.1
                 Button:
                     id: btn7
-                    text: "(7) show image(s) of variant impacts"   
+                    text: "(7) map variant impacts on cons dynamics"   
                     on_press: root.btn7()
                     background_color: 0.1, 0.9, 0.9, 1
                     on_release: btn7.background_color=(0.9, 0.1, 0.1, 1)
                 Button:
                     id: btn8
-                    text: "(8) play movies of learners"   
+                    text: "(8) play movies of learners over time"   
                     on_press: root.btn8()
                     background_color: 0.1, 0.9, 0.9, 1
                     on_release: btn8.background_color=(0.9, 0.1, 0.1, 1)

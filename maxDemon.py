@@ -8,7 +8,9 @@ class MAXDEMONApp(App):
 #    kv_directory = 'kivy_templates'
     def build(self):
         return MyLayout()
-   
+    global s
+    s = 'off'
+    
 class MyLayout(Widget):
     
     fileML = open("MLmethods.txt","w")
@@ -17,7 +19,10 @@ class MyLayout(Widget):
     fileML.write("dist\n")
     fileML.write("kern\n")
     fileML.write("ens\n")
+    fileML.write("shape\n")
     fileML.close()
+    
+    
     
     # define buttons and actions
      
@@ -41,6 +46,13 @@ class MyLayout(Widget):
             fileML = open("MLmethods.txt","a+")
             fileML.writelines("no_ens\n")
             fileML.close()
+    def ml5(self):
+            print("shape analysis selected")
+            fileML = open("MLmethods.txt","a+")
+            fileML.writelines("no_shape\n")
+            fileML.close()
+            global s
+            s = 'on'
     def btn1(self):
             print ("Please enter type of structure (1=protein | 2=DNA+protein | 3=protein+ligand)")
             structure = input("Enter 1,2 or 3: ")
@@ -59,9 +71,14 @@ class MyLayout(Widget):
             cmd = 'perl GUI_ML_DROIDSbtn2.pl'
             os.system(cmd)
     def btn3(self):
-            print("running stacked machine learning model") 
-            cmd = 'perl GUI_ML_DROIDSbtn3.pl'
-            os.system(cmd)
+            if s == 'on':
+                print("running stacked machine learning model") 
+                cmd = 'perl GUI_ML_DROIDSbtn3.pl'
+                os.system(cmd)
+            if s == 'off':
+                print("running stacked machine learning model") 
+                cmd = 'perl GUI_ML_DROIDSbtn3_fluxOnly.pl'
+                os.system(cmd)    
     def btn4(self):
             print("running canonical correlation and variant impact analyses") 
             cmd = 'perl GUI_ML_DROIDSbtn4.pl'

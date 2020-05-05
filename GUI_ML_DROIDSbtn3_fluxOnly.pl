@@ -81,7 +81,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
       if ($header eq "representations"){$repStr = $value;}
       if ($header eq "homology"){$homology = $value;}
       if ($header eq "num_chains"){$chainN = $value;}
-            
+      
 }
 close IN;
 
@@ -133,8 +133,9 @@ print ("\n\n\n");
 ###########################################################################################################
 system "x-terminal-emulator -e htop\n";
 sleep(1);
-print "\n\nINITIATING MACHINE LEARNING ON PROTEIN SHAPE CHANGE AND ATOM FLUCTUATION\n\n";
+print "\n\nINITIATING MACHINE LEARNING ON PROTEIN ATOM FLUCTUATION ONLY\n\n";
 sleep(3);
+
 
 if ($method_kern == 1 || $method_other == 1){
 # prompt user - choose best learning model to display
@@ -243,9 +244,7 @@ if ($method_bnp == 1){
      print "running KNN classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassKNNtemp");     
  for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
+     $add = $p*$framegroups-$framegroups;
      $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nKNN classifier learning residue $r on $fileIDq\n\n";
@@ -256,92 +255,18 @@ if ($method_bnp == 1){
    print Rinput "library(class)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
+   print Rinput "class <- dataT\$class\n"; # training class
    #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
+   print Rinput "train <- dataT\n";
    print Rinput "train <- train[-c(1)]\n"; # drops class column
-   #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
+   print Rinput "test <- dataD\n";
    #print Rinput "print(test)\n";
    # define subset of dataD to match size of dataT
    if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
+   print Rinput "test <- test[,$add:$total]\n";
    #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
    }
-   #print Rinput "print(test)\n";
    if ($p == 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassKNNtemp/classAA_$fileIDq"."_$r.txt')\n";
    }
@@ -376,7 +301,6 @@ if ($method_bnp == 1){
    print Rinput "q()\n";# quit R 
    print Rinput "n\n";# save workspace image?
    close Rinput;
-   #if($p>1){exit;}
    }
  } # end iterations 
  mkdir("./testingData_$fileIDq/indAAclassKNN");
@@ -445,16 +369,9 @@ if ($method_bnp == 1){
 }
 
 ############################################
-if ($method_dist == 1){ 
+if ($method_dist == 1 && $method_dist == 0){ # METHOD IS PERMANENTLY DISABLED (it duplicates QDA)...change to 1 to enable it again
      print "running naive Bayes classifier\n";
-     mkdir("./testingData_$fileIDq/indAAclassNBtemp");
-     
- for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
-     $total = $framefactor*$framegroups;
- 
+     mkdir("./testingData_$fileIDq/indAAclassNBtemp");     
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nNB classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -466,118 +383,49 @@ if ($method_dist == 1){
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "class <- dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
    #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
    #print Rinput "print(test)\n";
-   # define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
-   names(test)[i]<-paste('X',i, sep='')
-   }\n";
-   #print Rinput "print(test)\n";
-   }
-   #print Rinput "train <- train[-c(1)]\n"; # drops class column
-   
+   print Rinput "my_bind <- vector()
+   classes <- vector()
+   for(i in 1:length(test)){
+     new <- class
+     my_bind = cbind(new, classes)
+     classes <- my_bind
+     }
+   classes <- as.data.frame(classes)
+   stack_class <- stack(classes)
+   names(stack_class)<-c(\"class\", \"slice\")
+   stack_class_slice = stack_class[,1, drop=FALSE]
+   stack_train <- stack(train)
+   names(stack_train)<-c(\"c1\", \"slice\")
+   stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassNBtemp/classAA_$fileIDq"."_$r.txt')\n";
    print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
-   
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
    print Rinput "registerDoParallel(numCores)\n";
    #print Rinput "for(i in 1:length(test)){
-   print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
-   train_slice = train[,i, drop=FALSE]
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
+   train_slice = stack_train_slice
+   class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
    test_slice <- test[,i, drop=FALSE]
+   names(test_slice)<-c(\"c1\")
    mean_test_slice <- mean(test_slice[,1])
    mean_ref_train_slice <- mean(ref_train_slice)
    delta_rmsf = (mean_test_slice - mean_ref_train_slice)
    ref_train_slice <- train_slice[class == 0,]
-   xy <- data.frame(class, train_slice)
+   xy <- data.frame(class_slice, train_slice)
    nb.xy   <- naiveBayes(as.factor(class)~., data=xy)
    nb.pred <- predict(nb.xy, as.data.frame(test_slice), type='class')
    myNB1 <- as.numeric(nb.pred[1])
@@ -599,7 +447,7 @@ if ($method_dist == 1){
    print Rinput "n\n";# save workspace image?
    close Rinput;
    }
- } # end iterations  
+  
  mkdir("./testingData_$fileIDq/indAAclassNB");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -665,14 +513,9 @@ if ($method_dist == 1){
 
 
 ############################################
-if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of identical group means
+if ($method_dist == 1){
      print "running linear discriminant analysis classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassLDAtemp");     
- for (my $p = 2; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
-     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nLDA classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -684,110 +527,41 @@ if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of id
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
-   print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
-   print Rinput "print(test)\n";
-   # define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
-   print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
+   print Rinput "class <- dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
+   #print Rinput "print(train)\n";
    #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
-   names(test)[i]<-paste('X',i, sep='')
-   }\n";
-   print Rinput "print(test)\n";
-   }
-   #print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "my_bind <- vector()
+   classes <- vector()
+   for(i in 1:length(test)){
+     new <- class
+     my_bind = cbind(new, classes)
+     classes <- my_bind
+     }
+   classes <- as.data.frame(classes)
+   stack_class <- stack(classes)
+   names(stack_class)<-c(\"class\", \"slice\")
+   stack_class_slice = stack_class[,1, drop=FALSE]
+   stack_train <- stack(train)
+   names(stack_train)<-c(\"c1\", \"slice\")
+   stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassLDAtemp/classAA_$fileIDq"."_$r.txt')\n";
    print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
    print Rinput "registerDoParallel(numCores)\n";
    #print Rinput "for(i in 1:length(test)){
-   print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
-   train_slice = train[,i, drop=FALSE]
-   names(train_slice)<-c(\"c1\")
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
+   train_slice = stack_train_slice
+   class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
    test_slice <- test[,i, drop=FALSE]
    names(test_slice)<-c(\"c1\")
@@ -795,7 +569,7 @@ if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of id
    mean_ref_train_slice <- mean(ref_train_slice)
    delta_rmsf = (mean_test_slice - mean_ref_train_slice)
    ref_train_slice <- train_slice[class == 0,]
-   xy <- data.frame(class, train_slice)
+   xy <- data.frame(class_slice, train_slice)
    lda.xy   <- lda(as.factor(class)~., data=xy)
    lda.pred <- predict(lda.xy, as.data.frame(test_slice))\$class
    myLDA1 <- as.numeric(lda.pred[1])
@@ -816,9 +590,8 @@ if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of id
    print Rinput "q()\n";# quit R 
    print Rinput "n\n";# save workspace image?
    close Rinput;
-   exit;
    }
- } # end iterations 
+  
  mkdir("./testingData_$fileIDq/indAAclassLDA");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -886,11 +659,6 @@ if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of id
 if ($method_dist == 1){
      print "running quadratic discriminant analysis classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassQDAtemp");     
- for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
-     $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nQDA classifier learning residue $r on $fileIDq\n\n";
    sleep(1);
@@ -902,116 +670,49 @@ if ($method_dist == 1){
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "class <- dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
    #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
    #print Rinput "print(test)\n";
-   # define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
-   names(test)[i]<-paste('X',i, sep='')
-   }\n";
-   #print Rinput "print(test)\n";
-   }
-   #print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "my_bind <- vector()
+   classes <- vector()
+   for(i in 1:length(test)){
+     new <- class
+     my_bind = cbind(new, classes)
+     classes <- my_bind
+     }
+   classes <- as.data.frame(classes)
+   stack_class <- stack(classes)
+   names(stack_class)<-c(\"class\", \"slice\")
+   stack_class_slice = stack_class[,1, drop=FALSE]
+   stack_train <- stack(train)
+   names(stack_train)<-c(\"c1\", \"slice\")
+   stack_train_slice = stack_train[,1, drop=FALSE]\n";
    print Rinput "sink('./testingData_$fileIDq/indAAclassQDAtemp/classAA_$fileIDq"."_$r.txt')\n";
    print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
    print Rinput "registerDoParallel(numCores)\n";
    #print Rinput "for(i in 1:length(test)){
-   print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
-   train_slice = train[,i, drop=FALSE]
+   print Rinput "foreach(i=1:length(test), .combine=rbind) %dopar% {
+   train_slice = stack_train_slice
+   class_slice = stack_class_slice
    ref_train_slice <- train_slice[class == 0,]
    test_slice <- test[,i, drop=FALSE]
+   names(test_slice)<-c(\"c1\")
    mean_test_slice <- mean(test_slice[,1])
    mean_ref_train_slice <- mean(ref_train_slice)
    delta_rmsf = (mean_test_slice - mean_ref_train_slice)
    ref_train_slice <- train_slice[class == 0,]
-   xy <- data.frame(class, train_slice)
+   xy <- data.frame(class_slice, train_slice)
    qda.xy   <- qda(as.factor(class)~., data=xy)
    qda.pred <- predict(qda.xy,  as.data.frame(test_slice))\$class
    myQDA1 <- as.numeric(qda.pred[1])
@@ -1033,7 +734,7 @@ if ($method_dist == 1){
    print Rinput "n\n";# save workspace image?
    close Rinput;
    }
- } # end iterations 
+  
  mkdir("./testingData_$fileIDq/indAAclassQDA");
  mkdir("./testingData_$fileIDq/indAAdrmsf");
  if ($option eq "on"){  # apply mask...learn only where KS test is signif
@@ -1103,9 +804,7 @@ if ($method_kern == 1){
      print "running SVM classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassSVMtemp");
  for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
+     $add = $p*$framegroups-$framegroups;
      $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nSVM classifier learning residue $r on $fileIDq\n\n";
@@ -1118,96 +817,25 @@ if ($method_kern == 1){
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
+   print Rinput "class <- dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
    #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
+   #print Rinput "print(test)\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassSVMtemp/classAA_$fileIDq"."_$r.txt')\n";
    #print Rinput "print(test)\n";
    # define subset of dataD to match size of dataT
    if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
+   print Rinput "test <- test[,$add:$total]\n";
    #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
+   print Rinput "for(i in 1:$framegroups){
    names(test)[i]<-paste('X',i, sep='')
    }\n";
    #print Rinput "print(test)\n";
@@ -1225,7 +853,7 @@ if ($method_kern == 1){
    print Rinput "registerDoParallel(numCores)\n";
    #print Rinput "for(i in 1:length(train)){
    print Rinput "foreach(i=1:length(train), .combine=rbind) %dopar% {
-   train_slice <- train[,i, drop=FALSE]
+      train_slice <- train[,i, drop=FALSE]
    ref_train_slice <- train_slice[class == 0,]
    test_slice <- test[,i, drop=FALSE]
    mean_test_slice <- mean(test_slice[,1])
@@ -1321,13 +949,11 @@ if ($method_kern == 1){
 
 
 ###########################################
-if ($method_ens == 1 && $method_ens == 0){  # disabled due to runtime bug
+if ($method_ens == 1){
     print "running random forest classifier\n";
     mkdir("./testingData_$fileIDq/indAAclassRFORtemp");     
  for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
+     $add = $p*$framegroups-$framegroups;
      $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nRFOR classifier learning residue $r on $fileIDq\n\n";
@@ -1340,99 +966,26 @@ if ($method_ens == 1 && $method_ens == 0){  # disabled due to runtime bug
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
-   #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
+   print Rinput "class = dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassRFORtemp/classAA_$fileIDq"."_$r.txt')\n";
    #print Rinput "print(test)\n";
    # define subset of dataD to match size of dataT
    if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
-   names(test)[i]<-paste('X',i, sep='')
-   }\n";
-   #print Rinput "print(test)\n";
+    print Rinput "test <- test[,$add:$total]\n";
+    #print Rinput "print(test)\n";
+    print Rinput "for(i in 1:$framegroups){
+    names(test)[i]<-paste('X',i, sep='')
+    }\n";
+    #print Rinput "print(test)\n";
    }
    #print Rinput "train <- train[-c(1)]\n"; # drops class column
    if ($p == 1){
@@ -1441,7 +994,7 @@ if ($method_ens == 1 && $method_ens == 0){  # disabled due to runtime bug
    if ($p > 1){
    print Rinput "sink('./testingData_$fileIDq/indAAclassRFORtemp/classAA_$fileIDq"."_$r.txt', append = TRUE)\n";
    }
-   print Rinput "numCores <- (detectCores())\n";
+   print Rinput "numCores <- detectCores()\n";
    print Rinput "print(numCores)\n";
    #print Rinput "cl <- makeCluster(numCores, type='FORK')\n";  
    print Rinput "registerDoParallel(numCores)\n";
@@ -1547,9 +1100,7 @@ if ($method_ens == 1){
     print "running adaptive boosting classifier\n";
     mkdir("./testingData_$fileIDq/indAAclassADAtemp");     
  for (my $p = 1; $p<=$framefactor; $p++){
-     #$add = $p*$framegroups-$framegroups;
-     $startframe = $p*$framegroups-$framegroups;
-     $stopframe = $p*$framegroups-1;
+     $add = $p*$framegroups-$framegroups;
      $total = $framefactor*$framegroups;
  for (my $r = 0; $r<$lengthID; $r++){
    print "\n\nADA classifier learning residue $r on $fileIDq\n\n";
@@ -1562,99 +1113,26 @@ if ($method_ens == 1){
    print Rinput "library(doParallel)\n";
    # read data into R
    print Rinput "dataT = read.table('indAAtrain/fluxtimeAA_$refID"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataTvect = read.table('indAAtrain_fluxvector/fluxvectorAA_$refID"."_$r.txt', header = TRUE)\n";
-   #print Rinput "dataTvect = t(dataTvect)\n";
-   print Rinput "for(i in 1:$framegroups){
-   dataTflux <- subset(dataTvect, datatype == 'F' & run == i-1)
-   if(i == 1){
-   dataTclass <- dataTflux[c(1)]
-   dataTclass<- data.frame(dataTclass)
-   }
-   dataTvals <- dataTflux[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataTinit <- dataTvals}
-   if(i == 2){dataTnew <- cbind(dataTinit, dataTvals)}
-   if(i > 2){dataTnew <- cbind(dataTnew, dataTvals)}
-   }
-   l=$framegroups+1
-   dataTnew <- cbind(dataTclass, dataTnew)
-   dataTx <- subset(dataTvect, datatype == 'X' & run == i-1)
-   dataTvals <- dataTx[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTy <- subset(dataTvect, datatype == 'Y' & run == i-1)
-   dataTvals <- dataTy[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   dataTz <- subset(dataTvect, datatype == 'Z' & run == i-1)
-   dataTvals <- dataTz[c(2)]
-   dataTvals <- data.frame(dataTvals)
-   names(dataTvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataTnew <- cbind(dataTnew, dataTvals)}
-   \n";
-   #print Rinput "print(dataTnew)\n";
    print Rinput "dataD = read.table('testingData_$fileIDq/indAAtest/fluxtimeAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "dataDvect = read.table('testingData_$fileIDq/indAAtest_fluxvector/fluxvectorAA_$fileIDq"."_$r.txt', header = TRUE)\n";
-   print Rinput "for(i in 1:$total){
-   dataDflux <- subset(dataDvect, datatype == 'F' & run == i-1)
-   dataDvals <- dataDflux[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',i, sep='')
-   if(i == 1){dataDinit <- dataDvals}
-   if(i == 2){dataDnew <- cbind(dataDinit, dataDvals)}
-   if(i > 2){dataDnew <- cbind(dataDnew, dataDvals)}
-   }
-   l=$total+1
-   dataDx <- subset(dataDvect, datatype == 'X' & run == 1)
-   dataDvals <- dataDx[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDy <- subset(dataDvect, datatype == 'Y' & run == 1)
-   dataDvals <- dataDy[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+1, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   dataDz <- subset(dataDvect, datatype == 'Z' & run == 1)
-   dataDvals <- dataDz[c(1)]
-   dataDvals <- data.frame(dataDvals)
-   names(dataDvals)[1] <- paste('X',l+2, sep='')
-   if(i >= 1){dataDnew <- cbind(dataDnew, dataDvals)}
-   \n";
-   #print Rinput "print(dataDnew)\n";
-   print Rinput "class <- dataTnew\$class\n"; # training class
-   #print Rinput "print(dataD)\n";
-   #print Rinput "print(dataDvect)\n";
-   #print Rinput "print(dataTnew)\n";
-   #print Rinput "print(dataT)\n";
-   #print Rinput "print(dataTvect)\n";
-   print Rinput "train <- dataTnew\n";
-   print Rinput "train <- train[-c(1)]\n"; # drops class column
-   #print Rinput "print(train)\n";
-   print Rinput "test <- dataDnew\n";
+   print Rinput "class = dataT\$class\n"; # training class
+   $c1 = "dataT\$c1";
+   $c2 = "dataT\$c2";
+   $c3 = "dataT\$c3";
+   $c4 = "dataT\$c4";
+   $c5 = "dataT\$c5";
+   print Rinput "train <- dataT\n";
+   print Rinput "train <- train[-c(1)]\n";
+   print Rinput "test <- dataD\n";
+   #print Rinput "sink('./testingData_$fileIDq/indAAclassADAtemp/classAA_$fileIDq"."_$r.txt')\n";
    #print Rinput "print(test)\n";
    # define subset of dataD to match size of dataT
    if ($p > 1){
-   #print Rinput "test <- test[,$add:$total]\n";
-   $startXYZ = $total+1;
-   $stopXYZ = $total+3;
-   print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "dataDxyz <- dataDnew[c($startXYZ:$stopXYZ)]\n"; # drops all but XYZ column
-   #print Rinput "print(dataDxyz)\n";
-   print Rinput "test <- cbind(test, dataDxyz)\n";
-   }
-   #print Rinput "print(test)\n";# define subset of dataD to match size of dataT
-   if ($p > 1){
-   #print Rinput "test <- test[,$startframe:$stopframe]\n";
-   #print Rinput "print(test)\n";
-   print Rinput "for(i in 1:($framegroups+3)){
-   names(test)[i]<-paste('X',i, sep='')
-   }\n";
-   #print Rinput "print(test)\n";
+    print Rinput "test <- test[,$add:$total]\n";
+    #print Rinput "print(test)\n";
+    print Rinput "for(i in 1:$framegroups){
+    names(test)[i]<-paste('X',i, sep='')
+    }\n";
+    #print Rinput "print(test)\n";
    }
    #print Rinput "train <- train[-c(1)]\n"; # drops class column
    if ($p == 1){
@@ -1767,7 +1245,6 @@ if ($method_ens == 1){
 
 #############################################################################     
 #############################################################################
-
 sleep(1);
 print "\n machine learning classification is completed\n\n";
 
@@ -1802,7 +1279,7 @@ for (my $r = 0; $r<$lengthID; $r++){
 close OUT;
 }
 
-if ($method_dist == 1){  
+if ($method_dist == 1){  # this is permanently disabled (replicates QDA)
 # NB method
 open (OUT, ">"."./testingData_$fileIDq/classpositionHISTOnb.txt\n");
 print OUT "position\t"."sum\n";
@@ -1826,7 +1303,7 @@ for (my $r = 0; $r<$lengthID; $r++){
 close OUT;
 }
 
-if ($method_dist == 1 && $method_dist == 0){  # disabled due to assumption of equal group means
+if ($method_dist == 1){
 # LDA method
 open (OUT, ">"."./testingData_$fileIDq/classpositionHISTOlda.txt\n");
 print OUT "position\t"."sum\n";
@@ -1899,7 +1376,7 @@ close OUT;
 }
 
 
-if ($method_ens == 1 && $method_ens == 0){  # disabled due to run time error
+if ($method_ens == 1){
 # RANDOM FOREST method
 open (OUT, ">"."./testingData_$fileIDq/classpositionHISTOrfor.txt\n");
 print OUT "position\t"."sum\n";
