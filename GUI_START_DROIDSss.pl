@@ -552,6 +552,7 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
 }
 print CTL "length\t"."$chainTTL\t # total length of chain\n";
 print CTL "start\t"."$startN\t # number of AA at start of chain\n";
+print CTL "shape\t"."$vector_enter\t # also analyze protein shape change?\n";
 #print CTL "cutoff_value\t"."$cutoffValue\t # p-value under which the KS comparison will be considered significant\n";
 #print CTL "representations\t"."$repStr\t # methods of molecular representation in Chimera (ribbon and/or surface)\n";
 #print CTL "test_type\t"."$testStr\t # test method (sequence = local Grantham dist, structure = RMSD, fluctuation = MD)\n";
