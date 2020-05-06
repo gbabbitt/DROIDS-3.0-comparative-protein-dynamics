@@ -78,6 +78,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
       if ($header eq "test_type"){$testStr = $value;}
       if ($header eq "homology"){$homology = $value;}
       if ($header eq "num_chains"){$chainN = $value;}
+      if ($header eq "shape"){$vector_enter = $value;}
 }
 close IN;
 
@@ -406,6 +407,7 @@ print CTL "cutoff_value\t"."$cutoffValue\t # p-value under which the KS comparis
 print CTL "representations\t"."$repStr\t # methods of molecular representation in Chimera (ribbon and/or surface)\n";
 print CTL "test_type\t"."$testStr\t # test method (sequence = local Grantham dist, structure = RMSD, fluctuation = MD)\n";
 print CTL "color_scheme\t"."$colorType\t # output color scheme (stoplight=red-green, temperature=blue-red)\n";
+print CTL "shape\t"."$vector_enter\t # option to analyze protein shape as well as fluctuation\n";
 close CTL;
 print("CTL file made\n");
 }
