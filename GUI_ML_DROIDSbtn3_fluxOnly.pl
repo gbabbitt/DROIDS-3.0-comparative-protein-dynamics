@@ -369,7 +369,7 @@ if ($method_bnp == 1){
 }
 
 ############################################
-if ($method_dist == 1){ # METHOD IS PERMANENTLY DISABLED (it duplicates QDA)...change to 1 to enable it again
+if ($method_dist == 1){ 
      print "running naive Bayes classifier\n";
      mkdir("./testingData_$fileIDq/indAAclassNBtemp");     
  for (my $r = 0; $r<$lengthID; $r++){
