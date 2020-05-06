@@ -47,6 +47,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
       #if ($header eq "start"){$startN = $value;}
       if ($header eq "homology"){$homology = $value;}
       if ($header eq "num_chains"){$chainN = $value;}
+      if ($header eq "shape"){$vector_enter = $value;}
 }
 
 close IN;
@@ -614,6 +615,7 @@ print ctlFile3 "atomicfluct out fluct_$fileIDq"."_deploy.txt \@CA,C,O,N,H&!(:WAT
 print ctlFile3 "run\n";
 close ctlFile3;
 
+if($vector_enter eq 'y'){
 mkdir("atomvctl_$fileIDq"."_deploy");
 mkdir("atomvect_$fileIDq"."_deploy");
 
@@ -628,6 +630,7 @@ print ctlFile5 "trajin $traj_label5\n";
 print ctlFile5 "vector out ./atomvect_$fileIDq"."_deploy/vect_$fileIDq"."_aa$j.txt :$jplus :$vectref\n";
 print ctlFile5 "run\n";
 close ctlFile5;
+}
 }
 #  } # end per run loop 
 
@@ -910,9 +913,11 @@ for (my $p = 0; $p < scalar @MUT; $p++){
       #for (my $i = 0; $i < $runsID; $i++){
       system("cpptraj "."-i ./atomflux_$fileIDq"."_deploy.ctl | tee cpptraj_atomflux_$fileIDq.txt");
       #system("cpptraj "."-i ./atomflux_$fileIDr"."_$i.ctl | tee cpptraj_atomflux_$fileIDr.txt");
+      if($vector_enter eq 'y'){
       for(my $j = 0; $j<$allchainlen; $j++){
           system("cpptraj "."-i ./atomvctl_$fileIDq"."_deploy/atomvector_$fileIDq"."_aa$j.ctl | tee cpptraj_atomvector_$fileIDq.txt");
           }
+      }
 #  }
 
 close MUT;
@@ -1577,6 +1582,8 @@ for (my $t = 0; $t < $lengthID; $t++){
 close OUT2;
 
 #############################################################
+if($vector_enter eq 'y'){
+
 mkdir("./testingData_$fileIDq/indAAtest_vector");
 print("\nparsing testing set time series for shape data for each amino acid in $fileIDq...\n");
 sleep(3);
@@ -1693,6 +1700,7 @@ for (my $t = 0; $t < $lengthID; $t++){
    close OUT;
    }
 
+}
 
 print("\nparsing is done\n");
 
