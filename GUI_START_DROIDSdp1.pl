@@ -415,7 +415,11 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
 }
 
 # define vector reference point (...as mid sequence in Chain A)
-$vectref = int(0.5*$allchainlen);
+#$vectref = int(0.5*$allchainlen);
+sleep(1);print "CHOOSE AN AMINO ACID RESIDUE AS REFERENCE POINT FOR VECTOR (i.e. shape) ANALYSIS (default = 1)\n\n";
+my $vectref = <STDIN>;
+chop($vectref);
+if ($vectref eq ''){$vectref = 1;}
 
 print $ctlFile2
 "Force_Field\t$forceID\t# AMBER force field to use in MD runs
