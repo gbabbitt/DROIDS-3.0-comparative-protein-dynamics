@@ -909,7 +909,7 @@ for (my $i = 0; $i < $lengthID; $i++){
               #print "freqAB = "."$freqAB\n";
                     
           # calculate MI
-          $MI = $freqAB*log($freqAB/($freqA*$freqB));
+          $MI = $freqAB*log(($freqAB+0.0001)/(($freqA*$freqB)+0.0001));
           if ($MI>1){$MI = 1;}
           #print "MImatrix\t"."$residue1\t"."$residue2\t"."$MI\n";
           print MI "$residue1\t"."$residue2\t"."$MI\n";
