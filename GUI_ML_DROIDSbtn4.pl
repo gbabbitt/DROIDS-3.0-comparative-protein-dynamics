@@ -939,7 +939,7 @@ print Rinput "print(myMIsd)\n";
 #print Rinput "print(mymap1)\n";
 print Rinput "x <- (1:nrow(datamatrixMI))\n";
 print Rinput "y <- (1:ncol(datamatrixMI))\n";
-print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION (black = 0, white = 1) for $variantID', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
+print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION (lighter = higher) for $variantID', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
 print Rinput "print(mymap2)\n";      
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
