@@ -927,13 +927,19 @@ open (Rinput, "| R --vanilla")||die "could not start R command line\n";
 print Rinput "datamatrixMI = read.table('./testingData_$variantID/MImatrix_$learner"."_$variantID.txt', header = FALSE)\n";
 #print Rinput "print(datamatrixMI)\n";
 print Rinput "datamatrixMI<-as.matrix(datamatrixMI)\n";
+print Rinput "myMImean <- mean(datamatrixMI)\n";
+print Rinput "myMImean <- round(myMImean, digits=4)\n";
+print Rinput "print(myMImean)\n";
+print Rinput "myMIsd <- sd(datamatrixMI)\n";
+print Rinput "myMIsd <- round(myMIsd, digits=4)\n";
+print Rinput "print(myMIsd)\n";
 #print Rinput "print(datamatrixMI)\n";
 #print Rinput "datamatrixMI <- scale(datamatrixMI)\n";
 #print Rinput "mymap1<-heatmap(datamatrixMI, Colv = 'Rowv', symm = TRUE, keep.dendro = FALSE)\n";
 #print Rinput "print(mymap1)\n";
 print Rinput "x <- (1:nrow(datamatrixMI))\n";
 print Rinput "y <- (1:ncol(datamatrixMI))\n";
-print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = 'MUTUAL INFORMATION (black = 0, white = 1) for $variantID', xlab = 'residue position', ylab = 'residue position')\n";
+print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION (black = 0, white = 1) for $variantID', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
 print Rinput "print(mymap2)\n";      
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
@@ -944,7 +950,9 @@ print " copying plot\n\n";
 sleep(1);
 my $oldfilename = "Rplots.pdf";
 my $newfilename = "./testingData_$variantID/MImatrix_$learner"."_$variantID.pdf";
-copy($oldfilename, $newfilename);	
+my $newfilename2 = "./maxDemon_results/MImatrix_$learner"."_$variantID.pdf";
+copy($oldfilename, $newfilename);
+copy($oldfilename, $newfilename2);	
 print " mutual information matrix is complete\n\n";
 print " close PDF and txt viewer to continue\n\n";
 
