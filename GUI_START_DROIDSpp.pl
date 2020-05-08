@@ -385,6 +385,7 @@ open(my $ctlFile2, '>', "MDr.ctl") or die "Could not open output file";
 print $ctlFile2 
 "PDB_ID\t".$fileIDr."REDUCED\t# Protein Data Bank ID for MD run
 Number_Chains\t$chainN\t# Number of chains on structure\n";
+$allchainlen = 0;
 for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     my $chain = chr($cnt + 65);
     #print "$cnt";
@@ -393,8 +394,12 @@ for(my $cnt = 0; $cnt < scalar @chainlen2; $cnt++){
     print $ctlFile2 "length$chain\t$chainlen2[$cnt]\t #end of chain designated\n";
     print "MDr.ctl\n";
     print "length$chain\t$chainlen2[$cnt]\t #end of chain designated\n";
-    
+    $allchainlen = $allchainlen + $chainlen2[$cnt];
 }
+
+# define vector reference point (...as mid sequence in Chain A)
+$vectref = int(0.5*$allchainlen);
+
 print $ctlFile2
 "Force_Field\t$forceID\t# AMBER force field to use in MD runs
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
