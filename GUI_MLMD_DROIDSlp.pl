@@ -603,10 +603,12 @@ for(my $ent = 0; $ent < scalar @chainlen; $ent++){
 
 # define vector reference point (...as mid sequence in Chain A)
 #$vectref = int(0.5*$allchainlen);
+if ($vector_enter eq 'y'){
 sleep(1);print "\nCHOOSE AN AMINO ACID RESIDUE AS REFERENCE POINT FOR VECTOR (i.e. shape) ANALYSIS (default = 1)\n\n";
 my $vectref = <STDIN>;
 chop($vectref);
 if ($vectref eq ''){$vectref = 1;}
+}
 
 print $ctlFile1
 "LIGAND_ID\t".$fileIDl."REDUCED\t# Protein Data Bank ID for MD run
