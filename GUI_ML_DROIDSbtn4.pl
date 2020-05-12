@@ -954,7 +954,13 @@ my $oldfilename = "Rplots.pdf";
 my $newfilename = "./testingData_$variantID/MImatrix_$learner"."_$variantID.pdf";
 my $newfilename2 = "./maxDemon_results/MImatrix_$learner"."_$variantID.pdf";
 copy($oldfilename, $newfilename);
-copy($oldfilename, $newfilename2);	
+copy($oldfilename, $newfilename2);
+my $oldfilename3 = "./testingData_$variantID/MImatrix_$learner"."_$variantID.txt";
+my $newfilename3 = "./maxDemon_results/MImatrix_$learner"."_$variantID.txt";
+copy($oldfilename3, $newfilename3);
+my $oldfilename4 = "./testingData_$variantID/MIcolumn_$learner"."_$variantID.txt";
+my $newfilename4 = "./maxDemon_results/MIcolumn_$learner"."_$variantID.txt";
+copy($oldfilename4, $newfilename4);
 print " mutual information matrix is complete\n\n";
 print " close PDF and txt viewer to continue\n\n";
 

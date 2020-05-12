@@ -124,11 +124,11 @@ print "queryID label is "."$queryID\n";
 if($queryID =~ m/_1_1/){$queryID = substr($queryID, 0, length($queryID)-4);}
 if($queryID =~ m/_1/){$queryID = substr($queryID, 0, length($queryID)-2);}
 print "queryID label is adjusted to "."$queryID\n";
-my $orig_queryID = $queryID;  # create tag for original query in training set
-my $queryID = "$queryID"."_1"; # set query to first copy for this subroutine
+$orig_queryID = $queryID;  # create tag for original query in training set
+$queryID = "$queryID"."_1"; # set query to first copy for this subroutine
 print "queryID label is adjusted to "."$queryID\n\n\n";
 
-print "Enter chain ID where color map should start (default = A)\n";
+print "\nEnter chain ID where color map should start (default = A)\n";
    print "i.e. color map only to homologous parts of bound and unbound
    structure\n";
    $chainMAP = <STDIN>;
@@ -136,12 +136,40 @@ print "Enter chain ID where color map should start (default = A)\n";
    if ($chainMAP eq ''){$chainMAP = 'A';}
 
 if($stype eq 'dna' || $stype eq 'ligand' || $stype eq 'protprot'){
-   print "Enter number position of N terminal on this chain (default = 0)\n";
+   print "\nEnter number position of N terminal on this chain (default = 0)\n";
    $offset = <STDIN>;
    chop($offset);
    $offset = $offset-2;
    if ($offset eq ''){$offset = 0;}
    }
+
+
+print "\nDO YOU WANT TO MAP CONSERVED REGIONS OR MUTUAL INFORMATION VALUES?\n";
+   print "(TYPE = 'cons' or 'mi')\n";
+   print "i.e. color map only to homologous parts of bound and unbound
+   structure\n";
+   $typeMAP = <STDIN>;
+   chop($typeMAP);
+   if ($typeMAP eq ''){$typeMAP = 'cons';}
+   if ($typeMAP eq 'CONS'){$typeMAP = 'cons';}
+   if ($typeMAP eq 'MI'){$typeMAP = 'mi';}
+
+if ($typeMAP eq 'mi'){   
+# prompt user - selest machine learner for MI matrix
+sleep(1);print "\nCHOOSE BEST LEARNER FOR MUTUAL INFORMATION MAPPING (type 'KNN', 'NB', 'LDA', 'QDA', 'SVM', 'RFOR' or 'ADA')\n\n";
+$learner = <STDIN>;
+chop($learner);
+# prompt user - selest variant for MI matrix
+sleep(1);print "\nSELECT VARIANT ID FOR MUTUAL INFORMATION MAPPING (e.g. type '1yet_bound')\n\n";
+$variantID = <STDIN>;
+chop($variantID);
+# prompt user - selest AA site for MI mapping
+sleep(1);print "\nSELECT AMINO ACID REFERENCE SITE MUTUAL INFORMATION MAPPING (e.g. type '50' for interaction strengths with AA 50)\n\n";
+$siteID = <STDIN>;
+chop($siteID);
+}
+
+
 # create mask for signif Wilks lamda
 open(OUT, ">"."./testingData_$queryID/adj_vertpvals_$queryID.txt")||die "could not create mask file /testingData_$queryID/adj_vertpvals_$queryID.txt\n";  
 open(IN, "<"."./testingData_$queryID/adj_pvals_$queryID.txt")||die "could not open mask file /testingData_$queryID/adj_pvals_$queryID.txt\n";  
@@ -159,6 +187,8 @@ for (my $i = 0; $i < scalar @IN; $i++) {
      }
 close IN;
 close OUT;
+
+if ($typeMAP eq 'cons'){
 
 # make learned class attribute files for image rendering
   open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";
@@ -189,6 +219,62 @@ close OUT;
 
 print "\n class attribute files for all frames are created\n";
 sleep(1);
+}
+
+if ($typeMAP eq 'mi'){
+
+print "collecting MI values over all interaction sites for given amino acid\n";
+   sleep(1);
+   open(OUT, ">"."./maxDemon_results/MIsite_$learner"."_$variantID.txt")||die "could not open mask file /maxDemon_results/MIcolumn_$learner"."_$variantID.txt\n";  
+   print OUT "position\t"."MIvalue\n";
+   open(IN, "<"."./maxDemon_results/MIcolumn_$learner"."_$variantID.txt")||die "could not open mask file /maxDemon_results/MIcolumn_$learner"."_$variantID.txt\n";  
+    my @IN = <IN>;
+    for (my $a = 0; $a < scalar @IN; $a++){
+      $INrow = $IN[$a];
+      @INrow = split(/\s+/, $INrow);
+      $first = $INrow[0];
+      $second = $INrow[1];
+      $MIvalue = $INrow[2];
+      if ($siteID == $first){print OUT "$second\t"."$MIvalue\n";}
+    
+    }
+    close IN;
+    close OUT;
+
+
+
+
+# make learned class attribute files for image rendering
+  open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";
+  #if ($stype ne "protprot"){open(OUT, ">"."./attribute_files/classATTR_$refID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
+  #if ($stype eq "protprot"){open(OUT, ">"."./attribute_files/classATTR_$orig_queryID"."_mask".".dat")||die "could not create ATTR time series file\n";}  
+  print OUT "recipient: residues\n";
+  print OUT "attribute: class\n";
+  print OUT "\n";
+  
+   
+   
+   for (my $a = 0; $a < $lengthID+$offset+1; $a++){
+   if ($a eq '' || $a <= $offset){next;}
+   open(IN, "<"."./maxDemon_results/MIsite_$learner"."_$variantID.txt")||die "could not open mask file /maxDemon_results/MIcolumn_$learner"."_$variantID.txt\n";  
+    my @IN = <IN>;
+   $INrow = $IN[$a-$offset];
+    @INrow = split(/\s+/, $INrow);
+    $MIvalue = $INrow[1];
+   
+     #print "$a\t"."$frame\t"."$value\n";
+     $pos = $a+1;
+     print OUT "\t:"."$pos".".$chainMAP\t"."$MIvalue\n";
+     
+ 
+ close IN;
+ }
+ close OUT;
+
+print "\n class attribute files for all frames are created\n";
+sleep(1);
+}
+
 
 
 print("Preparing static display...\n");
