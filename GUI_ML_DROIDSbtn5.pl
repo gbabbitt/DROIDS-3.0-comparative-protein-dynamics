@@ -160,7 +160,7 @@ sleep(1);print "\nCHOOSE BEST LEARNER FOR MUTUAL INFORMATION MAPPING (type 'KNN'
 $learner = <STDIN>;
 chop($learner);
 # prompt user - selest variant for MI matrix
-sleep(1);print "\nSELECT VARIANT ID FOR MUTUAL INFORMATION MAPPING (e.g. type '1yet_bound')\n\n";
+sleep(1);print "\nSELECT VARIANT ID FOR MUTUAL INFORMATION MAPPING (e.g. type '1yet_unbound_2')\n\n";
 $variantID = <STDIN>;
 chop($variantID);
 # prompt user - selest AA site for MI mapping
