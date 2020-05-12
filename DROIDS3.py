@@ -24,11 +24,11 @@ class MyLayout(Widget):
     def btn1(self):
         if self.gpu == 1:
             print("running DROIDS on single GPU - single protein analysis") 
-            cmd = 'perl GUI_START_DROIDSss.pl'
+            cmd = 'perl GUI_START_DROIDSss1.pl'
             os.system(cmd)
         if self.gpu == 2:
             print("running DROIDS on dual GPU - single protein analysis") 
-            cmd = 'perl GUI_START_DROIDSss_dualGPU.pl'
+            cmd = 'perl GUI_START_DROIDSss1_dualGPU.pl'
             os.system(cmd)
     def btn2(self):
         if self.gpu == 1:
