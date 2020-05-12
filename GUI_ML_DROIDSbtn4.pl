@@ -749,6 +749,7 @@ print Rinput "print(pval)\n";
 print Rinput "sink('./maxDemon_results/ANOVAresult.txt')\n";
 print Rinput "library(rpsychi)\n";     
 print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_cons_sums, sd = mySE_cons, n = my_impact_n)\n";
+print Rinput "print(dataframe6)\n";
 print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
 print Rinput "print(myANOVA)\n";
 print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
