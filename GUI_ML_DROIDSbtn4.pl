@@ -716,6 +716,7 @@ print Rinput "print(pval)\n";
 print Rinput "sink('./maxDemon_results/ANOVAresult.txt')\n";
 print Rinput "library(rpsychi)\n";     
 print Rinput "dataframe7 = data.frame(var = my_impact_IDs, sum = my_impact_sums, sd = mySE, n = my_impact_n)\n";
+print Rinput "print(dataframe6)\n";
 print Rinput "myANOVA <- with(dataframe7, ind.oneway.second(sum,sd,n))\n";
 print Rinput "print(myANOVA)\n";
 print Rinput "fval <- myANOVA\$anova.table[1,4]\n";
@@ -939,7 +940,7 @@ print Rinput "print(myMIsd)\n";
 #print Rinput "print(mymap1)\n";
 print Rinput "x <- (1:nrow(datamatrixMI))\n";
 print Rinput "y <- (1:ncol(datamatrixMI))\n";
-print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION (lighter = higher) for $variantID', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
+print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION for $variantID (lighter = higher))', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
 print Rinput "print(mymap2)\n";      
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
