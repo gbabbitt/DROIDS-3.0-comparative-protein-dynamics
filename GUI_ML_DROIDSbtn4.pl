@@ -841,10 +841,10 @@ print "\ncalculating mutual information matrix for $variantID \n";
 sleep(1);
 
 for (my $i = 0; $i < $lengthID; $i++){
-	 print "calculating MI values for residue\t"."$residue1 for $variantID\n";
+	 $residue1 = $i;
+      print "calculating MI values for residue\t"."$residue1 for $variantID\n";
       open(POS1, "<"."./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$i.txt") or die "could not open MI matrix file for ./testingData_$variantID/indAAclass$learner/classAA_$refID"."_$i.txt \n";    
       my @POS1 = <POS1>;
-      $residue1 = $i;
       if($i>0){print MI2 "\n";}
       #if($i==0){print MI2 "$residue1\t";}
       #if($i>0){print MI2 "\n"; print MI2 "$residue1\t";}
@@ -941,7 +941,7 @@ print Rinput "print(myMIsd)\n";
 #print Rinput "print(mymap1)\n";
 print Rinput "x <- (1:nrow(datamatrixMI))\n";
 print Rinput "y <- (1:ncol(datamatrixMI))\n";
-print Rinput "mymap2<-image(x, y, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION for $variantID (lighter = higher))', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
+print Rinput "mymap2<-image(x+$startN, y+$startN, datamatrixMI, col = gray.colors(20), main = c('MUTUAL INFORMATION for $variantID (lighter = higher))', paste('mean MI = ', myMImean, 'sd MI = ', myMIsd)), xlab = 'residue position', ylab = 'residue position')\n";
 print Rinput "print(mymap2)\n";      
 # write to output file and quit R
 print Rinput "q()\n";# quit R 
