@@ -458,7 +458,9 @@ open(MUT, ">"."copy_list.txt");
 print MUT "PDB_IDs\n";
 for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
 close MUT;
-print "check PDB ID's for copies of $fileIDr then save and close\n\n";
+print "check PDB files to ensure generation of copies of $fileIDr then save and close\n";
+print "NOTE: for evolutionary studies, ortholog models of identical chain length may be used instead\n";
+print "simply replace the identical copies on this list with your ortholog PDB file names \n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
