@@ -444,8 +444,10 @@ print MUT "PDB_IDs\n";
 for (my $c = 0; $c <= $num_copy ; $c++){if ($c == 0){next;} print MUT "$fileIDr"."_$c\n";}
 close MUT;
 print "check PDB files to ensure generation of copies of $fileIDr then save and close\n";
-print "NOTE: for evolutionary studies, ortholog models of identical chain length may be used instead\n";
-print "simply replace the identical copies on this list with your ortholog PDB file names \n\n";
+print "\nNOTE: For evolutionary studies, ortholog models of identical chain length are used instead\n";
+print "Such an ortholog model can be created manually using 'swapaa' command in UCSF Chimera.\n";
+print "Then simply replace one of the PDB copies on this list with your ortholog PDB file name.\n";
+print "For functional studies, use the two copies of PDB files created here for MD validation.\n\n";
 system "gedit copy_list.txt\n";
 
 # create mutate_protein.cmd script
