@@ -9,6 +9,7 @@ a GUI based script PATHS.pl will prompt paths to working directories for UCSF Ch
 Dr. Gregory A. Babbitt(1) and Dr. Ernest P. Fokoue(2) 
 1Thomas H. Gosnell School of Life Sciences, Rochester Institute of Technology, Rochester NY, USA 14623
 2 School of Mathematical Sciences, Rochester Institute of Technology, Rochester NY, USA 14623
+![image](/DROIDSgui.png)
 
 The Babbitt and Fokoue Labs at RIT have developed DROIDS 3.0, a software package for comparative protein dynamics, which applies metrics of distributional divergence and statistical analysis to the root mean square fluctuations (rmsf) of protein backbone atoms and maps these results to both static and moving image of proteins. We have also developed maxDemon 1.0, a multi-method machine learning application that trains on the comparative protein dynamics, identifies functionally conserved dynamics, and deploys classifications of functional dynamic states to newly generated protein simulations. Nine different types of machine learners can be deployed on the dynamics of each amino acid, then the resulting classifications are rendered upon movie images of the novel MD runs. This results in movies of protein dynamics where the conserved functional states are identified in real time by color mapping, allowing users to see both when and where a novel MD simulation displays a specific functional state defined by the comparative training. DROIDS+maxDemon designed to compare impacts of genetic variants and drug binding variants on the functional aspects of protein dynamics. 
 
